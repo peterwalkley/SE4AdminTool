@@ -1,0 +1,12 @@
+# Example player whitelist.  Any line starting with # is treated as a comment
+# and ignored.  List each steam ID to whitelist on a separate line.
+#
+# You can add an inline comment after the ID using a #
+#
+# Check a profile via web page e.g.:  https://steamcommunity.com/profiles/76561198067690499
+#
+# 
+76561198067690499 # TFA Hunter
+#
+# Some uncommented ID
+76561198022231968

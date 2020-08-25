@@ -1,0 +1,15 @@
+# Example player ban list.  Any line starting with # is treated as a comment
+# and ignored.  List each ban entry on a separate line.
+#
+# A ban entry is steam ID, name and reason separated by # characters.  SteamID
+# and name must be present as must all three # characters.
+#
+# Check a profile via web page e.g.:  https://steamcommunity.com/profiles/76561198153548463
+#
+#
+76561198338105564 # DELIAF # VAC Ban
+76561198298877273 # tino1958(FR) # Unspecified
+76561198153548463 # 温柔有多柔 # Game Ban
+
+
+

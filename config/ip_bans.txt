@@ -1,0 +1,9 @@
+# Example IP bans list.  Any line starting with # is treated as a comment
+# and ignored.  List each IP address to ban on a single line.
+#
+# You can add an inline comment after the ID using a #
+#
+#
+4.4.4.4
+1.2.3.4  # Some comment here
+8.8.8.8
