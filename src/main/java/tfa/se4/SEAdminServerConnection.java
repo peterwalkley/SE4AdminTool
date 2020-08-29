@@ -1,12 +1,14 @@
 package tfa.se4;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -28,8 +30,8 @@ import tfa.se4.json.ServerStatus;
 
 /* https://www.eclipse.org/jetty/documentation/current/websocket-jetty.html */
 
-@WebSocket(maxTextMessageSize = 64 * 1024)
-public class SEAdminServerConnection
+@WebSocket
+public class SEAdminServerConnection implements Runnable
 {
 	private String m_host;
 	private String m_port;
@@ -45,6 +47,7 @@ public class SEAdminServerConnection
     private PlayerWhiteList m_whiteList;
     private PlayerBanList m_banList;
     private String m_playerGreeting;
+    private WebSocketClient m_client = null;
    
     public SEAdminServerConnection(final Options options)
     {
@@ -57,8 +60,38 @@ public class SEAdminServerConnection
 		m_whiteList = new PlayerWhiteList(options.getWhiteListFile(), m_logger);
 		m_banList = new PlayerBanList(options.getPlayerBansListFile(), m_logger);
 		m_playerGreeting = options.getPlayerGreeting();
+        new Thread(this).start();
     }
 
+    @Override
+    public void run()
+    {
+        while (true)
+        {
+            if (m_client == null)
+            {
+                try
+                {
+                    final WebSocketClient client = new WebSocketClient();
+                    client.start();
+                    Future<Session> future = client.connect(this, this.getURI());
+                    future.get(10, TimeUnit.SECONDS);
+                    m_client = client;
+                }
+                catch (final Exception ex)
+                {
+                    m_logger.info("Connect failed. Retrying in 10 seconds.");
+                    m_logger.trace("Connection error", ex);
+                    sleep(10000);
+                }
+            }
+            else
+            {
+                sleep(1000);
+            }
+        }
+    }
+    
     public URI getURI() throws URISyntaxException
     {
     	return new URI("ws://" + m_host + ":" + m_port);    	
@@ -172,9 +205,9 @@ public class SEAdminServerConnection
     	m_serverStatus = status;
     }
     
-    public boolean awaitClose(int duration, TimeUnit unit) throws InterruptedException
+    public void awaitClose() throws InterruptedException
     {
-        return m_closeLatch.await(duration, unit);
+        m_closeLatch.await();
     }
 
     @OnWebSocketClose
@@ -182,7 +215,7 @@ public class SEAdminServerConnection
     {
     	m_logger.info("CLOSE||Status code {} reason {}", statusCode, reason);
         m_session = null;
-        m_closeLatch.countDown(); // trigger latch
+        m_client = null;
     }
 
     @OnWebSocketConnect
@@ -306,9 +339,31 @@ public class SEAdminServerConnection
     @OnWebSocketError
     public void onError(Throwable cause)
     {
-    	m_logger.info("WebSocket Error: ", cause);
+        if (cause instanceof ConnectException)
+        {
+            // Remote connection died or server was killed.
+            m_session = null;
+            m_client = null;
+        }
+        else
+        {
+            m_logger.info("Unhandled webSocket Error: ", cause);
+        }
+        
     }
     
+    private static void sleep(final int millis)
+    {
+        try
+        {
+            Thread.sleep(millis);
+        }
+        catch (final Exception ex2)
+        {
+            
+        }
+        
+    }
 	public static void main(String[] args) throws Exception
 	{
 		if (args.length != 1)
@@ -316,24 +371,15 @@ public class SEAdminServerConnection
 			System.out.println("Usage:\njava tfa.se4.SEAdminServerConnection <config file>");
 			System.exit(0);
 		}
-        final WebSocketClient client = new WebSocketClient();
-        client.setMaxBinaryMessageBufferSize(65535);
-        client.setMaxIdleTimeout(50000);
 
 		final SEAdminServerConnection socket = new SEAdminServerConnection(new Options(args[0]));
         try
         {
-            client.start();
-
-            client.connect(socket, socket.getURI());
-
             // wait for closed socket connection.
-            socket.awaitClose(20, TimeUnit.DAYS);
+            socket.awaitClose();
         }
         finally
         {
-            client.stop();
         }
-       
     }
 }
