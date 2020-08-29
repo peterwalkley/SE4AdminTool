@@ -27,6 +27,7 @@ import tfa.se4.Protocol.ReplyMessage;
 import tfa.se4.json.JSONUtils;
 import tfa.se4.json.Player;
 import tfa.se4.json.ServerStatus;
+import tfa.se4.steam.SteamAPI;
 
 /* https://www.eclipse.org/jetty/documentation/current/websocket-jetty.html */
 
@@ -48,6 +49,8 @@ public class SEAdminServerConnection implements Runnable
     private PlayerBanList m_banList;
     private String m_playerGreeting;
     private WebSocketClient m_client = null;
+    private boolean m_isApplyVACBans;
+    private SteamAPI m_steamAPI;
    
     public SEAdminServerConnection(final Options options)
     {
@@ -60,6 +63,11 @@ public class SEAdminServerConnection implements Runnable
 		m_whiteList = new PlayerWhiteList(options.getWhiteListFile(), m_logger);
 		m_banList = new PlayerBanList(options.getPlayerBansListFile(), m_logger);
 		m_playerGreeting = options.getPlayerGreeting();
+		m_isApplyVACBans = options.isApplyVACBans();
+		if (m_isApplyVACBans)
+		{
+		    m_steamAPI = new SteamAPI(options.getSteamAPIKey());
+		}
         new Thread(this).start();
     }
 
@@ -142,12 +150,10 @@ public class SEAdminServerConnection implements Runnable
     	final List<Player> newPlayers = status.getLobby().getPlayers();
     	final List<Player> oldPlayers = m_serverStatus == null ? new ArrayList<Player>() : m_serverStatus.getLobby().getPlayers();
     	
-    	final List<Player> joined = new ArrayList<Player>();
     	for (final Player p : newPlayers)
     	{
     		if (!oldPlayers.contains(p))
     		{
-    			joined.add(p);
     			m_logger.info("JOIN|{}|{} joined from IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
     			
     			if (!m_whiteList.isWhitelisted(p.getSteamId()) && m_ipBans.isBanned(p.getIPv4()))
@@ -168,6 +174,14 @@ public class SEAdminServerConnection implements Runnable
         			sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
         			m_logger.info("BAN|{}|{} for {}. Name when banned was {}" , p.getSteamId(), p.getName(), banInfo.reason, banInfo.name);
     			}
+                else if (!m_whiteList.isWhitelisted(p.getSteamId()) && m_isApplyVACBans && m_steamAPI.isHasVACBan(p.getSteamId(), m_logger))
+                {
+                    final String msg = "Server.Say BANNING " + p.getName() + " for VAC BAN";
+                    sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
+                    final String ban = "Server.KickBanSteamID " + p.getSteamId();
+                    sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
+                    m_logger.info("BAN|{}|{} for {}." , p.getSteamId(), p.getName(), "VAC");
+                }
     			else
     			{
     				// Don't greet for when we've just started up
@@ -182,12 +196,10 @@ public class SEAdminServerConnection implements Runnable
     		}
     	}
     	
-    	final List<Player> left = new ArrayList<Player>();
     	for (final Player p : oldPlayers)
     	{
     		if (!newPlayers.contains(p))
     		{
-    			left.add(p);
     			m_logger.info("LEAVE|{}|{} left from IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
     		}
     	}

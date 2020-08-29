@@ -35,7 +35,7 @@ public final class Protocol
 	public static final String STARTING_GAME = "Starting game";
 		
 	/** Server status in game. */
-	public static final String IN_GAME = "Starting game";
+	public static final String IN_GAME = "In-game";
 		
 	
 	public static final class ReplyMessage
