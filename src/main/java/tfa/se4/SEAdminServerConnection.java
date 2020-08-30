@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -54,6 +55,7 @@ public class SEAdminServerConnection implements Runnable
     private boolean m_isApplyVACBans;
     private boolean m_isApplyGameBans;
     private SteamAPI m_steamAPI;
+    private ConcurrentLinkedQueue<Player> m_playersToCheck = new ConcurrentLinkedQueue<Player>();
    
     /**
      * Set up and manage connection based on properties configuration.
@@ -107,9 +109,96 @@ public class SEAdminServerConnection implements Runnable
             }
             else
             {
+                while (!m_playersToCheck.isEmpty())
+                {
+                    checkPlayer(m_playersToCheck.remove());
+                }
                 sleep(1000);
             }
         }
+    }
+    
+    /**
+     * Check whether a player is allowed here.
+     * @param p Player to check.
+     */
+    private void checkPlayer(final Player p)
+    {
+        if (!m_serverStatus.getLobby().getPlayers().contains(p))
+        {
+            m_logger.info("CHECK|{}|{} from IP address {} left before checks performed" , p.getSteamId(), p.getName(), p.getIPv4());
+            return;
+        }
+        
+        if (m_whiteList.isWhitelisted(p.getSteamId()))
+        {
+            m_logger.info("WHITELIST|{}|{} joined from IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
+            doGreeting(p);
+            return;
+        }
+        
+        if (m_ipBans.isBanned(p.getIPv4()))
+        {
+            m_logger.info("IPBAN|{}|{} joined from banned IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
+            banPlayer(p, "banned IP address");
+            return;
+        }
+        
+        if (m_banList.getBan(p.getSteamId()) != null)
+        {
+            final Ban banInfo = m_banList.getBan(p.getSteamId());
+            m_logger.info("PLAYERBAN|{}|{} for {}. Name when banned was {}" , p.getSteamId(), p.getName(), banInfo.reason, banInfo.name);
+            banPlayer(p, banInfo.reason);
+            return;
+        }
+        
+        if (m_isApplyVACBans || m_isApplyGameBans)
+        {
+            final tfa.se4.steam.json.Player banInfo = m_steamAPI.getBanInfo(p.getSteamId(), p.getName(), m_logger);
+            if (banInfo != null)
+            {
+                if (banInfo.getVACBanned())
+                {
+                    m_logger.info("VACBAN|{}|{} for {}." , p.getSteamId(), p.getName(), "VAC Ban");
+                    banPlayer(p, "VAC ban");
+                    return;
+                }
+                
+                if (banInfo.getNumberOfGameBans() > 0)
+                {
+                    m_logger.info("GAMEBAN|{}|{} for {}." , p.getSteamId(), p.getName(), "Game Ban");
+                    banPlayer(p, "Game ban");
+                    return;
+                }
+            }
+        }
+        
+        // Passed all kick checks.
+        doGreeting(p);
+    }
+    
+    /**
+     * Apply player ban.
+     * @param p Player to ban
+     * @param reason Reason
+     */
+    private void banPlayer(final Player p, final String reason)
+    {
+        // Do a steam ID ban to make sure they are added to server ban list
+        final String steamIDBan = "Server.KickBanSteamID " + p.getSteamId();
+        sendMessage(Protocol.REQUEST_SEND_COMMAND, steamIDBan.getBytes());
+        
+        // Make the ban public
+        final String msg = "Server.Say BANNING " + p.getName() + " for " + reason;
+        sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
+        
+        // Delay 5 seconds
+        sleep(5000);
+        
+        // Kick them
+        final String ban = "Server.KickBan " + p.getName();
+        sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
+        
     }
     
     /**
@@ -181,63 +270,11 @@ public class SEAdminServerConnection implements Runnable
     	{
     		if (!oldPlayers.contains(p))
     		{
-                if (m_whiteList.isWhitelisted(p.getSteamId()))
-                {
-                    m_logger.info("WHITELIST|{}|{} joined from IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
-                    doGreeting(status, p);
-                    continue;
-                }
-                
-    			if (m_ipBans.isBanned(p.getIPv4()))
-    			{
-                    m_logger.info("IPBAN|{}|{} joined from banned IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
-        			final String msg = "Server.Say BANNING " + p.getName() + " for banned IP address";
-        			sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
-        			final String ban = "Server.KickBanSteamID " + p.getSteamId();
-        			sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
-        			continue;
-    			}
-    			else if (m_banList.getBan(p.getSteamId()) != null)
-    			{
-                    final Ban banInfo = m_banList.getBan(p.getSteamId());
-                    m_logger.info("PLAYERBAN|{}|{} for {}. Name when banned was {}" , p.getSteamId(), p.getName(), banInfo.reason, banInfo.name);
-    				
-        			final String msg = "Server.Say BANNING " + p.getName() + " for " + banInfo.reason;
-        			sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
-        			final String ban = "Server.KickBanSteamID " + p.getSteamId();
-        			sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
-                    continue;
-    			}
-                else if (m_isApplyVACBans || m_isApplyGameBans)
-                {
-                    final tfa.se4.steam.json.Player banInfo = m_steamAPI.getBanInfo(p.getSteamId(), p.getName(), m_logger);
-                    
-                    if (banInfo != null)
-                    {
-                        if (banInfo.getVACBanned())
-                        {
-                            m_logger.info("VACBAN|{}|{} for {}." , p.getSteamId(), p.getName(), "VAC");
-                            final String msg = "Server.Say BANNING " + p.getName() + " for VAC Ban";
-                            sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
-                            final String ban = "Server.KickBanSteamID " + p.getSteamId();
-                            sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
-                            continue;
-                        }
-                        
-                        if (banInfo.getNumberOfGameBans() > 0)
-                        {
-                            m_logger.info("GAMEBAN|{}|{} for {}." , p.getSteamId(), p.getName(), "Game Ban");
-                            final String msg = "Server.Say BANNING " + p.getName() + " for Game Ban";
-                            sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
-                            final String ban = "Server.KickBanSteamID " + p.getSteamId();
-                            sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
-                            continue;
-                        }
-                    }
-                }
-    			
+    		    if (m_serverStatus == null) // signal to skip the greeting if we're just starting up the monitoring
+    		        p.setSkipGreeting(true);
+    		    
+    		    m_playersToCheck.add(p);
                 m_logger.info("JOIN|{}|{} joined from IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
-			    doGreeting(status, p);
     		}
     	}
     	
@@ -267,15 +304,16 @@ public class SEAdminServerConnection implements Runnable
      * @param status Game state
      * @param p Player to greet.
      */
-    private void doGreeting(final ServerStatus status, final Player p)
+    private void doGreeting(final Player p)
     {
         // Don't greet for when we've just started up or there's no greeting message
-        if (m_serverStatus != null && StringUtils.isNotBlank(m_playerGreeting))
+        if (StringUtils.isNotBlank(m_playerGreeting) && !p.isSkipGreeting())
         {
             final String msg = "Server.Say "+ m_playerGreeting.
                     replace("#PlayerName#", p.getName()).
-                    replace("#ServerName#", status.getServer().getName());
+                    replace("#ServerName#", m_serverStatus.getServer().getName());
             sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
+            sleep(1000);
         }
     }
     
