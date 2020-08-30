@@ -32,8 +32,9 @@ public final class SteamAPI
      * @param logger Logger for catching errors
      * @return Ban information or null if we were not able to fetch it.
      */
-    public Player getBanInfo(final String steamID, final Logger logger)
+    public Player getBanInfo(final String steamID, final String playerName, final Logger logger)
     {
+        logger.info("STEAM|{}|{} checking for steam bans" , steamID, playerName);
         final String urltemplate = "http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key=##STEAMAPIKEY##&steamids=##STEAMID##";
         
         final String url = urltemplate
@@ -44,6 +45,12 @@ public final class SteamAPI
         {
             final PlayerBansQueryResult bans = JSONUtils.unMarshalServerStatus(
                     Request.Get(url).connectTimeout(2000).socketTimeout(2000).execute().returnContent().asString(), logger);
+            
+            if (bans == null || bans.getPlayers() == null || bans.getPlayers().isEmpty())
+            {
+                logger.error("Unable to fetch steam ban info for " + steamID + " empty return data");
+                
+            }
             return bans.getPlayers().get(0);
         }
         catch (IOException e)
