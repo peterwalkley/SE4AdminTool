@@ -18,6 +18,8 @@ public class Options
 	private String m_playerGreeting;
 	private String m_steamAPIKey;
 	private boolean m_applyVACBans;
+    private boolean m_applyGameBans;
+    
 	/**
 	 * Collect properties.
 	 * @param configFile
@@ -44,12 +46,13 @@ public class Options
 		m_bansListFile = getMandatoryFile(props, "banned.players");
 		m_whiteListFile = getMandatoryFile(props, "whitelist.players");
 		
-		m_applyVACBans = Boolean.parseBoolean(getMandatoryProperty(props, "kick.vac.banned").trim());
+		m_applyVACBans = Boolean.parseBoolean(props.getProperty("kick.vac.banned", "false").trim());
+		m_applyGameBans = Boolean.parseBoolean(props.getProperty("kick.game.banned", "false").trim());
 		m_steamAPIKey = props.getProperty("steam.api.key", "").trim();
 		
-		if (m_applyVACBans && StringUtils.isBlank(m_steamAPIKey))
+		if ((m_applyVACBans || m_applyGameBans) && StringUtils.isBlank(m_steamAPIKey))
 		{
-		    throw new IllegalArgumentException("Kicking of VAC banned player requires a steam API key for checks to be performed");
+		    throw new IllegalArgumentException("Kicking of VAC or Game banned player requires a steam API key for checks to be performed");
 		}
 	}
 	
@@ -157,6 +160,15 @@ public class Options
 	    return m_applyVACBans;
 	}
 	
+    /**
+     * Whether to apply game bans.
+     * @return true/false
+     */
+    public boolean isApplyGameBans()
+    {
+        return m_applyGameBans;
+    }
+    
 	/**
 	 * Get Steam API key.
 	 * @return Key

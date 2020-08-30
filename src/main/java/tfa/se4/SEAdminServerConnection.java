@@ -52,6 +52,7 @@ public class SEAdminServerConnection implements Runnable
     private String m_playerGreeting;
     private WebSocketClient m_client = null;
     private boolean m_isApplyVACBans;
+    private boolean m_isApplyGameBans;
     private SteamAPI m_steamAPI;
    
     /**
@@ -70,7 +71,8 @@ public class SEAdminServerConnection implements Runnable
 		m_banList = new PlayerBanList(options.getPlayerBansListFile(), m_logger);
 		m_playerGreeting = options.getPlayerGreeting();
 		m_isApplyVACBans = options.isApplyVACBans();
-		if (m_isApplyVACBans)
+		m_isApplyGameBans = options.isApplyGameBans();
+		if (m_isApplyVACBans || m_isApplyGameBans)
 		{
 		    m_steamAPI = new SteamAPI(options.getSteamAPIKey());
 		}
@@ -193,6 +195,7 @@ public class SEAdminServerConnection implements Runnable
         			sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
         			final String ban = "Server.KickBanSteamID " + p.getSteamId();
         			sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
+        			continue;
     			}
     			else if (m_banList.getBan(p.getSteamId()) != null)
     			{
@@ -203,20 +206,38 @@ public class SEAdminServerConnection implements Runnable
         			sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
         			final String ban = "Server.KickBanSteamID " + p.getSteamId();
         			sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
+                    continue;
     			}
-                else if (m_isApplyVACBans && m_steamAPI.isHasVACBan(p.getSteamId(), m_logger))
+                else if (m_isApplyVACBans || m_isApplyGameBans)
                 {
-                    m_logger.info("VACBAN|{}|{} for {}." , p.getSteamId(), p.getName(), "VAC");
-                    final String msg = "Server.Say BANNING " + p.getName() + " for VAC BAN";
-                    sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
-                    final String ban = "Server.KickBanSteamID " + p.getSteamId();
-                    sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
+                    final tfa.se4.steam.json.Player banInfo = m_steamAPI.getBanInfo(p.getId(), m_logger);
+                    
+                    if (banInfo != null)
+                    {
+                        if (banInfo.getVACBanned())
+                        {
+                            m_logger.info("VACBAN|{}|{} for {}." , p.getSteamId(), p.getName(), "VAC");
+                            final String msg = "Server.Say BANNING " + p.getName() + " for VAC Ban";
+                            sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
+                            final String ban = "Server.KickBanSteamID " + p.getSteamId();
+                            sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
+                            continue;
+                        }
+                        
+                        if (banInfo.getNumberOfGameBans() > 0)
+                        {
+                            m_logger.info("GAMEBAN|{}|{} for {}." , p.getSteamId(), p.getName(), "Game Ban");
+                            final String msg = "Server.Say BANNING " + p.getName() + " for Game Ban";
+                            sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
+                            final String ban = "Server.KickBanSteamID " + p.getSteamId();
+                            sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
+                            continue;
+                        }
+                    }
                 }
-    			else
-    			{
-                    m_logger.info("JOIN|{}|{} joined from IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
-    			    doGreeting(status, p);
-    			}
+    			
+                m_logger.info("JOIN|{}|{} joined from IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
+			    doGreeting(status, p);
     		}
     	}
     	

@@ -10,9 +10,11 @@ Written in java, so is portable across across a wide range of platforms: Windows
 specific players access a server even if the have a steam VAC ban.
 - A player greeting can be set up for whenever someone joins. See the sample configuration file for
 an example.
-- Players can be automatically kicked if they have a steam VAC ban.  Note that this feature requires
+- Players can be automatically kicked if they have a steam VAC ban and/or a Game ban.  Note that this feature requires
 you to provide your own Steam API Key. Obtain one from <https://steamcommunity.com/dev/apikey> and
-add it to your configuration file.
+add it to your configuration file.  Note that Game bans could for any game, not just Sniper Elite.
+For a guide to steam policies refer to <https://steamcommunity.com/sharedfiles/filedetails/?id=961168214>,
+particularly section 5.  
 
 ## TODO
 - Use IP location to find country, state and city information.
