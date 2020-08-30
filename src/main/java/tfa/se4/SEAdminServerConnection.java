@@ -1,7 +1,6 @@
 package tfa.se4;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
@@ -14,6 +13,8 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.StringUtils;
+
+// Jetty documentation:  https://www.eclipse.org/jetty/documentation/current/websocket-jetty.html
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -29,8 +30,9 @@ import tfa.se4.json.Player;
 import tfa.se4.json.ServerStatus;
 import tfa.se4.steam.SteamAPI;
 
-/* https://www.eclipse.org/jetty/documentation/current/websocket-jetty.html */
-
+/**
+ * Main handler class for a connection to SE4 server.
+ */
 @WebSocket
 public class SEAdminServerConnection implements Runnable
 {
@@ -52,6 +54,10 @@ public class SEAdminServerConnection implements Runnable
     private boolean m_isApplyVACBans;
     private SteamAPI m_steamAPI;
    
+    /**
+     * Set up and manage connection based on properties configuration.
+     * @param options Configuration options.
+     */
     public SEAdminServerConnection(final Options options)
     {
 		m_host = options.getHost();
@@ -71,6 +77,10 @@ public class SEAdminServerConnection implements Runnable
         new Thread(this).start();
     }
 
+    /**
+     * Management thread. Polls for dead connection and tries
+     * reconnect after 10 seconds.
+     */
     @Override
     public void run()
     {
@@ -100,6 +110,11 @@ public class SEAdminServerConnection implements Runnable
         }
     }
     
+    /**
+     * Get URL.
+     * @return ws://<<host>:<port>
+     * @throws URISyntaxException Shouldn't happen unless bad input
+     */
     public URI getURI() throws URISyntaxException
     {
     	return new URI("ws://" + m_host + ":" + m_port);    	
@@ -141,6 +156,16 @@ public class SEAdminServerConnection implements Runnable
     	return m_serverStatus;
     }
     
+    /**
+     * Update state based on receiving a {@link Protocol.REPLY_WEB_STATUS_UPDATE} notification.
+     * The payload is JSON which we parse to a {@link tfa.se4.json.ServerStatus} structure.
+     * <ul>
+     * <li>Check for players joining</li>
+     * <li>Check for players leaving</li>
+     * <li>Check for change in game state</li>
+     * </ul>
+     * @param content Payload content from incoming message.
+     */
     private synchronized void setServerStatus(final ByteBuffer content)
     {
     	ServerStatus status = JSONUtils.unMarshalServerStatus(Protocol.payloadAsUTF8String(content), m_logger);
@@ -154,44 +179,43 @@ public class SEAdminServerConnection implements Runnable
     	{
     		if (!oldPlayers.contains(p))
     		{
-    			m_logger.info("JOIN|{}|{} joined from IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
-    			
-    			if (!m_whiteList.isWhitelisted(p.getSteamId()) && m_ipBans.isBanned(p.getIPv4()))
+                if (m_whiteList.isWhitelisted(p.getSteamId()))
+                {
+                    m_logger.info("WHITELIST|{}|{} joined from IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
+                    doGreeting(status, p);
+                    continue;
+                }
+                
+    			if (m_ipBans.isBanned(p.getIPv4()))
     			{
+                    m_logger.info("IPBAN|{}|{} joined from banned IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
         			final String msg = "Server.Say BANNING " + p.getName() + " for banned IP address";
         			sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
         			final String ban = "Server.KickBanSteamID " + p.getSteamId();
         			sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
-        			m_logger.info("BAN|{}|{} joined from banned IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
     			}
-    			else if (!m_whiteList.isWhitelisted(p.getSteamId()) && m_banList.getBan(p.getSteamId()) != null)
+    			else if (m_banList.getBan(p.getSteamId()) != null)
     			{
-    				final Ban banInfo = m_banList.getBan(p.getSteamId());
+                    final Ban banInfo = m_banList.getBan(p.getSteamId());
+                    m_logger.info("PLAYERBAN|{}|{} for {}. Name when banned was {}" , p.getSteamId(), p.getName(), banInfo.reason, banInfo.name);
     				
         			final String msg = "Server.Say BANNING " + p.getName() + " for " + banInfo.reason;
         			sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
         			final String ban = "Server.KickBanSteamID " + p.getSteamId();
         			sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
-        			m_logger.info("BAN|{}|{} for {}. Name when banned was {}" , p.getSteamId(), p.getName(), banInfo.reason, banInfo.name);
     			}
-                else if (!m_whiteList.isWhitelisted(p.getSteamId()) && m_isApplyVACBans && m_steamAPI.isHasVACBan(p.getSteamId(), m_logger))
+                else if (m_isApplyVACBans && m_steamAPI.isHasVACBan(p.getSteamId(), m_logger))
                 {
+                    m_logger.info("VACBAN|{}|{} for {}." , p.getSteamId(), p.getName(), "VAC");
                     final String msg = "Server.Say BANNING " + p.getName() + " for VAC BAN";
                     sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
                     final String ban = "Server.KickBanSteamID " + p.getSteamId();
                     sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
-                    m_logger.info("BAN|{}|{} for {}." , p.getSteamId(), p.getName(), "VAC");
                 }
     			else
     			{
-    				// Don't greet for when we've just started up
-    				if (m_serverStatus != null && StringUtils.isNotBlank(m_playerGreeting))
-    				{
-    					final String msg = "Server.Say "+ m_playerGreeting.
-    							replace("#PlayerName#", p.getName()).
-    							replace("#ServerName#", status.getServer().getName());
-		    			sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
-    				}
+                    m_logger.info("JOIN|{}|{} joined from IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
+    			    doGreeting(status, p);
     			}
     		}
     	}
@@ -217,28 +241,36 @@ public class SEAdminServerConnection implements Runnable
     	m_serverStatus = status;
     }
     
+    /**
+     * Send a player greeting message (if configured)
+     * @param status Game state
+     * @param p Player to greet.
+     */
+    private void doGreeting(final ServerStatus status, final Player p)
+    {
+        // Don't greet for when we've just started up or there's no greeting message
+        if (m_serverStatus != null && StringUtils.isNotBlank(m_playerGreeting))
+        {
+            final String msg = "Server.Say "+ m_playerGreeting.
+                    replace("#PlayerName#", p.getName()).
+                    replace("#ServerName#", status.getServer().getName());
+            sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
+        }
+    }
+    
+    /**
+     * Simple latch so caller will wait until this is closed.
+     * @throws InterruptedException Never :)
+     */
     public void awaitClose() throws InterruptedException
     {
         m_closeLatch.await();
     }
 
-    @OnWebSocketClose
-    public void onClose(int statusCode, String reason)
-    {
-    	m_logger.info("CLOSE||Status code {} reason {}", statusCode, reason);
-        m_session = null;
-        m_client = null;
-    }
-
-    @OnWebSocketConnect
-    public void onConnect(Session session)
-    {
-    	m_logger.info("CONNECT||Connected to {}", session.getRemoteAddress());
-        m_session = session;
-        if (m_session.isOpen())
-        	sendMessage(Protocol.REQUEST_INIT);
-    }
-
+    /**
+     * Send message to SE4 server.
+     * @param messageId Message ID from {@link Protocol}
+     */
     private void sendMessage(final char messageId)
     {
         final ByteBuffer buf = Protocol.buildMessage(messageId);
@@ -252,6 +284,12 @@ public class SEAdminServerConnection implements Runnable
         	ex.printStackTrace();
         }
     }
+    
+    /**
+     * Send message with payload to SE4 server.
+     * @param messageId Message ID from {@link Protocol}.
+     * @param msg Message payload.
+     */
     private void sendMessage(final char messageId, final byte[] msg)
     {
     	final ByteBuffer buf = Protocol.buildMessage(messageId, msg);
@@ -267,22 +305,8 @@ public class SEAdminServerConnection implements Runnable
         }
     }
     
-    @OnWebSocketMessage
-    public void onMessage(Session session, byte[] b, int offset, int length)
-    {
-    	m_logger.trace("<<||{} offset={} length={}", Protocol.bytesToString(b), offset, length);
-        if (offset != 0 || length != b.length)
-        {
-        	// Never seems to happen from SE,but just in case.
-            return;
-        }
-        
-        final ReplyMessage msg = Protocol.getReplyMessage(b);
-        handleMessage(msg.messageId, msg.payload);
-    }
-
     /**
-     * Handle income message after we've split it into ID and (optional)payload.
+     * Handle income message after we've split it into ID and (optional) payload.
      * @param messageId MessageId
      * @param content Payload - may be empty
      */
@@ -348,12 +372,71 @@ public class SEAdminServerConnection implements Runnable
     	}
     }
     
+    /**
+     * Handler for when we receive an open web socket event. We trigger the
+     * password exchange handshake here.
+     * @param session Web socket session.
+     */
+    @OnWebSocketConnect
+    public void onConnect(Session session)
+    {
+        m_logger.info("CONNECT||Connected to {}", session.getRemoteAddress());
+        m_session = session;
+        if (m_session.isOpen())
+            sendMessage(Protocol.REQUEST_INIT);
+    }
+
+    /**
+     * Handler for when we receive a close web socket event. Just close the connection.
+     * @param statusCode Status code returned.
+     * @param reason Reason for closure.
+     */
+    @OnWebSocketClose
+    public void onClose(int statusCode, String reason)
+    {
+        m_logger.info("CLOSE||Status code {} reason {}", statusCode, reason);
+        m_session = null;
+        m_client = null;
+    }
+
+    /**
+     * Handler for incoming messages from SE4 server. We split the message
+     * into its ID and payload then hand off to {@link #handleMessage(char, ByteBuffer)}
+     * to deal with it.
+     *  
+     * @param session Web socket session
+     * @param b Message bytes
+     * @param offset Offset into bytes, always zero
+     * @param length Length of message, always same as b.length
+     */
+    @OnWebSocketMessage
+    public void onMessage(Session session, byte[] b, int offset, int length)
+    {
+        m_logger.trace("<<||{} offset={} length={}", Protocol.bytesToString(b), offset, length);
+        if (offset != 0 || length != b.length)
+        {
+            // Never seems to happen from SE,but just in case.
+            return;
+        }
+        
+        final ReplyMessage msg = Protocol.getReplyMessage(b);
+        handleMessage(msg.messageId, msg.payload);
+    }
+
+    /**
+     * Handler for any error signalled. In general all we can do is assume
+     * they mean the connection is dead.
+     * @param cause Underlying cause.
+     */
     @OnWebSocketError
     public void onError(Throwable cause)
     {
-        if (cause instanceof ConnectException)
+        if (cause instanceof java.net.ConnectException ||           // Remote connection died or server was killed.
+            cause instanceof java.net.SocketTimeoutException ||     // timeout connecting
+            cause instanceof java.io.IOException                    // Broken pipe
+            )
         {
-            // Remote connection died or server was killed.
+            m_logger.debug("WebSocket error handled as connection death: ", cause);
             m_session = null;
             m_client = null;
         }
@@ -361,9 +444,12 @@ public class SEAdminServerConnection implements Runnable
         {
             m_logger.info("Unhandled webSocket Error: ", cause);
         }
-        
     }
     
+    /**
+     * Force current thread to sleep a bit.
+     * @param millis Milliseconds.
+     */
     private static void sleep(final int millis)
     {
         try
@@ -374,7 +460,6 @@ public class SEAdminServerConnection implements Runnable
         {
             
         }
-        
     }
 	public static void main(String[] args) throws Exception
 	{
