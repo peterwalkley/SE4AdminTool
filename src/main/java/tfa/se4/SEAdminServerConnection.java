@@ -157,14 +157,14 @@ public class SEAdminServerConnection implements Runnable
             final tfa.se4.steam.json.Player banInfo = m_steamAPI.getBanInfo(p.getSteamId(), p.getName(), m_logger);
             if (banInfo != null)
             {
-                if (banInfo.getVACBanned())
+                if (m_isApplyVACBans && banInfo.getVACBanned())
                 {
                     m_logger.info("VACBAN|{}|{} for {}." , p.getSteamId(), p.getName(), "VAC Ban");
                     banPlayer(p, "VAC ban");
                     return;
                 }
                 
-                if (banInfo.getNumberOfGameBans() > 0)
+                if (m_isApplyGameBans && banInfo.getNumberOfGameBans() > 0)
                 {
                     m_logger.info("GAMEBAN|{}|{} for {}." , p.getSteamId(), p.getName(), "Game Ban");
                     banPlayer(p, "Game ban");
