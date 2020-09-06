@@ -4,6 +4,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import tfa.se4.json.Player;
 
 import java.net.URL;
@@ -41,9 +43,18 @@ public class ServerPaneController implements Initializable {
         m_connection.getModel().clearLog();
     }
     public void clipboard() {
-        //TODO:
-        System.out.println("clipboard clicked");
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        final StringBuilder sb = new StringBuilder(4096);
+        m_connection.getModel().getRawLogLines().forEach(line ->
+                {
+                sb.append(line);
+                sb.append('\n');
+        });
+        content.putString(sb.toString());
+        clipboard.setContent(content);
     }
+
     public void showProfile() {
         //TODO:
         System.out.println("profile button clicked");

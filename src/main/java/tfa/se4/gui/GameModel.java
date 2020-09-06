@@ -50,6 +50,11 @@ public class GameModel {
         logLines.clear();
     }
 
+    public List<String> getRawLogLines()
+    {
+        return logLines;
+    }
+
     public ObservableList<String> getLogLines()
     {
         return logLines;

@@ -107,15 +107,15 @@
       </HBox>
       <TableView fx:id="playersTable" minHeight="-Infinity" prefHeight="200.0" prefWidth="200.0">
         <columns>
-          <TableColumn fx:id="name" editable="false" prefWidth="75.0" text="Name"  />
-          <TableColumn fx:id="steamID" editable="false" prefWidth="75.0" text="ID" />
-          <TableColumn fx:id="ipV4" editable="false" prefWidth="75.0" text="IP" />
-          <TableColumn fx:id="latency" editable="false" prefWidth="75.0" text="Latency" />
-          <TableColumn fx:id="score" editable="false" prefWidth="75.0" text="Score" />
-          <TableColumn fx:id="deaths" editable="false" prefWidth="75.0" text="Deaths" />
-          <TableColumn fx:id="kills" editable="false" prefWidth="75.0" text="Kills" />
-          <TableColumn fx:id="assists" editable="false" prefWidth="75.0" text="Assists" />
-          <TableColumn fx:id="longestShot" editable="false" prefWidth="75.0" text="Shot" />
+          <TableColumn fx:id="name" editable="false" prefWidth="135.0" text="Name" />
+          <TableColumn fx:id="steamID" editable="false" prefWidth="125.0" text="Steam ID" />
+          <TableColumn fx:id="ipV4" editable="false" prefWidth="85.0" style="-fx-alignment: CENTER_RIGHT;" text="IP Address" />
+          <TableColumn fx:id="latency" editable="false" prefWidth="65.0" style="-fx-alignment: CENTER_RIGHT;" text="Latency" />
+          <TableColumn fx:id="score" editable="false" prefWidth="65.0" style="-fx-alignment: CENTER_RIGHT;" text="Score" />
+          <TableColumn fx:id="deaths" editable="false" prefWidth="65.0" style="-fx-alignment: CENTER_RIGHT;" text="Deaths" />
+          <TableColumn fx:id="kills" editable="false" prefWidth="65.0" style="-fx-alignment: CENTER_RIGHT;" text="Kills" />
+          <TableColumn fx:id="assists" editable="false" prefWidth="65.0" style="-fx-alignment: CENTER_RIGHT;" text="Assists" />
+          <TableColumn fx:id="longestShot" editable="false" prefWidth="65.0" style="-fx-alignment: CENTER_RIGHT;" text="Distance" />
         </columns>
       </TableView>
       <HBox scaleShape="false" SplitPane.resizableWithParent="false">
