@@ -1,15 +1,16 @@
 package tfa.se4.steam;
 
-import org.slf4j.Logger;
+import java.io.IOException;
+
+import org.apache.http.client.fluent.Request;
 
 import tfa.se4.steam.json.JSONUtils;
 import tfa.se4.steam.json.Player;
 import tfa.se4.steam.json.PlayerBansQueryResult;
 
-import java.io.IOException;
-
-import org.apache.http.client.fluent.Request;
-
+import tfa.se4.logger.LoggerInterface;
+import static tfa.se4.logger.LoggerInterface.LogLevel;
+import static tfa.se4.logger.LoggerInterface.LogType;
 /**
  * Holder class for anything we use to talk to Steam.
  */
@@ -32,9 +33,9 @@ public final class SteamAPI
      * @param logger Logger for catching errors
      * @return Ban information or null if we were not able to fetch it.
      */
-    public Player getBanInfo(final String steamID, final String playerName, final Logger logger)
+    public Player getBanInfo(final String steamID, final String playerName, final LoggerInterface logger)
     {
-        logger.info("STEAM|{}|{} checking for steam bans" , steamID, playerName);
+        logger.log(LogLevel.INFO, LogType.STEAM, "Checking player %s steam ID %s for bans", playerName, steamID);
         final String urltemplate = "http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key=##STEAMAPIKEY##&steamids=##STEAMID##";
         
         final String url = urltemplate
@@ -48,14 +49,13 @@ public final class SteamAPI
             
             if (bans == null || bans.getPlayers() == null || bans.getPlayers().isEmpty())
             {
-                logger.error("Unable to fetch steam ban info for " + steamID + " empty return data");
-                
+                logger.log(LogLevel.ERROR, LogType.STEAM, "Unable to fetch steam ban info for %s empty return data", steamID);
             }
             return bans.getPlayers().get(0);
         }
         catch (IOException e)
         {
-            logger.error("Unable to fetch steam ban info for " + steamID, e);
+            logger.log(LogLevel.ERROR, LogType.STEAM, e,"Unable to fetch steam ban info for %s", steamID);
             return null;
         }
     }

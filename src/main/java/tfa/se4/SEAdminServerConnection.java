@@ -1,9 +1,12 @@
 package tfa.se4;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -11,8 +14,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.StringUtils;
 
 // Jetty documentation:  https://www.eclipse.org/jetty/documentation/current/websocket-jetty.html
@@ -29,13 +30,14 @@ import tfa.se4.Protocol.ReplyMessage;
 import tfa.se4.json.JSONUtils;
 import tfa.se4.json.Player;
 import tfa.se4.json.ServerStatus;
+import tfa.se4.logger.LoggerInterface;
 import tfa.se4.steam.SteamAPI;
 
 /**
  * Main handler class for a connection to SE4 server.
  */
 @WebSocket
-public class SEAdminServerConnection implements Runnable
+public class SEAdminServerConnection implements LoggerInterface, Runnable
 {
 	private String m_host;
 	private String m_port;
@@ -46,7 +48,6 @@ public class SEAdminServerConnection implements Runnable
     private long m_bytesSent;
     private float m_fps;
     private ServerStatus m_serverStatus;
-    private Logger m_logger;
     private IPBanList m_ipBans;
     private PlayerWhiteList m_whiteList;
     private PlayerBanList m_banList;
@@ -56,6 +57,7 @@ public class SEAdminServerConnection implements Runnable
     private boolean m_isApplyGameBans;
     private SteamAPI m_steamAPI;
     private ConcurrentLinkedQueue<Player> m_playersToCheck = new ConcurrentLinkedQueue<Player>();
+    private LogLevel m_displayLogLevel = LogLevel.INFO;
    
     /**
      * Set up and manage connection based on properties configuration.
@@ -67,10 +69,9 @@ public class SEAdminServerConnection implements Runnable
 		m_port = options.getPort();
 		m_password = options.getPassword();
         m_closeLatch = new CountDownLatch(1);
-        m_logger = LoggerFactory.getLogger(m_host + ":" + m_port);
-		m_ipBans = new IPBanList(options.getIPBansFile(), m_logger);
-		m_whiteList = new PlayerWhiteList(options.getWhiteListFile(), m_logger);
-		m_banList = new PlayerBanList(options.getPlayerBansListFile(), m_logger);
+		m_ipBans = new IPBanList(options.getIPBansFile(), this);
+		m_whiteList = new PlayerWhiteList(options.getWhiteListFile(), this);
+		m_banList = new PlayerBanList(options.getPlayerBansListFile(), this);
 		m_playerGreeting = options.getPlayerGreeting();
 		m_isApplyVACBans = options.isApplyVACBans();
 		m_isApplyGameBans = options.isApplyGameBans();
@@ -102,8 +103,8 @@ public class SEAdminServerConnection implements Runnable
                 }
                 catch (final Exception ex)
                 {
-                    m_logger.info("Connect failed. Retrying in 10 seconds.");
-                    m_logger.trace("Connection error", ex);
+                    log(LogLevel.INFO, LogType.SYSTEM, "Connect failed. Retrying in 10 seconds.");
+                    log(LogLevel.TRACE, LogType.SYSTEM, ex, "Connection error");
                     sleep(10000);
                 }
             }
@@ -126,20 +127,20 @@ public class SEAdminServerConnection implements Runnable
     {
         if (!m_serverStatus.getLobby().getPlayers().contains(p))
         {
-            m_logger.info("CHECK|{}|{} from IP address {} left before checks performed" , p.getSteamId(), p.getName(), p.getIPv4());
+            log(LogLevel.INFO, LogType.CHECK, "Player %s steam ID %s from IP address %s left before checks performed", p.getName(), p.getSteamId(), p.getIPv4());
             return;
         }
         
         if (m_whiteList.isWhitelisted(p.getSteamId()))
         {
-            m_logger.info("WHITELIST|{}|{} joined from IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
+            log(LogLevel.INFO, LogType.WHITELIST, "Player %s steam ID %s joined from IP address %s", p.getName(), p.getSteamId(), p.getIPv4());
             doGreeting(p);
             return;
         }
         
         if (m_ipBans.isBanned(p.getIPv4()))
         {
-            m_logger.info("IPBAN|{}|{} joined from banned IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
+            log(LogLevel.INFO, LogType.IPBAN,"Player %s steam ID %s joined from banned IP address %s", p.getName(), p.getSteamId(), p.getIPv4());
             banPlayer(p, "banned IP address");
             return;
         }
@@ -147,26 +148,26 @@ public class SEAdminServerConnection implements Runnable
         if (m_banList.getBan(p.getSteamId()) != null)
         {
             final Ban banInfo = m_banList.getBan(p.getSteamId());
-            m_logger.info("PLAYERBAN|{}|{} for {}. Name when banned was {}" , p.getSteamId(), p.getName(), banInfo.reason, banInfo.name);
+            log(LogLevel.INFO, LogType.PLAYERBAN,"Banned player %s steam ID %s for reason '%s' joined from banned IP address %s. Name at ban was %s", p.getName(), p.getSteamId(), banInfo.reason, p.getIPv4(), banInfo.name);
             banPlayer(p, banInfo.reason);
             return;
         }
         
         if (m_isApplyVACBans || m_isApplyGameBans)
         {
-            final tfa.se4.steam.json.Player banInfo = m_steamAPI.getBanInfo(p.getSteamId(), p.getName(), m_logger);
+            final tfa.se4.steam.json.Player banInfo = m_steamAPI.getBanInfo(p.getSteamId(), p.getName(), this);
             if (banInfo != null)
             {
                 if (m_isApplyVACBans && banInfo.getVACBanned())
                 {
-                    m_logger.info("VACBAN|{}|{} for {}." , p.getSteamId(), p.getName(), "VAC Ban");
+                    log(LogLevel.INFO, LogType.VAC, "Player %s steam ID %s has VAC ban", p.getName(), p.getSteamId());
                     banPlayer(p, "VAC ban");
                     return;
                 }
                 
                 if (m_isApplyGameBans && banInfo.getNumberOfGameBans() > 0)
                 {
-                    m_logger.info("GAMEBAN|{}|{} for {}." , p.getSteamId(), p.getName(), "Game Ban");
+                    log(LogLevel.INFO, LogType.GAMEBAN, "Player %s steam ID %s has game ban", p.getName(), p.getSteamId());
                     banPlayer(p, "Game ban");
                     return;
                 }
@@ -238,17 +239,7 @@ public class SEAdminServerConnection implements Runnable
     }
     
     /**
-     * Expose server state to outside world. This will
-     * be updated roughly every 5 seconds.
-     * @return
-     */
-    public synchronized ServerStatus getServerStatus()
-    {
-    	return m_serverStatus;
-    }
-    
-    /**
-     * Update state based on receiving a {@link Protocol.REPLY_WEB_STATUS_UPDATE} notification.
+     * Update state based on receiving a {@link Protocol#REPLY_WEB_STATUS_UPDATE} notification.
      * The payload is JSON which we parse to a {@link tfa.se4.json.ServerStatus} structure.
      * <ul>
      * <li>Check for players joining</li>
@@ -259,7 +250,7 @@ public class SEAdminServerConnection implements Runnable
      */
     private synchronized void setServerStatus(final ByteBuffer content)
     {
-    	ServerStatus status = JSONUtils.unMarshalServerStatus(Protocol.payloadAsUTF8String(content), m_logger);
+    	ServerStatus status = JSONUtils.unMarshalServerStatus(Protocol.payloadAsUTF8String(content), this);
     	if (status == null) // do nothing when we've got bad JSON
     		return;
     	
@@ -274,7 +265,7 @@ public class SEAdminServerConnection implements Runnable
     		        p.setSkipGreeting(true);
     		    
     		    m_playersToCheck.add(p);
-                m_logger.info("JOIN|{}|{} joined from IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
+                log(LogLevel.INFO, LogType.JOIN, "Player %s steam ID %s joined from IP address %s",p.getName(),p.getSteamId(),  p.getIPv4());
     		}
     	}
     	
@@ -282,7 +273,7 @@ public class SEAdminServerConnection implements Runnable
     	{
     		if (!newPlayers.contains(p))
     		{
-    			m_logger.info("LEAVE|{}|{} left from IP address {}" , p.getSteamId(), p.getName(), p.getIPv4());
+                log(LogLevel.INFO, LogType.LEAVE, "Player %s steam ID %s left from IP address %s",p.getName(),p.getSteamId(),  p.getIPv4());
     		}
     	}
     	
@@ -290,18 +281,26 @@ public class SEAdminServerConnection implements Runnable
     	final String oldGameState = m_serverStatus == null ? "unknown" : m_serverStatus.getLobby().getState();
     	if (!oldGameState.equals(newGameState))
     	{
-			m_logger.info("GAME||Status {}", newGameState);
 			if (Protocol.IN_GAME.equals(oldGameState))
-				m_logger.info("GAME_ENDED||{}", JSONUtils.marshalServerStatus(m_serverStatus, m_logger));
+			    log(LogLevel.INFO, LogType.GAME_ENDED, JSONUtils.marshalServerStatus(m_serverStatus, this));
 			else
-				m_logger.info("GAME||{}", Protocol.payloadAsUTF8String(content));
+                log(LogLevel.DEBUG, LogType.GAME_DATA, Protocol.payloadAsUTF8String(content));
     	}
-    	m_serverStatus = status;
+
+    	setServerStatus(status);
     }
-    
+
+    /**
+     * Status update handler for inherited classes to over-ride.
+     * @param status
+     */
+    public void setServerStatus(final ServerStatus status)
+    {
+        m_serverStatus = status;
+    }
+
     /**
      * Send a player greeting message (if configured)
-     * @param status Game state
      * @param p Player to greet.
      */
     private void doGreeting(final Player p)
@@ -335,7 +334,7 @@ public class SEAdminServerConnection implements Runnable
         final ByteBuffer buf = Protocol.buildMessage(messageId);
         try
         {
-        	m_logger.debug(">>||{}", Protocol.bytesToString(buf.array()));
+            log(LogLevel.TRACE, LogType.SYSTEM, ">> %s", Protocol.bytesToString(buf.array()));
         	m_session.getRemote().sendBytes(buf);
         }
         catch (final IOException ex)
@@ -355,7 +354,7 @@ public class SEAdminServerConnection implements Runnable
         
         try
         {
-        	m_logger.trace(">>||{}", Protocol.bytesToString(buf.array()));
+            log(LogLevel.TRACE, LogType.SYSTEM, ">> %s", Protocol.bytesToString(buf.array()));
         	m_session.getRemote().sendBytes(buf);
         }
         catch (final IOException ex)
@@ -373,15 +372,15 @@ public class SEAdminServerConnection implements Runnable
     {
     	switch (messageId)
     	{
-    	case Protocol.REPLY_INIT : 
-        	m_logger.info("AUTH||Authenticating");
+    	case Protocol.REPLY_INIT :
+    	    log(LogLevel.INFO, LogType.SYSTEM, "Authenticating");
     		final byte[] salt = Protocol.getSaltValue(content);
     		sendMessage(Protocol.REQUEST_SEND_PWD, Protocol.buildSaltedPassword(salt, m_password));
     		break;
     		
     	case Protocol.REPLY_CONNECTION_SUCCESS_1 : 
     	case Protocol.REPLY_CONNECTION_SUCCESS_2 : 
-        	m_logger.info("AUTH||Authentication successful");
+            log(LogLevel.INFO, LogType.SYSTEM, "Authentication successful");
     		sendMessage(Protocol.REQUEST_SET_WEB_STATUS_UPDATE_INTERVAL, Protocol.uInt32ToBytes(5000));
     		break;
     		
@@ -391,7 +390,7 @@ public class SEAdminServerConnection implements Runnable
     		
     	case Protocol.REPLY_ASYNC_MSG :
     		final String message = Protocol.payloadAsUTF8String(content);
-        	m_logger.info("MSG||{}", message);
+            log(LogLevel.INFO, LogType.MSG, message);
     		break;
     		
     	case Protocol.REPLY_WEB_STATUS_MONITOR_UPDATE :
@@ -400,15 +399,15 @@ public class SEAdminServerConnection implements Runnable
     		
     	case Protocol.REPLY_COMMAND_LIST: // triggered as a result of REQUEST_SET_WEB_STATUS_UPDATE_INTERVAL being sent
     		final String cmdList = Protocol.payloadAsUTF8String(content);
-        	m_logger.info("MSG||Command list {}", cmdList);
+            log(LogLevel.DEBUG, LogType.MSG, "command list %s", cmdList);
     		break;
     		
     	case Protocol.REPLY_CMD_RESULT:
-        	m_logger.info("COMMAND||{}", content.get() == 0 ? "FAIL" : "OK");
+            log(LogLevel.DEBUG, LogType.SYSTEM, content.get() == 0 ? "FAIL" : "OK");
         	break;
         	
     	default:
-        	m_logger.info("MSG||id {} data {}", (int)messageId, Protocol.bytesToString(content.array()));
+            log(LogLevel.INFO, LogType.SYSTEM, "Unhandled message id = %s payload = %s", "" + messageId, Protocol.bytesToString(content.array()));
     	}
     }
     
@@ -421,16 +420,27 @@ public class SEAdminServerConnection implements Runnable
     {
     	if (content.array().length == 12)
     	{
-			m_bytesSent = Protocol.getUInt32(content, 0);
-			m_bytesReceived = Protocol.getUInt32(content, 4);
-			m_fps = Protocol.getFloat(content, 8);
+            updateServerStatistics(Protocol.getUInt32(content, 0),Protocol.getUInt32(content, 4), Protocol.getFloat(content, 8));
     	}
     	else
     	{
-        	m_logger.debug("MSG||Unexpected content length for WebStatusMonitorUpdate {}", Protocol.bytesToString(content.array()));
+    	    log(LogLevel.ERROR, LogType.SYSTEM, "Unexpected content length for WebStatusMonitorUpdate %s", Protocol.bytesToString(content.array()));
     	}
     }
-    
+
+    /**
+     * Update server statistics method to allow inherited classes to override.
+     * @param bytesSent Bytes send
+     * @param bytesReceived Bytes received
+     * @param fps FPS
+     */
+    public void updateServerStatistics(final long bytesSent, final long bytesReceived, final float fps)
+    {
+        m_bytesSent = bytesSent;
+        m_bytesReceived = bytesReceived;
+        m_fps = fps;
+    }
+
     /**
      * Handler for when we receive an open web socket event. We trigger the
      * password exchange handshake here.
@@ -439,7 +449,7 @@ public class SEAdminServerConnection implements Runnable
     @OnWebSocketConnect
     public void onConnect(Session session)
     {
-        m_logger.info("CONNECT||Connected to {}", session.getRemoteAddress());
+        log(LogLevel.INFO, LogType.SYSTEM, "Connected to %s", session.getRemoteAddress().toString());
         m_session = session;
         if (m_session.isOpen())
             sendMessage(Protocol.REQUEST_INIT);
@@ -453,7 +463,7 @@ public class SEAdminServerConnection implements Runnable
     @OnWebSocketClose
     public void onClose(int statusCode, String reason)
     {
-        m_logger.info("CLOSE||Status code {} reason {}", statusCode, reason);
+        log(LogLevel.INFO, LogType.SYSTEM,"Connection closed. Status code is '%s' reason is '%s", Integer.toString(statusCode), reason);
         m_session = null;
         m_client = null;
     }
@@ -471,7 +481,7 @@ public class SEAdminServerConnection implements Runnable
     @OnWebSocketMessage
     public void onMessage(Session session, byte[] b, int offset, int length)
     {
-        m_logger.trace("<<||{} offset={} length={}", Protocol.bytesToString(b), offset, length);
+        log(LogLevel.TRACE, LogType.SYSTEM, "<<||%s offset=%s length=%s", Protocol.bytesToString(b), Integer.toString(offset), Integer.toString(length));
         if (offset != 0 || length != b.length)
         {
             // Never seems to happen from SE,but just in case.
@@ -495,13 +505,13 @@ public class SEAdminServerConnection implements Runnable
             cause instanceof java.io.IOException                    // Broken pipe
             )
         {
-            m_logger.debug("WebSocket error handled as connection death: ", cause);
+            log(LogLevel.INFO, LogType.SYSTEM, "WebSocket error handled as connection death");
             m_session = null;
             m_client = null;
         }
         else
         {
-            m_logger.info("Unhandled webSocket Error: ", cause);
+            log(LogLevel.ERROR, LogType.SYSTEM, cause,"Unhandled webSocket Error");
         }
     }
     
@@ -517,10 +527,61 @@ public class SEAdminServerConnection implements Runnable
         }
         catch (final Exception ex2)
         {
-            
+            // ignore
         }
     }
-	public static void main(String[] args) throws Exception
+    @Override
+    public void log(LogLevel level, LogType type, String message, Object... args) {
+
+        log(level, type, null, message, args);
+    }
+
+    @Override
+    public void log(LogLevel level, LogType type, Throwable t, String message, Object... args) {
+
+        if (isFilterMessage(level))
+            return;
+
+        final StringBuilder sb = new StringBuilder(128);
+        sb.append(Instant.now().toString());
+        sb.append('|');
+        sb.append(level.label);
+        sb.append('|');
+        sb.append(type.label);
+        sb.append('|');
+        sb.append(String.format(message, args));
+
+        if (t != null)
+        {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            t.printStackTrace(pw);
+            sb.append('\n');
+            sb.append(sw.toString());
+        }
+
+        System.out.println(sb.toString());
+    }
+
+    /**
+     * Whether to filter out messages of the specified log level.
+     * @param level Log level to check
+     * @return true if NOT to display it.
+     */
+    protected boolean isFilterMessage(final LogLevel level)
+    {
+        if (level.equals(LogLevel.ERROR))
+            return false; // always show ERROR
+
+        switch(m_displayLogLevel) {
+            case INFO: return level.equals(LogLevel.DEBUG) || level.equals(LogLevel.TRACE);
+            case DEBUG: return level.equals(LogLevel.TRACE);
+            case TRACE:
+            default:
+                return false;
+        }
+    }
+    public static void main(String[] args) throws Exception
 	{
 		if (args.length != 1)
 		{
@@ -538,4 +599,5 @@ public class SEAdminServerConnection implements Runnable
         {
         }
     }
+
 }

@@ -8,7 +8,10 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
+
+import tfa.se4.logger.LoggerInterface;
+import static tfa.se4.logger.LoggerInterface.LogLevel;
+import static tfa.se4.logger.LoggerInterface.LogType;
 
 /**
  * Read list of white listed player steam ID's.  Format is one
@@ -23,9 +26,9 @@ public final class PlayerWhiteList implements Runnable
 	private HashSet<String> m_ids = new HashSet<String>();
 	private File m_file;
 	private long m_lastRead = 0;
-	private Logger m_logger;
+	private LoggerInterface m_logger;
 	
-	public PlayerWhiteList(final String fileName, final Logger logger)
+	public PlayerWhiteList(final String fileName, final LoggerInterface logger)
 	{
 		m_file = new File(fileName);
 		m_logger = logger;
@@ -52,7 +55,7 @@ public final class PlayerWhiteList implements Runnable
 					}
 					
 					m_ids = ids;
-			    	m_logger.info("SYSTEM||{} whitelisted steam IDs read from {}", m_ids.size(), m_file.getName());
+			    	m_logger.log(LogLevel.INFO, LogType.SYSTEM,"whitelisted steam IDs read from %s", Integer.toString(m_ids.size()), m_file.getName());
 			    	m_lastRead = System.currentTimeMillis();
 				}
 				Thread.sleep(30000);
@@ -60,8 +63,8 @@ public final class PlayerWhiteList implements Runnable
 		}
 		catch (final IOException | InterruptedException ex)
 		{
-	    	m_logger.error("SYSTEM||Cannot read player whitelist from {}. Error is {}", m_file.getName(), ex.getMessage());
-		}			
+			m_logger.log(LogLevel.ERROR, LogType.SYSTEM, ex,"Cannot read player whitelist from %s. Error is %s", m_file.getName(), ex.getMessage());
+		}
 	}
 	
 	/**

@@ -1,9 +1,11 @@
 package tfa.se4.json;
 
-import org.slf4j.Logger;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import tfa.se4.logger.LoggerInterface;
+import static tfa.se4.logger.LoggerInterface.LogLevel;
+import static tfa.se4.logger.LoggerInterface.LogType;
 
 public final class JSONUtils
 {
@@ -23,7 +25,7 @@ public final class JSONUtils
 	 * @param logger Logger for writing error information.
 	 * @return Object or null when fails to unmarshal.
 	 */
-	public static ServerStatus unMarshalServerStatus(final String json, final Logger logger)
+	public static ServerStatus unMarshalServerStatus(final String json, final LoggerInterface logger)
 	{
 		try
 		{
@@ -31,7 +33,7 @@ public final class JSONUtils
 		}
 		catch (JsonProcessingException e)
 		{
-        	logger.debug("MSG||Bad JSON {} Error was: {}", json, e.getMessage());
+			logger.log(LogLevel.ERROR, LogType.SYSTEM, e, "Bad JSON %s", json);
 			return null;
 		}
 	}
@@ -42,14 +44,14 @@ public final class JSONUtils
 	 * @param logger Logger for writing error information.
 	 * @return Marshalled string or empty when marshalling error.
 	 */
-	public static String marshalServerStatus(final ServerStatus status, final Logger logger)
+	public static String marshalServerStatus(final ServerStatus status, final LoggerInterface logger)
 	{
 		try
 		{
 			return MAPPER.writeValueAsString(status);
 		} catch (JsonProcessingException e)
 		{
-        	logger.debug("MSG||Marshal error was: {}", e.getMessage());
+			logger.log(LogLevel.ERROR, LogType.SYSTEM, e, "Marshalling error");
 			return "";
 		}
 	}

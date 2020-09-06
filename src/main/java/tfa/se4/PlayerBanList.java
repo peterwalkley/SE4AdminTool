@@ -9,8 +9,10 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 
+import tfa.se4.logger.LoggerInterface;
+import static tfa.se4.logger.LoggerInterface.LogLevel;
+import static tfa.se4.logger.LoggerInterface.LogType;
 /**
  * Read list of banned player steam ID and reasons.  Format is one
  * player ID, name and reason per line.
@@ -34,9 +36,9 @@ public final class PlayerBanList implements Runnable
 	private Map<String,Ban> m_bans = new HashMap<String,Ban>();
 	private File m_file;
 	private long m_lastRead = 0;
-	private Logger m_logger;
+	private LoggerInterface m_logger;
 	
-	public PlayerBanList(final String fileName, final Logger logger)
+	public PlayerBanList(final String fileName, final LoggerInterface logger)
 	{
 		m_file = new File(fileName);
 		m_logger = logger;
@@ -69,13 +71,13 @@ public final class PlayerBanList implements Runnable
 							}
 							else
 							{
-						    	m_logger.info("SYSTEM||Invalid ban entry '{}'  bans read from {} was ignored", line, m_file.getName());
+						    	m_logger.log(LogLevel.INFO, LogType.SYSTEM, "Invalid ban entry '%s'  bans read from %s was ignored", line, m_file.getName());
 							}
 						}
 						
 					}
 					m_bans = bans;
-			    	m_logger.info("SYSTEM||{} player bans read from {}", m_bans.size(), m_file.getName());
+			    	m_logger.log(LogLevel.INFO, LogType.SYSTEM,"%s player bans read from %s", Integer.toString(m_bans.size()), m_file.getName());
 			    	m_lastRead = System.currentTimeMillis();
 				}
 				Thread.sleep(30000);
@@ -83,7 +85,7 @@ public final class PlayerBanList implements Runnable
 		}
 		catch (final IOException | InterruptedException ex)
 		{
-	    	m_logger.error("SYSTEM||Cannot read player bans from {}. Error is {}", m_file.getName(), ex.getMessage());
+	    	m_logger.log(LogLevel.ERROR, LogType.SYSTEM, ex,"Cannot read player bans from %s. Error is %s", m_file.getName(), ex.getMessage());
 		}			
 	}
 	

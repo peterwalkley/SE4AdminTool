@@ -8,8 +8,10 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 
+import tfa.se4.logger.LoggerInterface;
+import static tfa.se4.logger.LoggerInterface.LogLevel;
+import static tfa.se4.logger.LoggerInterface.LogType;
 /**
  * Read list of banned IP addresses from file.  Format is one
  * IP address per line. Duplicates will automatically be ignored.
@@ -22,9 +24,9 @@ public final class IPBanList implements Runnable
 	private HashSet<String> m_ips = new HashSet<String>();
 	private File m_file;
 	private long m_lastRead = 0;
-	private Logger m_logger;
+	private LoggerInterface m_logger;
 	
-	public IPBanList(final String fileName, final Logger logger)
+	public IPBanList(final String fileName, final LoggerInterface logger)
 	{
 		m_file = new File(fileName);
 		m_logger = logger;
@@ -48,7 +50,7 @@ public final class IPBanList implements Runnable
 							ips.add(StringUtils.split(line, '#')[0].trim());
 					}
 					m_ips = ips;
-			    	m_logger.info("SYSTEM||{} banned IP addresses read from {}", m_ips.size(), m_file.getName());
+					m_logger.log(LogLevel.INFO, LogType.SYSTEM, "%s banned IP addresses read from %s", Integer.toString(m_ips.size()), m_file.getName());
 			    	m_lastRead = System.currentTimeMillis();
 				}
 				Thread.sleep(30000);
@@ -56,8 +58,8 @@ public final class IPBanList implements Runnable
 		}
 		catch (final IOException | InterruptedException ex)
 		{
-	    	m_logger.error("SYSTEM||Cannot read banned IP addresses from {}. Error is {}", m_file.getName(), ex.getMessage());
-		}			
+			m_logger.log(LogLevel.ERROR, LogType.SYSTEM, ex, "Cannot read banned IP addresses from %s. Error is %s", m_file.getName(), ex.getMessage());
+		}
 	}
 	
 	/**

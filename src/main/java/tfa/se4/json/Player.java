@@ -22,15 +22,15 @@ public class Player {
 	@JsonProperty("IPv4")
 	private String iPv4;
 	@JsonProperty("Latency")
-	private String latency;
+	private Integer latency;
 	@JsonProperty("Score")
-	private String score;
+	private Integer score;
 	@JsonProperty("Deaths")
-	private String deaths;
+	private Integer deaths;
 	@JsonProperty("Kills")
-	private String kills;
+	private Integer kills;
 	@JsonProperty("Assists")
-	private String assists;
+	private Integer assists;
 	@JsonProperty("LongestShot")
 	private Double longestShot;
 	@JsonIgnore
@@ -78,52 +78,52 @@ public class Player {
 	}
 
 	@JsonProperty("Latency")
-	public String getLatency() {
+	public Integer getLatency() {
 		return latency;
 	}
 
 	@JsonProperty("Latency")
-	public void setLatency(String latency) {
+	public void setLatency(Integer latency) {
 		this.latency = latency;
 	}
 
 	@JsonProperty("Score")
-	public String getScore() {
+	public Integer getScore() {
 		return score;
 	}
 
 	@JsonProperty("Score")
-	public void setScore(String score) {
+	public void setScore(Integer score) {
 		this.score = score;
 	}
 
 	@JsonProperty("Deaths")
-	public String getDeaths() {
+	public Integer getDeaths() {
 		return deaths;
 	}
 
 	@JsonProperty("Deaths")
-	public void setDeaths(String deaths) {
+	public void setDeaths(Integer deaths) {
 		this.deaths = deaths;
 	}
 
 	@JsonProperty("Kills")
-	public String getKills() {
+	public Integer getKills() {
 		return kills;
 	}
 
 	@JsonProperty("Kills")
-	public void setKills(String kills) {
+	public void setKills(Integer kills) {
 		this.kills = kills;
 	}
 
 	@JsonProperty("Assists")
-	public String getAssists() {
+	public Integer getAssists() {
 		return assists;
 	}
 
 	@JsonProperty("Assists")
-	public void setAssists(String assists) {
+	public void setAssists(Integer assists) {
 		this.assists = assists;
 	}
 
@@ -178,5 +178,4 @@ public class Player {
 			return false;
 		return true;
 	}
-
 }
