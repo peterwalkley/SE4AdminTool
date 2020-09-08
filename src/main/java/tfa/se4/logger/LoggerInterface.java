@@ -2,7 +2,7 @@ package tfa.se4.logger;
 
 public interface LoggerInterface {
 
-    public enum LogLevel {
+    enum LogLevel {
         TRACE("TRACE"),
         DEBUG("DEBUG"),
         ERROR("ERROR"),
@@ -10,12 +10,12 @@ public interface LoggerInterface {
 
         public final String label;
 
-        private LogLevel(final String label) {
+        LogLevel(final String label) {
             this.label = label;
         }
     }
 
-    public enum LogType {
+    enum LogType {
         CHECK("CHECK"),
         GAMEBAN("GAMEBAN"),
         GAME_DATA("GAME_DATA"),
@@ -32,11 +32,11 @@ public interface LoggerInterface {
 
         public final String label;
 
-        private LogType(final String label) {
+        LogType(final String label) {
             this.label = label;
         }
     }
 
-    public abstract void log(LogLevel level, LogType type, String message, Object... args);
-    public abstract void log(LogLevel level, LogType type, Throwable t, String message, Object... args);
+    void log(LogLevel level, LogType type, String message, Object... args);
+    void log(LogLevel level, LogType type, Throwable t, String message, Object... args);
 }

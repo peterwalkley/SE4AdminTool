@@ -21,7 +21,7 @@ import static tfa.se4.logger.LoggerInterface.LogType;
  */
 public final class IPBanList implements Runnable
 {
-	private HashSet<String> m_ips = new HashSet<String>();
+	private HashSet<String> m_ips = new HashSet<>();
 	private File m_file;
 	private long m_lastRead = 0;
 	private LoggerInterface m_logger;
@@ -32,7 +32,8 @@ public final class IPBanList implements Runnable
 		m_logger = logger;
 		new Thread(this).start();
 	}
-	
+
+	@SuppressWarnings({"InfiniteLoopStatement", "BusyWait"})
 	@Override
 	public void run()
 	{
@@ -42,7 +43,7 @@ public final class IPBanList implements Runnable
 			{	
 				if (FileUtils.isFileNewer(m_file, m_lastRead))
 				{
-					final HashSet<String> ips = new HashSet<String>();
+					final HashSet<String> ips = new HashSet<>();
 					final List<String> lines = FileUtils.readLines(m_file, Charset.defaultCharset());
 					for (final String line : lines)
 					{

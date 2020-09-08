@@ -24,7 +24,7 @@ public class CurrentMap {
 	@JsonProperty("MaxPlayers")
 	private Integer maxPlayers;
 	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+	private Map<String, Object> additionalProperties = new HashMap<>();
 
 	@JsonProperty("TimeLimit")
 	public Integer getTimeLimit() {

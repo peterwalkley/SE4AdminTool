@@ -29,22 +29,18 @@ public class MonitoredServerConnection extends SEAdminServerConnection {
     public void setServerStatus(ServerStatus status) {
         super.setServerStatus(status);
 
-        Platform.runLater(new Runnable() {
+        Platform.runLater(() -> {
+            if (status != null && status.getGameData() != null && status.getGameData().getCurrentMap() != null) {
+                model.setMap(status.getGameData().getCurrentMap().getName());
+                model.setMode(status.getGameData().getCurrentMap().getMode());
+                model.setScoreLimit(status.getGameData().getCurrentMap().getScoreLimit().toString());
+                model.setTimeLimit(status.getGameData().getCurrentMap().getTimeLimit().toString());
+            }
 
-            @Override
-            public void run() {
-                if (status != null && status.getGameData() != null && status.getGameData().getCurrentMap() != null) {
-                    model.setMap(status.getGameData().getCurrentMap().getName());
-                    model.setMode(status.getGameData().getCurrentMap().getMode());
-                    model.setScoreLimit(status.getGameData().getCurrentMap().getScoreLimit().toString());
-                    model.setTimeLimit(status.getGameData().getCurrentMap().getTimeLimit().toString());
-                }
-
-                if (status != null && status.getLobby() != null) {
-                    model.setState(status.getLobby().getState());
-                    model.setMaxPlayers(status.getLobby().getMaxPlayers().toString());
-                    model.setPlayers(status.getLobby().getPlayers());
-                }
+            if (status != null && status.getLobby() != null) {
+                model.setState(status.getLobby().getState());
+                model.setMaxPlayers(status.getLobby().getMaxPlayers().toString());
+                model.setPlayers(status.getLobby().getPlayers());
             }
         });
     }
@@ -79,28 +75,19 @@ public class MonitoredServerConnection extends SEAdminServerConnection {
             sb.append(sw.toString());
         }
 
-        Platform.runLater(new Runnable() {
-
-            @Override
-            public void run() {
-                model.addLogLine(sb.toString());
-            }
-        });
+        Platform.runLater(() -> model.addLogLine(sb.toString()));
     }
 
     @Override
     public void updateServerStatistics(long bytesSent, long bytesReceived, float fps) {
         super.updateServerStatistics(bytesSent, bytesReceived, fps);
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                //TODO: Formatting
-                model.setBytesSent(Long.toString(bytesSent));
-                model.setBytesReceived(Long.toString(bytesReceived));
-                model.setFps(Float.toString(fps));
+        Platform.runLater(() -> {
+            //TODO: Formatting
+            model.setBytesSent(Long.toString(bytesSent));
+            model.setBytesReceived(Long.toString(bytesReceived));
+            model.setFps(Float.toString(fps));
 
-            }
         });
     }
 

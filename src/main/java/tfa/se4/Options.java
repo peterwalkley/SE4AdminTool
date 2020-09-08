@@ -22,14 +22,14 @@ public class Options
     
 	/**
 	 * Collect properties.
-	 * @param configFile
+	 * @param configFile Properties configuration
 	 */
 	public Options(final String configFile) throws Exception
 	{
 		final Properties props = new Properties();
-		try
+		try (FileInputStream input = new FileInputStream(configFile))
 		{
-			props.load(new FileInputStream(configFile));
+			props.load(input);
 		}
 		catch (final IOException e)
 		{
@@ -52,7 +52,7 @@ public class Options
 		
 		if ((m_applyVACBans || m_applyGameBans) && StringUtils.isBlank(m_steamAPIKey))
 		{
-		    throw new IllegalArgumentException("Kicking of VAC or Game banned player requires a steam API key for checks to be performed");
+		    throw new Exception("Kicking of VAC or Game banned player requires a steam API key for checks to be performed");
 		}
 	}
 	
@@ -67,7 +67,7 @@ public class Options
 	{
 		final String val = props.getProperty(prop);
 		if (StringUtils.isBlank(val))
-			throw new IllegalArgumentException("Property " + prop + " cannot be a blank value");
+			throw new Exception("Property " + prop + " cannot be a blank value");
 		
 		return val.trim();
 	}
@@ -83,7 +83,7 @@ public class Options
 	{
 		final String val = getMandatoryProperty(props, prop);
 		if (!(new File(val)).isFile())
-			throw new IllegalArgumentException("Property " + prop + " does not refer to a file");
+			throw new Exception("Property " + prop + " does not refer to a file");
 		
 		return val;
 	}

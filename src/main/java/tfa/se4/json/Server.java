@@ -18,7 +18,7 @@ public class Server {
 	@JsonProperty("Host")
 	private String host;
 	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+	private Map<String, Object> additionalProperties = new HashMap<>();
 
 	@JsonProperty("Name")
 	public String getName() {

@@ -1,11 +1,11 @@
 package tfa.se4.gui;
 
 import java.io.File;
-import java.io.IOException;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.stage.FileChooser;
@@ -13,8 +13,9 @@ import tfa.se4.Options;
 
 public class MainPaneController {
 
-    @FXML
-    private TabPane tabPane;
+    @FXML private TabPane tabPane;
+    @FXML private Button connectButton;
+    @FXML private Button closeButton;
 
     public void connectButtonClicked() {
 
@@ -43,9 +44,11 @@ public class MainPaneController {
             final Options opts = new Options(selected.getAbsolutePath());
             final MonitoredServerConnection conn = new MonitoredServerConnection(opts);
             final ServerPaneController controller = new ServerPaneController(conn);
+            newTab.setOnCloseRequest(e -> controller.close());
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ServerPane.fxml"));
             loader.setController(controller);
             newTab.setContent(loader.load());
+
         } catch (Exception e) {
             System.out.println(e.getLocalizedMessage());
             e.printStackTrace();

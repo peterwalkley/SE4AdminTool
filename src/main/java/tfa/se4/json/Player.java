@@ -34,7 +34,7 @@ public class Player {
 	@JsonProperty("LongestShot")
 	private Double longestShot;
 	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+	private Map<String, Object> additionalProperties = new HashMap<>();
 
 	private boolean skipGreeting;
 	@JsonProperty("Id")
@@ -172,10 +172,7 @@ public class Player {
 			return false;
 		Player other = (Player) obj;
 		if (steamId == null) {
-			if (other.steamId != null)
-				return false;
-		} else if (!steamId.equals(other.steamId))
-			return false;
-		return true;
+			return other.steamId == null;
+		} else return steamId.equals(other.steamId);
 	}
 }

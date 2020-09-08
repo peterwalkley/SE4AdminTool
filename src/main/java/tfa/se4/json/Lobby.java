@@ -21,7 +21,7 @@ public class Lobby {
 	@JsonProperty("Players")
 	private List<Player> players = null;
 	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+	private Map<String, Object> additionalProperties = new HashMap<>();
 
 	@JsonProperty("State")
 	public String getState() {

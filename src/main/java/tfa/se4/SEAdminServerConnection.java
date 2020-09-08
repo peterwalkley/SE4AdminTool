@@ -44,9 +44,6 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
 	private String m_password;
     private final CountDownLatch m_closeLatch;
     private Session m_session;
-    private long m_bytesReceived;
-    private long m_bytesSent;
-    private float m_fps;
     private ServerStatus m_serverStatus;
     private IPBanList m_ipBans;
     private PlayerWhiteList m_whiteList;
@@ -56,8 +53,9 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     private boolean m_isApplyVACBans;
     private boolean m_isApplyGameBans;
     private SteamAPI m_steamAPI;
-    private ConcurrentLinkedQueue<Player> m_playersToCheck = new ConcurrentLinkedQueue<Player>();
+    private ConcurrentLinkedQueue<Player> m_playersToCheck = new ConcurrentLinkedQueue<>();
     private LogLevel m_displayLogLevel = LogLevel.INFO;
+    private boolean m_isClose = false;
    
     /**
      * Set up and manage connection based on properties configuration.
@@ -89,7 +87,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     @Override
     public void run()
     {
-        while (true)
+        while (!m_isClose)
         {
             if (m_client == null)
             {
@@ -117,8 +115,34 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
                 sleep(1000);
             }
         }
+
+        try
+        {
+            if (m_client != null)
+                m_client.stop();
+
+            if (m_session != null) {
+                m_session.disconnect();
+                m_session.close();
+            }
+        } catch (Exception e) {
+            log(LogLevel.TRACE, LogType.SYSTEM, e, "Exception during shutdown");
+            // ignore
+        }
+        finally {
+            m_client = null;
+            m_session = null;
+        }
     }
-    
+
+    /**
+     * Close connection as tidily as we can.
+     */
+    public synchronized void closeConnection()
+    {
+        log(LogLevel.INFO, LogType.SYSTEM, "Closing connection to %s:%s", m_host, m_port);
+        m_isClose = true;
+    }
     /**
      * Check whether a player is allowed here.
      * @param p Player to check.
@@ -188,7 +212,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         // Do a steam ID ban to make sure they are added to server ban list
         final String steamIDBan = "Server.KickBanSteamID " + p.getSteamId();
         sendMessage(Protocol.REQUEST_SEND_COMMAND, steamIDBan.getBytes());
-        
+
         // Make the ban public
         final String msg = "Server.Say BANNING " + p.getName() + " for " + reason;
         sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
@@ -213,32 +237,6 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     }
     
     /**
-     * Server statistic updated periodically.
-     * @return bytes received.
-     */
-    public synchronized long getBytesReceived()
-    {
-    	return m_bytesReceived;
-    }
-    /**
-     * Server statistic updated periodically.
-     * @return bytes sent.
-     */
-    public synchronized long getBytesSent()
-    {
-    	return m_bytesSent;
-    }
-    
-    /**
-     * Server statistic updated periodically.
-     * @return FPS.
-     */
-    public synchronized float getFPS()
-    {
-    	return m_fps;
-    }
-    
-    /**
      * Update state based on receiving a {@link Protocol#REPLY_WEB_STATUS_UPDATE} notification.
      * The payload is JSON which we parse to a {@link tfa.se4.json.ServerStatus} structure.
      * <ul>
@@ -255,7 +253,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     		return;
     	
     	final List<Player> newPlayers = status.getLobby().getPlayers();
-    	final List<Player> oldPlayers = m_serverStatus == null ? new ArrayList<Player>() : m_serverStatus.getLobby().getPlayers();
+    	final List<Player> oldPlayers = m_serverStatus == null ? new ArrayList<>() : m_serverStatus.getLobby().getPlayers();
     	
     	for (final Player p : newPlayers)
     	{
@@ -292,7 +290,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
 
     /**
      * Status update handler for inherited classes to over-ride.
-     * @param status
+     * @param status Server status from SE
      */
     public void setServerStatus(final ServerStatus status)
     {
@@ -436,9 +434,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
      */
     public void updateServerStatistics(final long bytesSent, final long bytesReceived, final float fps)
     {
-        m_bytesSent = bytesSent;
-        m_bytesReceived = bytesReceived;
-        m_fps = fps;
+        // Don't care.
     }
 
     /**
@@ -597,6 +593,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         }
         finally
         {
+            // nothing
         }
     }
 

@@ -16,7 +16,7 @@ public class GameData {
 	@JsonProperty("CurrentMap")
 	private CurrentMap currentMap;
 	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+	private Map<String, Object> additionalProperties = new HashMap<>();
 
 	@JsonProperty("CurrentMap")
 	public CurrentMap getCurrentMap() {

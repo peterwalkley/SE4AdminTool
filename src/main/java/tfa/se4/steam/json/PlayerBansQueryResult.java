@@ -19,7 +19,7 @@ public class PlayerBansQueryResult {
 @JsonProperty("players")
 private List<Player> players = null;
 @JsonIgnore
-private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+private Map<String, Object> additionalProperties = new HashMap<>();
 
 @JsonProperty("players")
 public List<Player> getPlayers() {

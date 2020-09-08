@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<SplitPane fx:id="paneId" dividerPositions="0.18433179723502305, 0.5990783410138248, 0.6835637480798771, 0.9231950844854071" orientation="VERTICAL" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<SplitPane fx:id="paneId" dividerPositions="0.18433179723502305, 0.5990783410138248, 0.6835637480798771, 0.9231950844854071" orientation="VERTICAL" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tfa.se4.gui.ServerPaneController">
   <items>
       <HBox SplitPane.resizableWithParent="false">
          <children>

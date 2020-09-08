@@ -24,7 +24,7 @@ public class ServerStatus {
 	@JsonProperty("GameData")
 	private GameData gameData;
 	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+	private Map<String, Object> additionalProperties = new HashMap<>();
 
 	@JsonProperty("Server")
 	public Server getServer() {

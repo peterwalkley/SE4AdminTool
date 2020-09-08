@@ -26,14 +26,14 @@ import static tfa.se4.logger.LoggerInterface.LogType;
  */
 public final class PlayerBanList implements Runnable
 {
-	public class Ban
+	public static class Ban
 	{
 		public String steamID;
 		public String name;
 		public String reason;
-	};
-	
-	private Map<String,Ban> m_bans = new HashMap<String,Ban>();
+	}
+
+	private Map<String,Ban> m_bans = new HashMap<>();
 	private File m_file;
 	private long m_lastRead = 0;
 	private LoggerInterface m_logger;
@@ -45,6 +45,7 @@ public final class PlayerBanList implements Runnable
 		new Thread(this).start();
 	}
 	
+	@SuppressWarnings("InfiniteLoopStatement")
 	@Override
 	public void run()
 	{
@@ -54,7 +55,7 @@ public final class PlayerBanList implements Runnable
 			{	
 				if (FileUtils.isFileNewer(m_file, m_lastRead))
 				{
-					final Map<String,Ban> bans = new HashMap<String,Ban>();
+					final Map<String,Ban> bans = new HashMap<>();
 					final List<String> lines = FileUtils.readLines(m_file, Charset.defaultCharset());
 					for (final String line : lines)
 					{
@@ -80,6 +81,7 @@ public final class PlayerBanList implements Runnable
 			    	m_logger.log(LogLevel.INFO, LogType.SYSTEM,"%s player bans read from %s", Integer.toString(m_bans.size()), m_file.getName());
 			    	m_lastRead = System.currentTimeMillis();
 				}
+				//noinspection BusyWait
 				Thread.sleep(30000);
 			}
 		}

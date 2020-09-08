@@ -55,6 +55,10 @@ public class ServerPaneController implements Initializable {
         clipboard.setContent(content);
     }
 
+    // close tab
+    public void close() {
+        m_connection.closeConnection();
+    }
     public void showProfile() {
         //TODO:
         System.out.println("profile button clicked");
@@ -76,15 +80,15 @@ public class ServerPaneController implements Initializable {
         timeLabel.textProperty().bind(m_connection.getModel().timeLimitProperty());
 
         // Players table
-        name.setCellValueFactory(new PropertyValueFactory<Player, String>("name"));
-        steamID.setCellValueFactory(new PropertyValueFactory<Player, String>("steamId"));
-        ipV4.setCellValueFactory(new PropertyValueFactory<Player, String>("iPv4"));
-        latency.setCellValueFactory(new PropertyValueFactory<Player, Integer>("latency"));
-        score.setCellValueFactory(new PropertyValueFactory<Player, Integer>("score"));
-        deaths.setCellValueFactory(new PropertyValueFactory<Player, Integer>("deaths"));
-        kills.setCellValueFactory(new PropertyValueFactory<Player, Integer>("kills"));
-        assists.setCellValueFactory(new PropertyValueFactory<Player, Integer>("assists"));
-        longestShot.setCellValueFactory(new PropertyValueFactory<Player, Double>("longestShot"));
+        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        steamID.setCellValueFactory(new PropertyValueFactory<>("steamId"));
+        ipV4.setCellValueFactory(new PropertyValueFactory<>("iPv4"));
+        latency.setCellValueFactory(new PropertyValueFactory<>("latency"));
+        score.setCellValueFactory(new PropertyValueFactory<>("score"));
+        deaths.setCellValueFactory(new PropertyValueFactory<>("deaths"));
+        kills.setCellValueFactory(new PropertyValueFactory<>("kills"));
+        assists.setCellValueFactory(new PropertyValueFactory<>("assists"));
+        longestShot.setCellValueFactory(new PropertyValueFactory<>("longestShot"));
         playersTable.setItems(m_connection.getModel().getPlayers());
 
         // log pane

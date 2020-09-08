@@ -35,9 +35,6 @@ private Integer daysSinceLastBan;
 private Integer numberOfGameBans;
 @JsonProperty("EconomyBan")
 private String economyBan;
-@JsonIgnore
-private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
 @JsonProperty("SteamId")
 public String getSteamId() {
 return steamId;
@@ -112,6 +109,9 @@ this.economyBan = economyBan;
 public Map<String, Object> getAdditionalProperties() {
 return this.additionalProperties;
 }
+
+    @JsonIgnore
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
 @JsonAnySetter
 public void setAdditionalProperty(String name, Object value) {

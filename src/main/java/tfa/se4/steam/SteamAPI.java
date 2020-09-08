@@ -47,16 +47,15 @@ public final class SteamAPI
             final PlayerBansQueryResult bans = JSONUtils.unMarshalServerStatus(
                     Request.Get(url).connectTimeout(2000).socketTimeout(2000).execute().returnContent().asString(), logger);
             
-            if (bans == null || bans.getPlayers() == null || bans.getPlayers().isEmpty())
-            {
-                logger.log(LogLevel.ERROR, LogType.STEAM, "Unable to fetch steam ban info for %s empty return data", steamID);
-            }
-            return bans.getPlayers().get(0);
+            if (bans != null && bans.getPlayers() != null && ! bans.getPlayers().isEmpty())
+                return bans.getPlayers().get(0);
+
+            logger.log(LogLevel.ERROR, LogType.STEAM, "Unable to fetch steam ban info for %s empty return data", steamID);
         }
         catch (IOException e)
         {
             logger.log(LogLevel.ERROR, LogType.STEAM, e,"Unable to fetch steam ban info for %s", steamID);
-            return null;
         }
+        return null;
     }
 }

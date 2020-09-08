@@ -1,8 +1,8 @@
 package tfa.se4;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -65,8 +65,9 @@ public final class Protocol
     	else
     	{
     		final byte[] load = new byte[b.length - 2];
-    		for (int i = 0; i < load.length; i++)
-    			load[i] = b[i + 2];
+			if (load.length >= 0)
+				System.arraycopy(b, 2, load, 0, load.length);
+
     		result.payload = ByteBuffer.wrap(load);
     	}
     			
@@ -183,7 +184,7 @@ public final class Protocol
      */
     public static byte[] buildSaltedPassword(final byte[] salt, final String password)
     {
-    	final ArrayList<Byte> salted = new ArrayList<Byte>();
+    	final ArrayList<Byte> salted = new ArrayList<>();
     	for (final byte b : salt)
     		salted.add(b);
     	
@@ -217,8 +218,7 @@ public final class Protocol
     	for (int i = 0; i < salted.size(); i++)
     		tmp[i] = salted.get(i);
     	
-    	final byte[] result = getSHA1().digest(tmp);
-    	return result;
+    	return getSHA1().digest(tmp);
     }
     
     /**
@@ -230,12 +230,11 @@ public final class Protocol
     public static long getUInt32(final ByteBuffer buf, int offset)
     {
     	byte[] bytes = buf.array();
-	    long value = 
+	    return
 	        ((bytes[offset + 0] & 0xFF) <<  0) |
 	        ((bytes[offset + 1] & 0xFF) <<  8) |
 	        ((bytes[offset + 2] & 0xFF) << 16) |
 	        ((bytes[offset + 3] & 0xFF) << 24);
-	    return value;
     }
     
     /**
@@ -262,8 +261,7 @@ public final class Protocol
     public static float getFloat(final ByteBuffer buf, int offset)
     {
     	byte[] floatBytes = new byte[4];
-    	for (int i = 0; i < floatBytes.length; i++)
-    		floatBytes[i] = buf.array()[i + offset];
+		System.arraycopy(buf.array(), 0 + offset, floatBytes, 0, floatBytes.length);
     	
     	return ByteBuffer.wrap(floatBytes).order(ByteOrder.LITTLE_ENDIAN).getFloat();
     }
@@ -275,17 +273,9 @@ public final class Protocol
      */
     public static String payloadAsUTF8String(final ByteBuffer buf)
     {
-		try
-		{
-			return new String(buf.array(), "UTF-8");
-		}
-		catch (final UnsupportedEncodingException e)
-		{
-			// Fatal error and should never be possible !
-			throw new Error(e);
-		}
+		return new String(buf.array(), StandardCharsets.UTF_8);
 
-    }
+	}
 /*    
 	public static void main(String[] args) throws Exception
 	{
