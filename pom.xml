@@ -8,8 +8,9 @@
   <artifactId>se4</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
-  <name>se4</name>
+  <name>TFA SE4 Administrator</name>
   <url>https://github.com/peterwalkley/SE4AdminTool</url>
+  <description>A tool to administer Sniper Elite 4 Servers</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -124,6 +125,7 @@
     </pluginManagement>
 	<finalName>SE4AdminTool</finalName>
 	<plugins>
+<!--
 		<plugin>
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-shade-plugin</artifactId>
@@ -146,6 +148,47 @@
 				</execution>
 			</executions>
 		</plugin>
+-->
+        <plugin>
+            <groupId>io.github.fvarrui</groupId>
+            <artifactId>javapackager</artifactId>
+            <version>1.1.0</version>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>package</goal>
+                    </goals>
+                    <configuration>
+                        <mainClass>tfa.se4.gui.SE4AdminGUI</mainClass>
+                        <bundleJre>true</bundleJre>
+                        <customizedJre>false</customizedJre>
+                        <jrePath>F:\JRE1.8</jrePath>
+<!--                        <runnableJar>SE4AdminTool.jar</runnableJar> -->
+                        <copyDependencies>true</copyDependencies>
+                        <generateInstaller>true</generateInstaller>
+                        <createZipball>true</createZipball>
+                        <administratorRequired>false</administratorRequired>
+                        <platform>windows</platform>
+                        <additionalResources>
+                            <additionalResource>config</additionalResource>
+                            <additionalResource>seadmin.bat</additionalResource>
+                            <additionalResource>config.properties</additionalResource>
+                        </additionalResources>
+                        <winConfig>
+                            <generateSetup>true</generateSetup>
+                            <generateMsi>false</generateMsi>
+                            <companyName>Peter Walkley</companyName>
+                            <productName>TFA Sniper Elite 4 Serer Administration Tool</productName>
+                            <disableDirPage>false</disableDirPage>
+                            <disableProgramGroupPage>false</disableProgramGroupPage>
+                            <disableFinishedPage>false</disableFinishedPage>
+                            <createDesktopIconTask>true</createDesktopIconTask>
+                        </winConfig>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
     </plugins>
   </build>
 </project>
