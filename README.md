@@ -34,13 +34,12 @@ particularly section 5.
 ## Pre-Release Version
 A windows pre release version of the GUI version can be downloaded from <https://github.com/peterwalkley/SE4AdminTool/releases/download/0.1-beta/TFA.SE4.Administrator_0.0.1-SNAPSHOT.exe>. 
 This will install the GUI and a java runtime environment for the application. Before using the GUI for the first time
-you will need to set up properties files for your own servers.  Use the supplied config.properties file as a template
+you will need to set up properties files for your own servers.  Use the supplied `config.properties` file as a template
 and create a file for each server you wish to administer.  You can open connections to multiple servers at the
 same time. Each will appear in its own application tab.
 
 ## Developer Usage
 
-No compiled version is provided as yet:
 - Use the `mvn clean install` command to build
 - Run with the provided batch file:   `seadmin.bat myserver.properties`
 - if you want logging to a file, re-direct as usual: `seadmin.bat myserver.properties* > myserver.log`
