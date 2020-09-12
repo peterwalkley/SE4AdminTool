@@ -201,29 +201,61 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         // Passed all kick checks.
         doGreeting(p);
     }
-    
+
+    /**
+     * Kick player.
+     * @param p Player to ban
+     * @param reason Reason
+     */
+    public void kickPlayer(final Player p, final String reason)
+    {
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                // Make the ban public
+                final String msg = "Server.Say KICKING " + p.getName() + " for " + reason;
+                sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
+
+                // Delay 5 seconds
+                sleep(5000);
+
+                // Kick them
+                final String ban = "Server.Kick " + p.getName();
+                sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
+            }
+
+        }).start();
+    }
+
     /**
      * Apply player ban.
      * @param p Player to ban
      * @param reason Reason
      */
-    private void banPlayer(final Player p, final String reason)
+    public void banPlayer(final Player p, final String reason)
     {
-        // Do a steam ID ban to make sure they are added to server ban list
-        final String steamIDBan = "Server.KickBanSteamID " + p.getSteamId();
-        sendMessage(Protocol.REQUEST_SEND_COMMAND, steamIDBan.getBytes());
+        new Thread(new Runnable() {
 
-        // Make the ban public
-        final String msg = "Server.Say BANNING " + p.getName() + " for " + reason;
-        sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
-        
-        // Delay 5 seconds
-        sleep(5000);
-        
-        // Kick them
-        final String ban = "Server.KickBan " + p.getName();
-        sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
-        
+            @Override
+            public void run() {
+                // Do a steam ID ban to make sure they are added to server ban list
+                final String steamIDBan = "Server.KickBanSteamID " + p.getSteamId();
+                sendMessage(Protocol.REQUEST_SEND_COMMAND, steamIDBan.getBytes());
+
+                // Make the ban public
+                final String msg = "Server.Say BANNING " + p.getName() + " for " + reason;
+                sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
+
+                // Delay 5 seconds
+                sleep(5000);
+
+                // Kick them
+                final String ban = "Server.KickBan " + p.getName();
+                sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
+            }
+
+        }).start();
     }
     
     /**

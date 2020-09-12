@@ -42,6 +42,11 @@ public class MonitoredServerConnection extends SEAdminServerConnection {
                 model.setMaxPlayers(status.getLobby().getMaxPlayers().toString());
                 model.setPlayers(status.getLobby().getPlayers());
             }
+
+            if (status != null && status.getServer() != null) {
+                model.setServerName(status.getServer().getName());
+                model.setServerHost(status.getServer().getHost());
+            }
         });
     }
 
@@ -83,12 +88,28 @@ public class MonitoredServerConnection extends SEAdminServerConnection {
         super.updateServerStatistics(bytesSent, bytesReceived, fps);
 
         Platform.runLater(() -> {
-            //TODO: Formatting
-            model.setBytesSent(Long.toString(bytesSent));
-            model.setBytesReceived(Long.toString(bytesReceived));
-            model.setFps(Float.toString(fps));
+            model.setBytesSent(formatBytes(bytesSent));
+            model.setBytesReceived(formatBytes(bytesReceived));
+            model.setFps(Integer.toString(Math.round(fps)));
 
         });
+    }
+
+    /**
+     * Pretty print bytes values.
+     * @param bytes bytes
+     * @return pretty printed bytes
+     */
+    private String formatBytes(final long bytes)
+    {
+        if (bytes < 1024)
+            return String.format("%d byte", bytes);
+        else if (bytes < (1024 * 1024))
+            return String.format("%.2f kb", (float)bytes / 1024.0);
+        else if (bytes < (1024 * 1024 * 1024))
+            return String.format("%.2f mb", (float)bytes / (1024.0 * 1024.0));
+        else
+            return String.format("%.2f gb", (float)bytes / (1024.0 * 1024.0 * 1024.0));
     }
 
     public GameModel getModel()

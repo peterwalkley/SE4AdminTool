@@ -1,9 +1,12 @@
 package tfa.se4.gui;
 
 import java.io.File;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
@@ -11,11 +14,16 @@ import javafx.scene.control.TabPane;
 import javafx.stage.FileChooser;
 import tfa.se4.Options;
 
-public class MainPaneController {
+public class MainPaneController  implements Initializable {
 
     @FXML private TabPane tabPane;
     @FXML private Button connectButton;
     @FXML private Button closeButton;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        SE4AdminGUI.getPrimaryStage().setOnCloseRequest(e -> quitButtonClicked());
+    }
 
     public void connectButtonClicked() {
 
@@ -31,20 +39,23 @@ public class MainPaneController {
         // If we've already got this server being monitored. Select the tab and exit.
         for (final Tab t : tabPane.getTabs())
         {
-            if (selected.getAbsolutePath().equals(t.getId()))
+            if (selected.getName().equals(t.getId()))
             {
                 tabPane.getSelectionModel().select(t);
                 return;
             }
         }
 
-        final Tab newTab = new Tab(selected.getAbsolutePath());
+        System.out.println(selected.getName());
+        final Tab newTab = new Tab(selected.getName());
+        newTab.setId(selected.getName());
         try
         {
             final Options opts = new Options(selected.getAbsolutePath());
             final MonitoredServerConnection conn = new MonitoredServerConnection(opts);
             final ServerPaneController controller = new ServerPaneController(conn);
             newTab.setOnCloseRequest(e -> controller.close());
+            newTab.setUserData(conn);
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ServerPane.fxml"));
             loader.setController(controller);
             newTab.setContent(loader.load());
@@ -67,7 +78,13 @@ public class MainPaneController {
      * Handler for quit button. Close all the tabs and exit.
      */
     public void quitButtonClicked() {
-        //TODO: close all tabs signalling controllers to shutdown threads
+        tabPane.getTabs().forEach(t -> ((MonitoredServerConnection)t.getUserData()).closeConnection());
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            //ignore
+        }
         SE4AdminGUI.getPrimaryStage().close();
         System.exit(0);
     }
