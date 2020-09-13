@@ -7,6 +7,7 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.SepiaTone?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -198,23 +199,25 @@
         </columns>
       </TableView>
       <ListView fx:id="logList" prefHeight="393.0" prefWidth="838.0" />
-      <HBox SplitPane.resizableWithParent="false">
+      <HBox fillHeight="false" prefHeight="40.0" prefWidth="838.0" SplitPane.resizableWithParent="false">
          <children>
-            <Button mnemonicParsing="false" onAction="#clearLog" text="Clear">
+            <Label text="Server command" HBox.hgrow="NEVER">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
                <HBox.margin>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  <Insets bottom="10.0" left="10.0" top="10.0" />
                </HBox.margin>
-               <padding>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding>
-            </Button>
-            <Button mnemonicParsing="false" onAction="#clipboard" text="Clipboard">
+            </Label>
+            <TextField fx:id="commandText" onAction="#sendMessage" prefWidth="400.0" promptText="Enter server command. Right click to see commands available" HBox.hgrow="NEVER">
                <HBox.margin>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  <Insets bottom="10.0" left="5.0" top="7.0" />
                </HBox.margin>
-               <padding>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding>
+            </TextField>
+            <Button fx:id="sendButton" mnemonicParsing="false" onAction="#sendMessage" text="Send">
+               <HBox.margin>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="7.0" />
+               </HBox.margin>
             </Button>
          </children>
       </HBox>

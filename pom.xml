@@ -6,7 +6,7 @@
 
   <groupId>tfa</groupId>
   <artifactId>se4</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.2-SNAPSHOT</version>
 
   <name>TFA SE4 Administrator</name>
   <url>https://github.com/peterwalkley/SE4AdminTool</url>
@@ -147,45 +147,61 @@
 				</execution>
 			</executions>
 		</plugin>
-        <plugin>
-            <groupId>io.github.fvarrui</groupId>
-            <artifactId>javapackager</artifactId>
-            <version>1.1.0</version>
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>package</goal>
-                    </goals>
-                    <configuration>
-                        <mainClass>tfa.se4.gui.SE4AdminGUI</mainClass>
-                        <bundleJre>true</bundleJre>
-                        <customizedJre>false</customizedJre>
-                        <jrePath>F:\JRE1.8</jrePath>
-                        <copyDependencies>true</copyDependencies>
-                        <generateInstaller>true</generateInstaller>
-                        <createZipball>true</createZipball>
-                        <administratorRequired>false</administratorRequired>
-                        <platform>windows</platform>
-                        <additionalResources>
-                            <additionalResource>config</additionalResource>
-                            <additionalResource>seadmin.bat</additionalResource>
-                            <additionalResource>config.properties</additionalResource>
-                        </additionalResources>
-                        <winConfig>
-                            <generateSetup>true</generateSetup>
-                            <generateMsi>false</generateMsi>
-                            <companyName>Peter Walkley</companyName>
-                            <productName>TFA Sniper Elite 4 Serer Administration Tool</productName>
-                            <disableDirPage>false</disableDirPage>
-                            <disableProgramGroupPage>false</disableProgramGroupPage>
-                            <disableFinishedPage>false</disableFinishedPage>
-                            <createDesktopIconTask>true</createDesktopIconTask>
-                        </winConfig>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
     </plugins>
   </build>
+    <profiles>
+        <profile>
+            <id>installer-build</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <!--
+                        https://github.com/fvarrui/JavaPackager
+
+                        Note that you need to have Inno Setup (https://jrsoftware.org/isinfo.php)
+                        installed and on the path when executing maven in order for the windows
+                        installer to be built.
+                        -->
+                        <groupId>io.github.fvarrui</groupId>
+                        <artifactId>javapackager</artifactId>
+                        <version>1.1.0</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>package</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>tfa.se4.gui.SE4AdminGUI</mainClass>
+                                    <bundleJre>true</bundleJre>
+                                    <customizedJre>false</customizedJre>
+                                    <jrePath>F:\JRE1.8</jrePath>
+                                    <copyDependencies>true</copyDependencies>
+                                    <generateInstaller>true</generateInstaller>
+                                    <createZipball>true</createZipball>
+                                    <administratorRequired>false</administratorRequired>
+                                    <platform>windows</platform>
+                                    <additionalResources>
+                                        <additionalResource>config</additionalResource>
+                                        <additionalResource>seadmin.bat</additionalResource>
+                                        <additionalResource>config.properties</additionalResource>
+                                    </additionalResources>
+                                    <winConfig>
+                                        <generateSetup>true</generateSetup>
+                                        <generateMsi>false</generateMsi>
+                                        <companyName>Peter Walkley</companyName>
+                                        <productName>TFA Sniper Elite 4 Serer Administration Tool</productName>
+                                        <disableDirPage>false</disableDirPage>
+                                        <disableProgramGroupPage>false</disableProgramGroupPage>
+                                        <disableFinishedPage>false</disableFinishedPage>
+                                        <createDesktopIconTask>true</createDesktopIconTask>
+                                    </winConfig>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+      </profile>
+    </profiles>
 </project>

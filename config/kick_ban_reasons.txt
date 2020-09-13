@@ -3,3 +3,5 @@ shoulder aim
 spawn camping
 unacceptable language
 not responding to administrator
+slow connection
+having a closed profile

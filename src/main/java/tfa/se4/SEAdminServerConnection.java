@@ -239,6 +239,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
 
             @Override
             public void run() {
+                m_banList.addBan(p.getSteamId(), p.getName(), reason);
                 // Do a steam ID ban to make sure they are added to server ban list
                 final String steamIDBan = "Server.KickBanSteamID " + p.getSteamId();
                 sendMessage(Protocol.REQUEST_SEND_COMMAND, steamIDBan.getBytes());
@@ -257,7 +258,23 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
 
         }).start();
     }
-    
+
+    /**
+     * Send server a command
+     * @param command Reason
+     */
+    public void sendCommand(final String command)
+    {
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                sendMessage(Protocol.REQUEST_SEND_COMMAND, command.getBytes());
+            }
+
+        }).start();
+    }
+
     /**
      * Get URL.
      * @return ws://<<host>:<port>

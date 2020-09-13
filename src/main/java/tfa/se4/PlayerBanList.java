@@ -1,7 +1,6 @@
 package tfa.se4;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
@@ -99,5 +98,26 @@ public final class PlayerBanList implements Runnable
 	public Ban getBan(final String steamID)
 	{
 		return m_bans.get(steamID);
+	}
+
+	/**
+	 * Add a ban to to ban list.
+	 * @param steamID Steam ID
+	 * @param playerName Player name
+	 * @param reason Reason for the ban
+	 */
+	public void addBan(final String steamID, final String playerName, final String reason) {
+		final String banText = steamID + " # " + playerName.replace('#', 'x') + " # " + reason;
+
+		try {
+			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(m_file.getAbsolutePath(), true)));
+			out.println(banText);
+			out.close();
+		} catch (IOException e)
+		{
+			// Ignore as we can't do much
+			System.out.println("Error adding banned player to ban list");
+			e.printStackTrace();
+		}
 	}
 }

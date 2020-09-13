@@ -46,7 +46,6 @@ public class MainPaneController  implements Initializable {
             }
         }
 
-        System.out.println(selected.getName());
         final Tab newTab = new Tab(selected.getName());
         newTab.setId(selected.getName());
         try

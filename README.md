@@ -25,10 +25,11 @@ particularly section 5.
 - See players' steam profile
 
 ## TODO
+- Reduced install with no JRE for those who want to provide their own
+- Documentation of command-line version
 - Use IP location to find country, state and city information.
-- Players banned by GUI tool should be added to tools' ban list automatically.
-- Add facility to send server commands via GUI tool.
-- Create configuration properties files via GUI.
+- Help and installation guide on github and then a help button on the application to take you there. 
+- Create configuration properties files via GUI ?
  
 
 ## Pre-Release Version
@@ -51,3 +52,10 @@ match your server IP address, RCON port and RCON password. Include your steam AP
 want to be able to check for VAC bans. The format of the sample player ban list,
 IP address ban list and white list files is hopefully fairly self-explanatory.
  
+ ## Changelog
+ ### 0.0.2-SNAPSHOT 
+- Log window buttons replaced with content sensitive menu
+- Commands now sent using text box
+- Players banned by GUI tool added to tools' ban list automatically.
+ ### 0.0.1-SNAPSHOT 
+- Initial release outside private repository
