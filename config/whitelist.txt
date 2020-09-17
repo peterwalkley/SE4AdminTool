@@ -6,7 +6,7 @@
 # Check a profile via web page e.g.:  https://steamcommunity.com/profiles/76561198022231968
 #
 #
-76561198022231968  # My steam ID for testing
+#76561198022231968  # My steam ID for testing
 #
 # An uncommented example
 1234567890

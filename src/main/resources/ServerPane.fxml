@@ -12,10 +12,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-
-<SplitPane fx:id="paneId" dividerPositions="0.15506715506715507, 0.5274725274725275, 0.8998778998778999" orientation="VERTICAL" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<SplitPane fx:id="paneId"  orientation="VERTICAL" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
   <items>
-      <HBox SplitPane.resizableWithParent="false">
+      <HBox minHeight="115.0" maxHeight="115.0" prefHeight="115.0">
          <children>
             <VBox>
                <children>
@@ -185,7 +184,7 @@
             <SepiaTone />
          </effect>
       </HBox>
-      <TableView fx:id="playersTable" minHeight="-Infinity" prefHeight="200.0" prefWidth="200.0">
+      <TableView fx:id="playersTable" minHeight="320.0" maxHeight="320" prefHeight="320.0" prefWidth="200.0">
         <columns>
           <TableColumn fx:id="name" editable="false" prefWidth="135.0" text="Name" />
           <TableColumn fx:id="steamID" editable="false" prefWidth="125.0" text="Steam ID" />
@@ -196,10 +195,11 @@
           <TableColumn fx:id="kills" editable="false" prefWidth="65.0" style="-fx-alignment: CENTER_RIGHT;" text="Kills" />
           <TableColumn fx:id="assists" editable="false" prefWidth="65.0" style="-fx-alignment: CENTER_RIGHT;" text="Assists" />
           <TableColumn fx:id="longestShot" editable="false" prefWidth="65.0" style="-fx-alignment: CENTER_RIGHT;" text="Distance" />
+            <TableColumn fx:id="location" editable="false" prefWidth="150.0" text="Location" />
         </columns>
       </TableView>
-      <ListView fx:id="logList" prefHeight="393.0" prefWidth="838.0" />
-      <HBox fillHeight="false" prefHeight="40.0" prefWidth="838.0" SplitPane.resizableWithParent="false">
+      <ListView fx:id="logList" prefHeight="400.0" prefWidth="838.0" />
+      <HBox fillHeight="false" minHeight="40.0" maxHeight="40.0" prefHeight="40.0" prefWidth="838.0" SplitPane.resizableWithParent="false">
          <children>
             <Label text="Server command" HBox.hgrow="NEVER">
                <font>
@@ -209,7 +209,7 @@
                   <Insets bottom="10.0" left="10.0" top="10.0" />
                </HBox.margin>
             </Label>
-            <TextField fx:id="commandText" onAction="#sendMessage" prefWidth="400.0" promptText="Enter server command. Right click to see commands available" HBox.hgrow="NEVER">
+            <TextField fx:id="commandText" onAction="#sendMessage" prefWidth="400.0" promptText="Enter server command or right-click here to to see all commands" HBox.hgrow="NEVER">
                <HBox.margin>
                   <Insets bottom="10.0" left="5.0" top="7.0" />
                </HBox.margin>

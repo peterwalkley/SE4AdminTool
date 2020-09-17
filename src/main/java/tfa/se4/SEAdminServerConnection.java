@@ -27,6 +27,7 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import tfa.se4.PlayerBanList.Ban;
 import tfa.se4.Protocol.ReplyMessage;
+import tfa.se4.ipstack.IPStackAPI;
 import tfa.se4.json.JSONUtils;
 import tfa.se4.json.Player;
 import tfa.se4.json.ServerStatus;
@@ -53,6 +54,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     private boolean m_isApplyVACBans;
     private boolean m_isApplyGameBans;
     private SteamAPI m_steamAPI;
+    private IPStackAPI m_ipStackAPI;
     private ConcurrentLinkedQueue<Player> m_playersToCheck = new ConcurrentLinkedQueue<>();
     private LogLevel m_displayLogLevel = LogLevel.INFO;
     private boolean m_isClose = false;
@@ -73,10 +75,15 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
 		m_playerGreeting = options.getPlayerGreeting();
 		m_isApplyVACBans = options.isApplyVACBans();
 		m_isApplyGameBans = options.isApplyGameBans();
-		if (m_isApplyVACBans || m_isApplyGameBans)
+		if ((m_isApplyVACBans || m_isApplyGameBans) && StringUtils.isNotBlank(options.getSteamAPIKey()))
 		{
 		    m_steamAPI = new SteamAPI(options.getSteamAPIKey());
 		}
+
+		if (StringUtils.isNotBlank(options.getIPStackAPIKey()))
+        {
+            m_ipStackAPI = new IPStackAPI(options.getIPStackAPIKey());
+        }
         new Thread(this).start();
     }
 
@@ -136,6 +143,24 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     }
 
     /**
+     * Provide inherited classes access to the IP Stack API
+     * @return IP stack API (may be null)
+     */
+    protected IPStackAPI getIPStackAPI()
+    {
+        return m_ipStackAPI;
+    }
+
+    /**
+     * Provide inherited classes access to the steam API
+     * @return Steam API (may be null)
+     */
+    protected SteamAPI getSteamAPI()
+    {
+        return m_steamAPI;
+    }
+
+    /**
      * Close connection as tidily as we can.
      */
     public synchronized void closeConnection()
@@ -149,6 +174,19 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
      */
     private void checkPlayer(final Player p)
     {
+        if (m_ipStackAPI != null)
+        {
+            LoggerInterface loggerRef = this;
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    p.setLocation(m_ipStackAPI.getLocation(p.getIPv4(), loggerRef));
+                }
+
+            }).start();
+        }
+
         if (!m_serverStatus.getLobby().getPlayers().contains(p))
         {
             log(LogLevel.INFO, LogType.CHECK, "Player %s steam ID %s from IP address %s left before checks performed", p.getName(), p.getSteamId(), p.getIPv4());

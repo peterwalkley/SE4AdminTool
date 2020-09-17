@@ -27,11 +27,11 @@ public class GameModel {
     private ObservableList<Player> players = FXCollections.observableArrayList();
     private ObservableList<String> logLines = FXCollections.observableArrayList();
 
-    public void setPlayers(final List<Player> p)
+    public void setPlayers(final List<Player> newPlayers)
     {
         players.clear();
-        if (p != null)
-            players.addAll(p);
+        if (newPlayers != null)
+            players.addAll(newPlayers);
     }
 
     public ObservableList<Player> getPlayers()

@@ -1,3 +1,7 @@
+#
+# This list of reasons will appear as a choice when you kick or ban a player
+# Add your own as needed.
+#
 make room for clan member
 shoulder aim
 spawn camping

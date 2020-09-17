@@ -23,6 +23,7 @@ public interface LoggerInterface {
         IPBAN("IPBAN"),
         PLAYERBAN("PLAYERBAN"),
         MSG("MSG"),
+        IPSTACK("IPSTACK"),
         STEAM("STEAM"),
         LEAVE("LEAVE"),
         JOIN("JOIN"),

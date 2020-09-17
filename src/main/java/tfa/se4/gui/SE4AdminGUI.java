@@ -19,7 +19,17 @@ public class SE4AdminGUI extends Application
         s_primaryStage = primaryStage;
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("MainPane.fxml"));
         primaryStage.setTitle("SE4 Admin");
-        primaryStage.setScene(new Scene(root, 800, 600));
+        final StartupSettings.Settings settings = StartupSettings.readSettings();
+
+        if (settings == null)
+            primaryStage.setScene(new Scene(root,  800,600));
+        else
+        {
+            primaryStage.setScene(new Scene(root,  settings.width,settings.height));
+            primaryStage.setX(settings.x);
+            primaryStage.setY(settings.y);
+
+        }
         primaryStage.show();
     }
 

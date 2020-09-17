@@ -17,7 +17,7 @@
          <children>
             <Button fx:id="connectButton" mnemonicParsing="false" onAction="#connectButtonClicked" text="Connect ..." textAlignment="CENTER" />
             <Region HBox.hgrow="ALWAYS" />
-            <Button fx:id="closeButton" mnemonicParsing="false" onAction="#quitButtonClicked" text="Quit" />
+            <Button fx:id="closeButton" mnemonicParsing="false" onAction="#closeButtonClicked" text="Quit" />
          </children>
          <padding>
             <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />

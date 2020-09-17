@@ -2,6 +2,8 @@ package tfa.se4.gui;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
@@ -14,7 +16,7 @@ import javafx.scene.control.TabPane;
 import javafx.stage.FileChooser;
 import tfa.se4.Options;
 
-public class MainPaneController  implements Initializable {
+public class MainPaneController implements Initializable {
 
     @FXML private TabPane tabPane;
     @FXML private Button connectButton;
@@ -22,7 +24,12 @@ public class MainPaneController  implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        SE4AdminGUI.getPrimaryStage().setOnCloseRequest(e -> quitButtonClicked());
+        SE4AdminGUI.getPrimaryStage().setOnCloseRequest(e -> closeButtonClicked());
+        final StartupSettings.Settings settings = StartupSettings.readSettings();
+        if (settings != null && settings.filesToReOpen != null)
+        {
+            settings.filesToReOpen.forEach(f -> openTab(new File(f)));
+        }
     }
 
     public void connectButtonClicked() {
@@ -39,15 +46,21 @@ public class MainPaneController  implements Initializable {
         // If we've already got this server being monitored. Select the tab and exit.
         for (final Tab t : tabPane.getTabs())
         {
-            if (selected.getName().equals(t.getId()))
+            if (selected.getAbsolutePath().equals(t.getId()))
             {
                 tabPane.getSelectionModel().select(t);
                 return;
             }
         }
 
+        final Tab newTab = openTab(selected);
+        if (newTab != null)
+            tabPane.getSelectionModel().select(newTab);
+    }
+
+    private Tab openTab(File selected) {
         final Tab newTab = new Tab(selected.getName());
-        newTab.setId(selected.getName());
+        newTab.setId(selected.getAbsolutePath());
         try
         {
             final Options opts = new Options(selected.getAbsolutePath());
@@ -66,19 +79,27 @@ public class MainPaneController  implements Initializable {
             errorAlert.setHeaderText("Unable to initialise connection");
             errorAlert.setContentText(e.getLocalizedMessage());
             errorAlert.showAndWait();
-            System.exit(0);
+            return null;
         }
 
         tabPane.getTabs().add(newTab);
-        tabPane.getSelectionModel().select(newTab);
+        return newTab;
     }
 
     /**
-     * Handler for quit button. Close all the tabs and exit.
+     * Handler for close button. Close all the tabs and exit.
      */
-    public void quitButtonClicked() {
+    public void closeButtonClicked() {
+        final List<String> openTabFileNames = new ArrayList<>();
+        tabPane.getTabs().forEach(t -> openTabFileNames.add(t.getId()));
+        StartupSettings.saveSettings(openTabFileNames,
+                SE4AdminGUI.getPrimaryStage().getX(),
+                SE4AdminGUI.getPrimaryStage().getY(),
+                SE4AdminGUI.getPrimaryStage().getWidth(),
+                SE4AdminGUI.getPrimaryStage().getHeight());
         tabPane.getTabs().forEach(t -> ((MonitoredServerConnection)t.getUserData()).closeConnection());
 
+        // Give threads above a little time to close.
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {

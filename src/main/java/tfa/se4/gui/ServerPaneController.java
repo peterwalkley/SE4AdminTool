@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
 import org.apache.commons.lang3.StringUtils;
@@ -64,6 +65,7 @@ public class ServerPaneController implements Initializable {
     @FXML private TableColumn<Player,Long> kills;
     @FXML private TableColumn<Player,Long> assists;
     @FXML private TableColumn<Player,Double> longestShot;
+    @FXML private TableColumn<Player,String> location;
     @FXML private ListView<String> logList;
     @FXML private TextField commandText;
     @FXML private Button sendButton;
@@ -82,7 +84,7 @@ public class ServerPaneController implements Initializable {
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void initialize(URL loc, ResourceBundle resources) {
         m_reasons = new KickBanReasons(m_connection);
         statusLabel.textProperty().bind(m_connection.getModel().stateProperty());
         mapLabel.textProperty().bind(m_connection.getModel().mapProperty());
@@ -105,6 +107,10 @@ public class ServerPaneController implements Initializable {
         assists.setCellValueFactory(new PropertyValueFactory<>("assists"));
         longestShot.setCellValueFactory(new PropertyValueFactory<>("longestShot"));
         longestShot.setCellFactory(new ColumnFormatter<Player, Double>(new DecimalFormat("0.00")));
+        location.setCellValueFactory(new PropertyValueFactory<>("location"));
+        if (!m_connection.ipStackSupported())
+            location.setVisible(false);
+
         playersTable.setItems(m_connection.getModel().getPlayers());
 
         playersTable.setRowFactory(

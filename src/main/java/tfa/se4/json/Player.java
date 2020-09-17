@@ -37,6 +37,8 @@ public class Player {
 	private Map<String, Object> additionalProperties = new HashMap<>();
 
 	private boolean skipGreeting;
+	private String location = "N/A";
+
 	@JsonProperty("Id")
 	public String getId() {
 		return id;
@@ -154,6 +156,12 @@ public class Player {
     public void setSkipGreeting(boolean skipGreeting) {
         this.skipGreeting = skipGreeting;
     }
+
+	public String getLocation() {
+		return location;
+	}
+	public void setLocation(String s) { location = s; }
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

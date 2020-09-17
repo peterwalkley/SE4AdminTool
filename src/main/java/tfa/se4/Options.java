@@ -17,6 +17,7 @@ public class Options
 	private String m_bansListFile;
 	private String m_playerGreeting;
 	private String m_steamAPIKey;
+	private String m_ipStackAPIKey;
 	private boolean m_applyVACBans;
     private boolean m_applyGameBans;
     
@@ -49,7 +50,8 @@ public class Options
 		m_applyVACBans = Boolean.parseBoolean(props.getProperty("kick.vac.banned", "false").trim());
 		m_applyGameBans = Boolean.parseBoolean(props.getProperty("kick.game.banned", "false").trim());
 		m_steamAPIKey = props.getProperty("steam.api.key", "").trim();
-		
+		m_ipStackAPIKey = props.getProperty("ipstack.api.key", "").trim();
+
 		if ((m_applyVACBans || m_applyGameBans) && StringUtils.isBlank(m_steamAPIKey))
 		{
 		    throw new Exception("Kicking of VAC or Game banned player requires a steam API key for checks to be performed");
@@ -176,5 +178,14 @@ public class Options
 	public String getSteamAPIKey()
 	{
 	    return m_steamAPIKey;
+	}
+
+	/**
+	 * Get IPStack API key.
+	 * @return Key
+	 */
+	public String getIPStackAPIKey()
+	{
+		return m_ipStackAPIKey;
 	}
 }

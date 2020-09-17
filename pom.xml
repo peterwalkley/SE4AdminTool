@@ -6,7 +6,7 @@
 
   <groupId>tfa</groupId>
   <artifactId>se4</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.0.3-SNAPSHOT</version>
 
   <name>TFA SE4 Administrator</name>
   <url>https://github.com/peterwalkley/SE4AdminTool</url>
@@ -167,6 +167,7 @@
                         <version>1.1.0</version>
                         <executions>
                             <execution>
+                                <id>exe-installer</id>
                                 <phase>package</phase>
                                 <goals>
                                     <goal>package</goal>
@@ -178,13 +179,15 @@
                                     <jrePath>F:\JRE1.8</jrePath>
                                     <copyDependencies>true</copyDependencies>
                                     <generateInstaller>true</generateInstaller>
-                                    <createZipball>true</createZipball>
+                                    <createZipball>false</createZipball>
                                     <administratorRequired>false</administratorRequired>
                                     <platform>windows</platform>
+                                    <url>https://github.com/peterwalkley/SE4AdminTool</url>
                                     <additionalResources>
                                         <additionalResource>config</additionalResource>
                                         <additionalResource>seadmin.bat</additionalResource>
                                         <additionalResource>config.properties</additionalResource>
+                                        <additionalResource>original-SE4AdminTool.jar</additionalResource>
                                     </additionalResources>
                                     <winConfig>
                                         <generateSetup>true</generateSetup>
@@ -196,6 +199,29 @@
                                         <disableFinishedPage>false</disableFinishedPage>
                                         <createDesktopIconTask>true</createDesktopIconTask>
                                     </winConfig>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>zipfile</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>package</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>tfa.se4.gui.SE4AdminGUI</mainClass>
+                                    <bundleJre>true</bundleJre>
+                                    <customizedJre>false</customizedJre>
+                                    <jrePath>F:\JRE1.8</jrePath>
+                                    <copyDependencies>true</copyDependencies>
+                                    <generateInstaller>false</generateInstaller>
+                                    <createZipball>true</createZipball>
+                                    <platform>windows</platform>
+                                    <additionalResources>
+                                        <additionalResource>config</additionalResource>
+                                        <additionalResource>seadmin.bat</additionalResource>
+                                        <additionalResource>config.properties</additionalResource>
+                                        <additionalResource>target/original-SE4AdminTool.jar</additionalResource>
+                                    </additionalResources>
                                 </configuration>
                             </execution>
                         </executions>

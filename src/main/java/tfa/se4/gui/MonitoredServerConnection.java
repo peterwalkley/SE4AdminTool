@@ -23,6 +23,11 @@ public class MonitoredServerConnection extends SEAdminServerConnection {
     public MonitoredServerConnection(Options options) {
         super(options);
         model = new GameModel();
+        if (!isSteamSupported())
+            log(LogLevel.INFO, LogType.STEAM, "Steam access is disabled. No automatic ban checks will be performed.");
+
+        if (!ipStackSupported())
+            log(LogLevel.INFO, LogType.IPSTACK, "IPStack access is disabled. No location lookups will be performed.");
     }
 
     @Override
@@ -40,6 +45,8 @@ public class MonitoredServerConnection extends SEAdminServerConnection {
             if (status != null && status.getLobby() != null) {
                 model.setState(status.getLobby().getState());
                 model.setMaxPlayers(status.getLobby().getMaxPlayers().toString());
+                if (getIPStackAPI() != null)
+                    status.getLobby().getPlayers().forEach(p -> p.setLocation(getIPStackAPI().getLocation(p.getIPv4(), this)));
                 model.setPlayers(status.getLobby().getPlayers());
             }
 
@@ -93,6 +100,25 @@ public class MonitoredServerConnection extends SEAdminServerConnection {
             model.setFps(Integer.toString(Math.round(fps)));
 
         });
+    }
+
+    /**
+     * Is the IP stack in use ?
+     * @return
+     */
+    public boolean ipStackSupported()
+    {
+        return getIPStackAPI() != null;
+
+    }
+
+    /**
+     * Is the IP stack in use ?
+     * @return
+     */
+    public boolean isSteamSupported()
+    {
+        return getSteamAPI() != null;
     }
 
     /**
