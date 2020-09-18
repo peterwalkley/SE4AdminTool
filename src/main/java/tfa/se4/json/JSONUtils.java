@@ -4,21 +4,36 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import tfa.se4.logger.LoggerInterface;
+
+import java.util.Locale;
+
 import static tfa.se4.logger.LoggerInterface.LogLevel;
 import static tfa.se4.logger.LoggerInterface.LogType;
 
 public final class JSONUtils
 {
 	/** Object mapper. */
-	
-	private static final ObjectMapper MAPPER = new ObjectMapper();
+	private static ObjectMapper S_MAPPER = null;
 	
 	/** Utility class private. */
 	private JSONUtils()
 	{
 		// do nothing
 	}
-	
+
+	/**
+	 * Get mapper.
+	 * @return mapper
+	 */
+	private static synchronized ObjectMapper getMapper()
+	{
+		if (S_MAPPER == null)
+		{
+			S_MAPPER = new ObjectMapper();
+			S_MAPPER.setLocale(Locale.US);
+		}
+		return S_MAPPER;
+	}
 	/**
 	 * Convert supplied JSON string to ServerStatus structure.
 	 * @param json JSON from SE server.
@@ -29,7 +44,7 @@ public final class JSONUtils
 	{
 		try
 		{
-			return MAPPER.readValue(json, ServerStatus.class);
+			return getMapper().readValue(json, ServerStatus.class);
 		}
 		catch (JsonProcessingException e)
 		{
@@ -48,7 +63,7 @@ public final class JSONUtils
 	{
 		try
 		{
-			return MAPPER.writeValueAsString(status);
+			return getMapper().writeValueAsString(status);
 		} catch (JsonProcessingException e)
 		{
 			logger.log(LogLevel.ERROR, LogType.SYSTEM, e, "Marshalling error");

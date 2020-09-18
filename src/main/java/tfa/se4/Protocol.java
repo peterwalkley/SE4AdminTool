@@ -276,48 +276,4 @@ public final class Protocol
 		return new String(buf.array(), StandardCharsets.UTF_8);
 
 	}
-/*    
-	public static void main(String[] args) throws Exception
-	{
-		final String fromWireshark = "f1e00000000025c91d85aaed704fcd6cbe09e8939f92b1b0594c1c1b7db5";
-		final byte[] msg = hexStringToByteArray(fromWireshark);
-//		System.out.println(fromWireshark);
-//		System.out.println(bytesToString(msg));
-		
-		final ReplyMessage reply = getReplyMessage(msg);
-		if (reply.messageId != Protocol.REPLY_INIT)
-			throw new Exception("unexpected messge id: " + (int)reply.messageId);
-		System.out.println("payload=" + bytesToString(reply.payload.array()));
-		
-		final byte[] salt = getSaltValue(reply.payload);
-		System.out.println("salt=" + bytesToString(salt));
-		final byte[] salted = buildSaltedPassword(salt, "wibble");
-		final ByteBuffer toSend = buildMessage(Protocol.REQUEST_SEND_PWD, salted);
-		System.out.println(bytesToString(toSend.array()));
-		System.out.println("f2e0386e53e0f11247b4075bb0721a3d33990f95e314");
-	}
-*/	   
-/*    
-	public static void main(String[] args) throws Exception
-	{
-		final String tmp = "ee0500000b0800000dca6f42";
-		final ByteBuffer b = ByteBuffer.wrap(hexStringToByteArray(tmp));
-		
-		long sent = getUInt32(b, 0);
-		long received = getUInt32(b, 4);
-		float fps = getFloat(b, 8);
-		
-		
-		System.out.println("sent = " + sent);
-		System.out.println("received = " + received);
-		System.out.println("fps= " + fps);
-		
-		final byte[] test = new byte[4];
-		test[0] = (byte)(received & 0xff);
-		test[1] = (byte)((received >> 8) & 0xff);
-		test[2] = (byte)((received >> 16) & 0xff);
-		test[3] = (byte)((received >> 24) & 0xff);
-		System.out.println("backToByete = " + bytesToString(test));
-	}
-*/	
 }
