@@ -11,7 +11,8 @@ import java.io.StringWriter;
 import java.time.Instant;
 
 @WebSocket
-public class MonitoredServerConnection extends SEAdminServerConnection {
+public class MonitoredServerConnection extends SEAdminServerConnection
+{
 
     private GameModel model;
 
@@ -20,37 +21,48 @@ public class MonitoredServerConnection extends SEAdminServerConnection {
      *
      * @param options Configuration options.
      */
-    public MonitoredServerConnection(Options options) {
+    public MonitoredServerConnection(Options options)
+    {
         super(options);
         model = new GameModel();
         if (!isSteamSupported())
+        {
             log(LogLevel.INFO, LogType.STEAM, "Steam access is disabled. No automatic ban checks will be performed.");
+        }
 
         if (!ipStackSupported())
+        {
             log(LogLevel.INFO, LogType.IPSTACK, "IPStack access is disabled. No location lookups will be performed.");
+        }
     }
 
     @Override
-    public void setServerStatus(ServerStatus status) {
+    public void setServerStatus(ServerStatus status)
+    {
         super.setServerStatus(status);
 
         Platform.runLater(() -> {
-            if (status != null && status.getGameData() != null && status.getGameData().getCurrentMap() != null) {
+            if (status != null && status.getGameData() != null && status.getGameData().getCurrentMap() != null)
+            {
                 model.setMap(status.getGameData().getCurrentMap().getName());
                 model.setMode(status.getGameData().getCurrentMap().getMode());
                 model.setScoreLimit(status.getGameData().getCurrentMap().getScoreLimit().toString());
                 model.setTimeLimit(status.getGameData().getCurrentMap().getTimeLimit().toString());
             }
 
-            if (status != null && status.getLobby() != null) {
+            if (status != null && status.getLobby() != null)
+            {
                 model.setState(status.getLobby().getState());
                 model.setMaxPlayers(status.getLobby().getMaxPlayers().toString());
                 if (getIPStackAPI() != null)
+                {
                     status.getLobby().getPlayers().forEach(p -> p.setLocation(getIPStackAPI().getLocation(p.getIPv4(), this)));
+                }
                 model.setPlayers(status.getLobby().getPlayers());
             }
 
-            if (status != null && status.getServer() != null) {
+            if (status != null && status.getServer() != null)
+            {
                 model.setServerName(status.getServer().getName());
                 model.setServerHost(status.getServer().getHost());
             }
@@ -58,16 +70,20 @@ public class MonitoredServerConnection extends SEAdminServerConnection {
     }
 
     @Override
-    public void log(LogLevel level, LogType type, String message, Object... args) {
+    public void log(LogLevel level, LogType type, String message, Object... args)
+    {
 
         log(level, type, null, message, args);
     }
 
     @Override
-    public void log(LogLevel level, LogType type, Throwable t, String message, Object... args) {
+    public void log(LogLevel level, LogType type, Throwable t, String message, Object... args)
+    {
 
         if (isFilterMessage(level))
+        {
             return;
+        }
 
         final StringBuilder sb = new StringBuilder(128);
         sb.append(Instant.now().toString());
@@ -91,7 +107,8 @@ public class MonitoredServerConnection extends SEAdminServerConnection {
     }
 
     @Override
-    public void updateServerStatistics(long bytesSent, long bytesReceived, float fps) {
+    public void updateServerStatistics(long bytesSent, long bytesReceived, float fps)
+    {
         super.updateServerStatistics(bytesSent, bytesReceived, fps);
 
         Platform.runLater(() -> {
@@ -104,6 +121,7 @@ public class MonitoredServerConnection extends SEAdminServerConnection {
 
     /**
      * Is the IP stack in use ?
+     *
      * @return
      */
     public boolean ipStackSupported()
@@ -114,6 +132,7 @@ public class MonitoredServerConnection extends SEAdminServerConnection {
 
     /**
      * Is the IP stack in use ?
+     *
      * @return
      */
     public boolean isSteamSupported()
@@ -123,19 +142,28 @@ public class MonitoredServerConnection extends SEAdminServerConnection {
 
     /**
      * Pretty print bytes values.
+     *
      * @param bytes bytes
      * @return pretty printed bytes
      */
     private String formatBytes(final long bytes)
     {
         if (bytes < 1024)
+        {
             return String.format("%d byte", bytes);
+        }
         else if (bytes < (1024 * 1024))
-            return String.format("%.2f kb", (float)bytes / 1024.0);
+        {
+            return String.format("%.2f kb", (float) bytes / 1024.0);
+        }
         else if (bytes < (1024 * 1024 * 1024))
-            return String.format("%.2f mb", (float)bytes / (1024.0 * 1024.0));
+        {
+            return String.format("%.2f mb", (float) bytes / (1024.0 * 1024.0));
+        }
         else
-            return String.format("%.2f gb", (float)bytes / (1024.0 * 1024.0 * 1024.0));
+        {
+            return String.format("%.2f gb", (float) bytes / (1024.0 * 1024.0 * 1024.0));
+        }
     }
 
     public GameModel getModel()

@@ -3,6 +3,7 @@ package tfa.se4.ipstack.json;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,7 +23,8 @@ import tfa.se4.ipstack.json.Language;
         "calling_code",
         "is_eu"
 })
-public class Location {
+public class Location
+{
 
     @JsonProperty("geoname_id")
     private Integer geonameId;
@@ -44,92 +46,110 @@ public class Location {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("geoname_id")
-    public Integer getGeonameId() {
+    public Integer getGeonameId()
+    {
         return geonameId;
     }
 
     @JsonProperty("geoname_id")
-    public void setGeonameId(Integer geonameId) {
+    public void setGeonameId(Integer geonameId)
+    {
         this.geonameId = geonameId;
     }
 
     @JsonProperty("capital")
-    public String getCapital() {
+    public String getCapital()
+    {
         return capital;
     }
 
     @JsonProperty("capital")
-    public void setCapital(String capital) {
+    public void setCapital(String capital)
+    {
         this.capital = capital;
     }
 
     @JsonProperty("languages")
-    public List<Language> getLanguages() {
+    public List<Language> getLanguages()
+    {
         return languages;
     }
 
     @JsonProperty("languages")
-    public void setLanguages(List<Language> languages) {
+    public void setLanguages(List<Language> languages)
+    {
         this.languages = languages;
     }
 
     @JsonProperty("country_flag")
-    public String getCountryFlag() {
+    public String getCountryFlag()
+    {
         return countryFlag;
     }
 
     @JsonProperty("country_flag")
-    public void setCountryFlag(String countryFlag) {
+    public void setCountryFlag(String countryFlag)
+    {
         this.countryFlag = countryFlag;
     }
 
     @JsonProperty("country_flag_emoji")
-    public String getCountryFlagEmoji() {
+    public String getCountryFlagEmoji()
+    {
         return countryFlagEmoji;
     }
 
     @JsonProperty("country_flag_emoji")
-    public void setCountryFlagEmoji(String countryFlagEmoji) {
+    public void setCountryFlagEmoji(String countryFlagEmoji)
+    {
         this.countryFlagEmoji = countryFlagEmoji;
     }
 
     @JsonProperty("country_flag_emoji_unicode")
-    public String getCountryFlagEmojiUnicode() {
+    public String getCountryFlagEmojiUnicode()
+    {
         return countryFlagEmojiUnicode;
     }
 
     @JsonProperty("country_flag_emoji_unicode")
-    public void setCountryFlagEmojiUnicode(String countryFlagEmojiUnicode) {
+    public void setCountryFlagEmojiUnicode(String countryFlagEmojiUnicode)
+    {
         this.countryFlagEmojiUnicode = countryFlagEmojiUnicode;
     }
 
     @JsonProperty("calling_code")
-    public String getCallingCode() {
+    public String getCallingCode()
+    {
         return callingCode;
     }
 
     @JsonProperty("calling_code")
-    public void setCallingCode(String callingCode) {
+    public void setCallingCode(String callingCode)
+    {
         this.callingCode = callingCode;
     }
 
     @JsonProperty("is_eu")
-    public Boolean getIsEu() {
+    public Boolean getIsEu()
+    {
         return isEu;
     }
 
     @JsonProperty("is_eu")
-    public void setIsEu(Boolean isEu) {
+    public void setIsEu(Boolean isEu)
+    {
         this.isEu = isEu;
     }
 
     @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
+    public Map<String, Object> getAdditionalProperties()
+    {
         return this.additionalProperties;
     }
 
     @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
+    public void setAdditionalProperty(String name, Object value)
+    {
         this.additionalProperties.put(name, value);
     }
 

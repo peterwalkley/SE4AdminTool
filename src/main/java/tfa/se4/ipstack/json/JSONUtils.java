@@ -7,11 +7,15 @@ import tfa.se4.ipstack.json.IPStack;
 
 public final class JSONUtils
 {
-    /** Object mapper. */
+    /**
+     * Object mapper.
+     */
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    /** Utility class private. */
+    /**
+     * Utility class private.
+     */
     private JSONUtils()
     {
         // do nothing
@@ -19,7 +23,8 @@ public final class JSONUtils
 
     /**
      * Convert supplied JSON string to IPStack result structure.
-     * @param json JSON from IP stack.
+     *
+     * @param json   JSON from IP stack.
      * @param logger Logger for writing error information.
      * @return Object or null when fails to unmarshal.
      */

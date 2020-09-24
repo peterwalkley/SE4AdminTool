@@ -18,8 +18,10 @@ public final class IPStackAPI
     private String m_APIkey;
 
     private static Map<String, IPStack> s_cache = new HashMap<>();
+
     /**
      * Initialise and remember steam API key.
+     *
      * @param apiKey Steam API key.
      */
     public IPStackAPI(final String apiKey)
@@ -29,7 +31,8 @@ public final class IPStackAPI
 
     /**
      * Get IP information.
-     * @param ip IP address
+     *
+     * @param ip     IP address
      * @param logger Logger for catching errors
      * @return IP address information.
      */
@@ -57,27 +60,31 @@ public final class IPStackAPI
         }
         catch (IOException e)
         {
-            logger.log(LoggerInterface.LogLevel.ERROR, LoggerInterface.LogType.IPSTACK, e,"Unable to fetch IP info for %s", ip);
+            logger.log(LoggerInterface.LogLevel.ERROR, LoggerInterface.LogType.IPSTACK, e, "Unable to fetch IP info for %s", ip);
         }
         return null;
     }
 
     /**
      * Get location in form City, State, Country
-     * @param ip IP address
+     *
+     * @param ip     IP address
      * @param logger Logger for issues
      * @return String
      */
     public String getLocation(final String ip, final LoggerInterface logger)
     {
         IPStack ipInfo = getIPAddressInfo(ip, logger);
-        if (ipInfo != null) {
+        if (ipInfo != null)
+        {
             StringBuilder sb = new StringBuilder();
-            if (StringUtils.isNotBlank(ipInfo.getCity())) {
+            if (StringUtils.isNotBlank(ipInfo.getCity()))
+            {
                 sb.append(ipInfo.getCity());
                 sb.append(',');
             }
-            if (StringUtils.isNotBlank(ipInfo.getRegionName())) {
+            if (StringUtils.isNotBlank(ipInfo.getRegionName()))
+            {
                 sb.append(ipInfo.getRegionName());
                 sb.append(',');
             }

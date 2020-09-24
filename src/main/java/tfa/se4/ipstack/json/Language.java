@@ -2,6 +2,7 @@ package tfa.se4.ipstack.json;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -15,7 +16,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "name",
         "native"
 })
-public class Language {
+public class Language
+{
 
     @JsonProperty("code")
     private String code;
@@ -27,42 +29,50 @@ public class Language {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("code")
-    public String getCode() {
+    public String getCode()
+    {
         return code;
     }
 
     @JsonProperty("code")
-    public void setCode(String code) {
+    public void setCode(String code)
+    {
         this.code = code;
     }
 
     @JsonProperty("name")
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
     @JsonProperty("name")
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
     @JsonProperty("native")
-    public String getNative() {
+    public String getNative()
+    {
         return _native;
     }
 
     @JsonProperty("native")
-    public void setNative(String _native) {
+    public void setNative(String _native)
+    {
         this._native = _native;
     }
 
     @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
+    public Map<String, Object> getAdditionalProperties()
+    {
         return this.additionalProperties;
     }
 
     @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
+    public void setAdditionalProperty(String name, Object value)
+    {
         this.additionalProperties.put(name, value);
     }
 

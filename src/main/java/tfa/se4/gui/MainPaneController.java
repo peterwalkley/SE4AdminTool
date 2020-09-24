@@ -16,14 +16,18 @@ import javafx.scene.control.TabPane;
 import javafx.stage.FileChooser;
 import tfa.se4.Options;
 
-public class MainPaneController implements Initializable {
-
-    @FXML private TabPane tabPane;
-    @FXML private Button connectButton;
-    @FXML private Button closeButton;
+public class MainPaneController implements Initializable
+{
+    @FXML
+    private TabPane tabPane;
+    @FXML
+    private Button connectButton;
+    @FXML
+    private Button closeButton;
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void initialize(URL location, ResourceBundle resources)
+    {
         SE4AdminGUI.getPrimaryStage().setOnCloseRequest(e -> closeButtonClicked());
         final StartupSettings.Settings settings = StartupSettings.readSettings();
         if (settings != null && settings.filesToReOpen != null)
@@ -32,7 +36,8 @@ public class MainPaneController implements Initializable {
         }
     }
 
-    public void connectButtonClicked() {
+    public void connectButtonClicked()
+    {
 
         FileChooser chooser = new FileChooser();
         chooser.setInitialDirectory(new File(System.getProperty("user.dir")));
@@ -41,7 +46,9 @@ public class MainPaneController implements Initializable {
         );
         File selected = chooser.showOpenDialog(SE4AdminGUI.getPrimaryStage());
         if (selected == null)
+        {
             return;
+        }
 
         // If we've already got this server being monitored. Select the tab and exit.
         for (final Tab t : tabPane.getTabs())
@@ -55,10 +62,13 @@ public class MainPaneController implements Initializable {
 
         final Tab newTab = openTab(selected);
         if (newTab != null)
+        {
             tabPane.getSelectionModel().select(newTab);
+        }
     }
 
-    private Tab openTab(File selected) {
+    private Tab openTab(File selected)
+    {
         final Tab newTab = new Tab(selected.getName());
         newTab.setId(selected.getAbsolutePath());
         try
@@ -72,7 +82,9 @@ public class MainPaneController implements Initializable {
             loader.setController(controller);
             newTab.setContent(loader.load());
 
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             System.out.println(e.getLocalizedMessage());
             e.printStackTrace();
             Alert errorAlert = new Alert(Alert.AlertType.ERROR);
@@ -89,7 +101,8 @@ public class MainPaneController implements Initializable {
     /**
      * Handler for close button. Close all the tabs and exit.
      */
-    public void closeButtonClicked() {
+    public void closeButtonClicked()
+    {
         final List<String> openTabFileNames = new ArrayList<>();
         tabPane.getTabs().forEach(t -> openTabFileNames.add(t.getId()));
         StartupSettings.saveSettings(openTabFileNames,
@@ -97,12 +110,15 @@ public class MainPaneController implements Initializable {
                 SE4AdminGUI.getPrimaryStage().getY(),
                 SE4AdminGUI.getPrimaryStage().getWidth(),
                 SE4AdminGUI.getPrimaryStage().getHeight());
-        tabPane.getTabs().forEach(t -> ((MonitoredServerConnection)t.getUserData()).closeConnection());
+        tabPane.getTabs().forEach(t -> ((MonitoredServerConnection) t.getUserData()).closeConnection());
 
         // Give threads above a little time to close.
-        try {
+        try
+        {
             Thread.sleep(2000);
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
             //ignore
         }
         SE4AdminGUI.getPrimaryStage().close();

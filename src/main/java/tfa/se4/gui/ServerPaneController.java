@@ -20,7 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import tfa.se4.KickBanReasons;
 import tfa.se4.json.Player;
 
-public class ServerPaneController implements Initializable {
+public class ServerPaneController implements Initializable
+{
     private static final List<String> S_COMMANDS = new ArrayList<>(Arrays.asList(
             "?", "Clear", "Exec", "Game.End", "Game.Info", "Game.Start", "Help", "IP", "ListCmds", "ListVars",
             "Lobby.AutoTriggerMapVote", "Lobby.ClearPassword", "Lobby.Password", "Lobby.RequestMapVote",
@@ -45,30 +46,54 @@ public class ServerPaneController implements Initializable {
             "Settings.TripMines", "Settings.WarmupTime", "Settings.WindStrength"
     ));
 
-    @FXML private SplitPane paneId;
-    @FXML private Label statusLabel;
-    @FXML private Label mapLabel;
-    @FXML private Label modeLabel;
-    @FXML private Label scoreLabel;
-    @FXML private Label timeLabel;
-    @FXML private Label serverNameLabel;
-    @FXML private Label fpsLabel;
-    @FXML private Label bytesSentLabel;
-    @FXML private Label bytesReceivedLabel;
-    @FXML private TableView<Player> playersTable;
-    @FXML private TableColumn<Player,String> name;
-    @FXML private TableColumn<Player,String> steamID;
-    @FXML private TableColumn<Player,String> ipV4;
-    @FXML private TableColumn<Player,Long> latency;
-    @FXML private TableColumn<Player,Long> score;
-    @FXML private TableColumn<Player,Long> deaths;
-    @FXML private TableColumn<Player,Long> kills;
-    @FXML private TableColumn<Player,Long> assists;
-    @FXML private TableColumn<Player,Double> longestShot;
-    @FXML private TableColumn<Player,String> location;
-    @FXML private ListView<String> logList;
-    @FXML private TextField commandText;
-    @FXML private Button sendButton;
+    @FXML
+    private SplitPane paneId;
+    @FXML
+    private Label statusLabel;
+    @FXML
+    private Label mapLabel;
+    @FXML
+    private Label modeLabel;
+    @FXML
+    private Label scoreLabel;
+    @FXML
+    private Label timeLabel;
+    @FXML
+    private Label serverNameLabel;
+    @FXML
+    private Label fpsLabel;
+    @FXML
+    private Label bytesSentLabel;
+    @FXML
+    private Label bytesReceivedLabel;
+    @FXML
+    private TableView<Player> playersTable;
+    @FXML
+    private TableColumn<Player, String> name;
+    @FXML
+    private TableColumn<Player, String> steamID;
+    @FXML
+    private TableColumn<Player, String> ipV4;
+    @FXML
+    private TableColumn<Player, Long> latency;
+    @FXML
+    private TableColumn<Player, Long> score;
+    @FXML
+    private TableColumn<Player, Long> deaths;
+    @FXML
+    private TableColumn<Player, Long> kills;
+    @FXML
+    private TableColumn<Player, Long> assists;
+    @FXML
+    private TableColumn<Player, Double> longestShot;
+    @FXML
+    private TableColumn<Player, String> location;
+    @FXML
+    private ListView<String> logList;
+    @FXML
+    private TextField commandText;
+    @FXML
+    private Button sendButton;
 
     private MonitoredServerConnection m_connection;
     private KickBanReasons m_reasons;
@@ -79,12 +104,14 @@ public class ServerPaneController implements Initializable {
     }
 
     // close tab
-    public void close() {
+    public void close()
+    {
         m_connection.closeConnection();
     }
 
     @Override
-    public void initialize(URL loc, ResourceBundle resources) {
+    public void initialize(URL loc, ResourceBundle resources)
+    {
         m_reasons = new KickBanReasons(m_connection);
         statusLabel.textProperty().bind(m_connection.getModel().stateProperty());
         mapLabel.textProperty().bind(m_connection.getModel().mapProperty());
@@ -109,68 +136,80 @@ public class ServerPaneController implements Initializable {
         longestShot.setCellFactory(new ColumnFormatter<Player, Double>(new DecimalFormat("0.00")));
         location.setCellValueFactory(new PropertyValueFactory<>("location"));
         if (!m_connection.ipStackSupported())
+        {
             location.setVisible(false);
+        }
 
         playersTable.setItems(m_connection.getModel().getPlayers());
 
         playersTable.setRowFactory(
-            new Callback<TableView<Player>, TableRow<Player>>() {
-                @Override
-                public TableRow<Player> call(TableView<Player> tableView) {
-                    final TableRow<Player> row = new TableRow<>();
-                    final ContextMenu rowMenu = new ContextMenu();
-                    MenuItem profileItem = new MenuItem("Profile ...");
-                    profileItem.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                            SE4AdminGUI.showDocument("https://steamcommunity.com/profiles/" + row.getItem().getSteamId());
-                        }
-                    });
-                    MenuItem kickItem = new MenuItem("Kick ...");
-                    kickItem.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                            final List<String> reasons = m_reasons.getReasons();
-                            ChoiceDialog<String> dialog = new ChoiceDialog<>(reasons.get(0), reasons);
-                            dialog.setTitle("Kick " + row.getItem().getName());
-                            dialog.setHeaderText("Select reason for kicking " + row.getItem().getName());
-                            dialog.setContentText("Reason:");
+                new Callback<TableView<Player>, TableRow<Player>>()
+                {
+                    @Override
+                    public TableRow<Player> call(TableView<Player> tableView)
+                    {
+                        final TableRow<Player> row = new TableRow<>();
+                        final ContextMenu rowMenu = new ContextMenu();
+                        MenuItem profileItem = new MenuItem("Profile ...");
+                        profileItem.setOnAction(new EventHandler<ActionEvent>()
+                        {
+                            @Override
+                            public void handle(ActionEvent event)
+                            {
+                                SE4AdminGUI.showDocument("https://steamcommunity.com/profiles/" + row.getItem().getSteamId());
+                            }
+                        });
+                        MenuItem kickItem = new MenuItem("Kick ...");
+                        kickItem.setOnAction(new EventHandler<ActionEvent>()
+                        {
+                            @Override
+                            public void handle(ActionEvent event)
+                            {
+                                final List<String> reasons = m_reasons.getReasons();
+                                ChoiceDialog<String> dialog = new ChoiceDialog<>(reasons.get(0), reasons);
+                                dialog.setTitle("Kick " + row.getItem().getName());
+                                dialog.setHeaderText("Select reason for kicking " + row.getItem().getName());
+                                dialog.setContentText("Reason:");
 
-                            Optional<String> result = dialog.showAndWait();
-                            result.ifPresent(r -> m_connection.kickPlayer(row.getItem(), r));
-                        }
-                    });
-                    MenuItem banItem = new MenuItem("Ban ...");
-                    banItem.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                            final List<String> reasons = m_reasons.getReasons();
-                            ChoiceDialog<String> dialog = new ChoiceDialog<>(reasons.get(0), reasons);
-                            dialog.setTitle("Ban " + row.getItem().getName());
-                            dialog.setHeaderText("Select reason for banning " + row.getItem().getName());
-                            dialog.setContentText("Reason:");
+                                Optional<String> result = dialog.showAndWait();
+                                result.ifPresent(r -> m_connection.kickPlayer(row.getItem(), r));
+                            }
+                        });
+                        MenuItem banItem = new MenuItem("Ban ...");
+                        banItem.setOnAction(new EventHandler<ActionEvent>()
+                        {
+                            @Override
+                            public void handle(ActionEvent event)
+                            {
+                                final List<String> reasons = m_reasons.getReasons();
+                                ChoiceDialog<String> dialog = new ChoiceDialog<>(reasons.get(0), reasons);
+                                dialog.setTitle("Ban " + row.getItem().getName());
+                                dialog.setHeaderText("Select reason for banning " + row.getItem().getName());
+                                dialog.setContentText("Reason:");
 
-                            Optional<String> result = dialog.showAndWait();
-                            result.ifPresent(r -> m_connection.banPlayer(row.getItem(), r));
-                        }
-                    });
-                    rowMenu.getItems().addAll(profileItem, kickItem, banItem);
+                                Optional<String> result = dialog.showAndWait();
+                                result.ifPresent(r -> m_connection.banPlayer(row.getItem(), r));
+                            }
+                        });
+                        rowMenu.getItems().addAll(profileItem, kickItem, banItem);
 
-                    // only display context menu for non-null items:
-                    row.contextMenuProperty().bind(
-                            Bindings.when(Bindings.isNotNull(row.itemProperty()))
-                                    .then(rowMenu)
-                                    .otherwise((ContextMenu)null));
-                    return row;
-                }
-            });
+                        // only display context menu for non-null items:
+                        row.contextMenuProperty().bind(
+                                Bindings.when(Bindings.isNotNull(row.itemProperty()))
+                                        .then(rowMenu)
+                                        .otherwise((ContextMenu) null));
+                        return row;
+                    }
+                });
 
         // log pane
         final ContextMenu logMenu = new ContextMenu();
         MenuItem copyAllItem = new MenuItem("Copy ALL to clipboard ...");
-        copyAllItem.setOnAction(new EventHandler<ActionEvent>() {
+        copyAllItem.setOnAction(new EventHandler<ActionEvent>()
+        {
             @Override
-            public void handle(ActionEvent event) {
+            public void handle(ActionEvent event)
+            {
                 final Clipboard clipboard = Clipboard.getSystemClipboard();
                 final ClipboardContent content = new ClipboardContent();
                 final StringBuilder sb = new StringBuilder(4096);
@@ -184,9 +223,11 @@ public class ServerPaneController implements Initializable {
             }
         });
         MenuItem copySelectedItem = new MenuItem("Copy selected to clipboard ...");
-        copySelectedItem.setOnAction(new EventHandler<ActionEvent>() {
+        copySelectedItem.setOnAction(new EventHandler<ActionEvent>()
+        {
             @Override
-            public void handle(ActionEvent event) {
+            public void handle(ActionEvent event)
+            {
                 final Clipboard clipboard = Clipboard.getSystemClipboard();
                 final ClipboardContent content = new ClipboardContent();
                 final StringBuilder sb = new StringBuilder(4096);
@@ -201,9 +242,11 @@ public class ServerPaneController implements Initializable {
         });
         copySelectedItem.disableProperty().bind(logList.getSelectionModel().selectedItemProperty().isNull());
         MenuItem clearItem = new MenuItem("Clear log");
-        clearItem.setOnAction(new EventHandler<ActionEvent>() {
+        clearItem.setOnAction(new EventHandler<ActionEvent>()
+        {
             @Override
-            public void handle(ActionEvent event) {
+            public void handle(ActionEvent event)
+            {
                 m_connection.getModel().clearLog();
             }
         });
@@ -211,6 +254,14 @@ public class ServerPaneController implements Initializable {
         logList.setItems(m_connection.getModel().getLogLines());
         logList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         logList.setContextMenu(logMenu);
+        logList.setCellFactory(new Callback<ListView<String>, ListCell<String>>()
+        {
+            @Override
+            public ListCell<String> call(ListView<String> param)
+            {
+                return new ColouredCell(m_connection);
+            }
+        });
 
         // command window section
         final ContextMenu commandsMenu = new ContextMenu();
@@ -219,18 +270,23 @@ public class ServerPaneController implements Initializable {
             String parentName = null;
             String itemName = null;
 
-            if (command.indexOf('.') != -1) {
+            if (command.indexOf('.') != -1)
+            {
                 final String[] commandSeq = command.split("\\.");
                 parentName = commandSeq[0];
                 itemName = commandSeq[1];
             }
             else
+            {
                 itemName = command;
+            }
 
             MenuItem item = new MenuItem(itemName);
-            item.setOnAction(new EventHandler<ActionEvent>() {
+            item.setOnAction(new EventHandler<ActionEvent>()
+            {
                 @Override
-                public void handle(ActionEvent event) {
+                public void handle(ActionEvent event)
+                {
                     insertCommand(command);
                 }
             });
@@ -274,7 +330,8 @@ public class ServerPaneController implements Initializable {
 
     public void sendMessage()
     {
-        if (StringUtils.isNotBlank(commandText.getText())) {
+        if (StringUtils.isNotBlank(commandText.getText()))
+        {
             logList.scrollTo(logList.getItems().size() - 1);
             m_connection.sendCommand(commandText.getText());
             commandText.clear();

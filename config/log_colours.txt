@@ -1,0 +1,20 @@
+# This file allows you to colour the text in the log window.  Normal text and player chat are handled by
+# these first two entries.
+#
+# The color can be specified in several ways, refer to:
+#     https://docs.oracle.com/javase/8/javafx/api/javafx/scene/paint/Color.html#web-java.lang.String-
+#
+
+default = black
+chat = darkblue
+
+
+# These entries allow you to match specific text in the log window to a colour. Set the text you want to match,
+# followed by '#', followed by the colour you wish to be matched.  Note that the FIRST match found will be used
+# so set your most specific matches first.
+#
+# The text to match can be a regular expression. Refer to https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html
+# for the full specification of what is available.
+
+Connected to # green
+read from # lightgray

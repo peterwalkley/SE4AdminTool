@@ -14,7 +14,8 @@ public class SE4AdminGUI extends Application
     private static HostServicesDelegate s_hostServices;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) throws Exception
+    {
         s_hostServices = HostServicesFactory.getInstance(this);
         s_primaryStage = primaryStage;
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("MainPane.fxml"));
@@ -22,10 +23,12 @@ public class SE4AdminGUI extends Application
         final StartupSettings.Settings settings = StartupSettings.readSettings();
 
         if (settings == null)
-            primaryStage.setScene(new Scene(root,  800,600));
+        {
+            primaryStage.setScene(new Scene(root, 800, 600));
+        }
         else
         {
-            primaryStage.setScene(new Scene(root,  settings.width,settings.height));
+            primaryStage.setScene(new Scene(root, settings.width, settings.height));
             primaryStage.setX(settings.x);
             primaryStage.setY(settings.y);
 
@@ -35,6 +38,7 @@ public class SE4AdminGUI extends Application
 
     /**
      * Show URL in system browser.
+     *
      * @param url URL to show
      */
     public static void showDocument(final String url)
@@ -47,7 +51,8 @@ public class SE4AdminGUI extends Application
         return s_primaryStage;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         launch(args);
     }
 }

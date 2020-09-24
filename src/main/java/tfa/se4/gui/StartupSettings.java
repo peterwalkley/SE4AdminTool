@@ -5,13 +5,15 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.io.FileUtils;
 
 /**
  * Class to remember settings between sessions. These are saved when program exits and re-read on
  * startup.
  */
-public class StartupSettings {
+public class StartupSettings
+{
 
     public static class Settings
     {
@@ -20,6 +22,7 @@ public class StartupSettings {
         public double width;
         public double height;
         public List<String> filesToReOpen;
+
         private Settings()
         {
 
@@ -34,11 +37,12 @@ public class StartupSettings {
 
     /**
      * Save stuff
+     *
      * @param openFiles List of files for open server properties
-     * @param x X location of main window
-     * @param y Y location of main window
-     * @param width width of main window
-     * @param height height of main window
+     * @param x         X location of main window
+     * @param y         Y location of main window
+     * @param width     width of main window
+     * @param height    height of main window
      */
     public static void saveSettings(final List<String> openFiles, final double x, final double y, final double width, final double height)
     {
@@ -50,15 +54,19 @@ public class StartupSettings {
         toWrite.add(Double.toString(height));
         toWrite.addAll(openFiles);
 
-        try {
+        try
+        {
             FileUtils.writeLines(SETTINGS_FILE, toWrite);
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             // ignore. This is at program exit anyway.
         }
     }
 
     /**
      * Fetch previously saved settings.
+     *
      * @return Settings or null if not found or contain junk data.
      */
     public static Settings readSettings()
@@ -69,7 +77,9 @@ public class StartupSettings {
         {
             final List<String> lines = FileUtils.readLines(SETTINGS_FILE, Charset.defaultCharset());
             if (lines.size() < 5)
+            {
                 return null;
+            }
 
             // first line always the version flag. If we change the file format later on,
             // need to retain ability to read old versions.
@@ -77,10 +87,14 @@ public class StartupSettings {
             result.y = Double.parseDouble(lines.get(2));
             result.width = Double.parseDouble(lines.get(3));
             result.height = Double.parseDouble(lines.get(4));
-            if (lines.size()  == 5)
+            if (lines.size() == 5)
+            {
                 result.filesToReOpen = new ArrayList<String>();
+            }
             else
+            {
                 result.filesToReOpen = lines.subList(5, lines.size());
+            }
 
             return result;
         }
