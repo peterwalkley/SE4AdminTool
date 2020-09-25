@@ -31,10 +31,10 @@ from <https://ipstack.com/>. A free key will allow 10,000 lookups per month.
 
 ![Example Screenshot](images/screenshot.png)
 ## Installation
-A windows installer can be downloaded from <https://github.com/peterwalkley/SE4AdminTool/releases/download/0.4-beta/TFA.SE4.Administrator_0.0.5-SNAPSHOT.exe>. 
+A windows installer can be downloaded from <https://github.com/peterwalkley/SE4AdminTool/releases/download/0.5-beta/TFA.SE4.Administrator_0.0.5-SNAPSHOT.exe>. 
 This will install the GUI and a java runtime environment for the application.
 
-The zip file <https://github.com/peterwalkley/SE4AdminTool/releases/download/0.4-beta/TFA.SE4.Administrator-0.0.5-SNAPSHOT.zip> is available as an alternative,
+The zip file <https://github.com/peterwalkley/SE4AdminTool/releases/download/0.5-beta/TFA.SE4.Administrator-0.0.5-SNAPSHOT.zip> is available as an alternative,
 download, unzip to a directory and run the exe within.
 
 Before using the application for the first time
