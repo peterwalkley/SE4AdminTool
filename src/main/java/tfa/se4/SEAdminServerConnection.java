@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
@@ -256,7 +257,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     /**
      * Kick player.
      *
-     * @param p      Player to ban
+     * @param p      Player to kick
      * @param reason Reason
      */
     public void kickPlayer(final Player p, final String reason)
@@ -274,9 +275,12 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
                 // Delay 5 seconds
                 sleep(5000);
 
-                // Kick them
-                final String kick = "Server.Kick " + p.getName();
-                sendMessage(Protocol.REQUEST_SEND_COMMAND, kick.getBytes());
+                // Kick them by re-searching the current players list to get
+                // latest id and then kick by id.
+                m_serverStatus.getLobby().getPlayers().stream().filter(x -> x.equals(p)).findFirst().ifPresent( x -> {
+                    final String ban = "Server.KickIndex " + x.getId();
+                    sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
+                });
             }
 
         }).start();
@@ -308,9 +312,12 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
                 // Delay 5 seconds
                 sleep(5000);
 
-                // Kick them
-                final String ban = "Server.KickBan " + p.getName();
-                sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
+                // Kick ban them by re-searching the current players list to get
+                // latest id and then kick by id.
+                m_serverStatus.getLobby().getPlayers().stream().filter(x -> x.equals(p)).findFirst().ifPresent( x -> {
+                    final String ban = "Server.KickBanIndex " + x.getId();
+                    sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
+                });
             }
 
         }).start();

@@ -165,14 +165,15 @@ public class ServerPaneController implements Initializable
                             @Override
                             public void handle(ActionEvent event)
                             {
+                                final Player toKick = row.getItem();
                                 final List<String> reasons = m_reasons.getReasons();
                                 ChoiceDialog<String> dialog = new ChoiceDialog<>(reasons.get(0), reasons);
-                                dialog.setTitle("Kick " + row.getItem().getName());
-                                dialog.setHeaderText("Select reason for kicking " + row.getItem().getName());
+                                dialog.setTitle("Kick " + toKick.getName());
+                                dialog.setHeaderText("Select reason for kicking " + toKick.getName());
                                 dialog.setContentText("Reason:");
 
                                 Optional<String> result = dialog.showAndWait();
-                                result.ifPresent(r -> m_connection.kickPlayer(row.getItem(), r));
+                                result.ifPresent(r -> m_connection.kickPlayer(toKick, r));
                             }
                         });
                         MenuItem banItem = new MenuItem("Ban ...");
@@ -181,14 +182,15 @@ public class ServerPaneController implements Initializable
                             @Override
                             public void handle(ActionEvent event)
                             {
+                                final Player toBan = row.getItem();
                                 final List<String> reasons = m_reasons.getReasons();
                                 ChoiceDialog<String> dialog = new ChoiceDialog<>(reasons.get(0), reasons);
-                                dialog.setTitle("Ban " + row.getItem().getName());
-                                dialog.setHeaderText("Select reason for banning " + row.getItem().getName());
+                                dialog.setTitle("Ban " + toBan.getName());
+                                dialog.setHeaderText("Select reason for banning " + toBan.getName());
                                 dialog.setContentText("Reason:");
 
                                 Optional<String> result = dialog.showAndWait();
-                                result.ifPresent(r -> m_connection.banPlayer(row.getItem(), r));
+                                result.ifPresent(r -> m_connection.banPlayer(toBan, r));
                             }
                         });
                         rowMenu.getItems().addAll(profileItem, kickItem, banItem);
