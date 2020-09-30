@@ -93,6 +93,7 @@ usual: `seadmin.bat myserver.properties* > myserver.log`
 
 
 ## TODO
+- Perform an update check to warn on new versions
 - No JRE installer and shelll scripts for unix home server running the command line version
 - Create configuration properties files via GUI
 - Calculate match remaining time
