@@ -31,10 +31,10 @@ from <https://ipstack.com/>. A free key will allow 10,000 lookups per month.
 
 ![Example Screenshot](images/screenshot.png)
 ## Installation
-A windows installer can be downloaded from <https://github.com/peterwalkley/SE4AdminTool/releases/download/0.6-beta/TFA.SE4.Administrator_0.0.6-SNAPSHOT.exe>. 
+A windows installer can be downloaded from <https://github.com/peterwalkley/SE4AdminTool/releases/download/v1.0/TFA.SE4.Administrator_1.0.exe>. 
 This will install the GUI and a java runtime environment for the application.
 
-The zip file <https://github.com/peterwalkley/SE4AdminTool/releases/download/0.6-beta/TFA.SE4.Administrator-0.0.6-SNAPSHOT.zip> is available as an alternative,
+The zip file <https://github.com/peterwalkley/SE4AdminTool/releases/download/v1.0/TFA.SE4.Administrator-1.0.zip> is available as an alternative,
 download, unzip to a directory and run the exe within.
 
 Before using the application for the first time
@@ -66,6 +66,16 @@ usual: `seadmin.bat myserver.properties* > myserver.log`
 
  
  ## Changelog
+ ### 1.0 RELEASE
+- Move to release versioning from pre-release
+- Display game countdown timer on GUI
+- Update IP stack logging to show location in log file
+- Update example configuration to default values that work when no steam API key is present
+- Don't treat using steam facilities without a steam key as an error, just switch them off (credit Muslim|Snipe|ALG for discovering the issue)
+- Add an online check for later version being available (credit Kroden for the idea)
+- Show version number on window title
+- Add hyperlink to website on main window
+
  ### 0.0.6-SNAPSHOT
 - Fix issue with kicks and bans on the GUI intermittently not working or selecting the wrong player.
 
@@ -92,9 +102,7 @@ usual: `seadmin.bat myserver.properties* > myserver.log`
 
 
 
-## TODO
-- Perform an update check to warn on new versions
-- No JRE installer and shelll scripts for unix home server running the command line version
+## TODO (if sufficient demand)
+- No JRE installer and shell scripts for unix home server running the command line version
 - Create configuration properties files via GUI
-- Calculate match remaining time
  
