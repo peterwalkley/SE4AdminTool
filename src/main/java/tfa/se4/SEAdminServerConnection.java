@@ -9,7 +9,6 @@ import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
@@ -54,6 +53,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     private LogLevel m_displayLogLevel = LogLevel.INFO;
     private boolean m_isClose = false;
     private Options m_options;
+    private long m_gameStartTime = 0;
 
     /**
      * Set up and manage connection based on properties configuration.
@@ -158,6 +158,16 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     protected SteamAPI getSteamAPI()
     {
         return m_steamAPI;
+    }
+
+    /**
+     * Provided inherited classes access to the game start time
+     * @return game start time. Value will be zero if we are not
+     * in-game or don't know when the match started.
+     */
+    protected long getGameStartTime()
+    {
+        return m_gameStartTime;
     }
 
     /**
@@ -447,9 +457,16 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         final String oldGameState = m_serverStatus == null ? "unknown" : m_serverStatus.getLobby().getState();
         if (!oldGameState.equals(newGameState))
         {
+            if (Protocol.IN_GAME.equals(newGameState) && m_serverStatus != null)
+            {
+                m_gameStartTime = System.currentTimeMillis();
+                log(LogLevel.INFO, LogType.GAME_STARTED, JSONUtils.marshalServerStatus(m_serverStatus, this));
+            }
+
             if (Protocol.IN_GAME.equals(oldGameState))
             {
                 log(LogLevel.INFO, LogType.GAME_ENDED, JSONUtils.marshalServerStatus(m_serverStatus, this));
+                m_gameStartTime = 0;
             }
             else
             {
@@ -765,7 +782,13 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             System.exit(0);
         }
 
-        final SEAdminServerConnection socket = new SEAdminServerConnection(new Options(args[0]));
+        final Options opts = new Options(args[0]);
+        if (opts.hasInvalidSteamSettings())
+        {
+            opts.makeSteamSettingsConsistent();
+            System.out.println("Kicking of VAC or Game banned player and managing closed profiles requires a steam API key for checks to be performed. These features will be disabled.  Please update your configuration.");
+        }
+        final SEAdminServerConnection socket = new SEAdminServerConnection(opts);
         try
         {
             // wait for closed socket connection.

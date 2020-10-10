@@ -153,6 +153,14 @@
                         <Insets left="50.0" right="5.0" top="5.0" />
                      </padding>
                   </Label>
+                  <Label text="Remaining" fx:id="remainingLabel">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                     <padding>
+                        <Insets left="50.0" right="5.0" top="5.0" />
+                     </padding>
+                  </Label>
                </children>
             </VBox>
             <VBox prefHeight="161.0" prefWidth="454.0">
@@ -173,6 +181,11 @@
                      </padding>
                   </Label>
                   <Label fx:id="bytesReceivedLabel" alignment="CENTER_RIGHT" text="Label">
+                     <padding>
+                        <Insets left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </Label>
+                  <Label fx:id="timeLeftLabel" alignment="CENTER_RIGHT" text="Label">
                      <padding>
                         <Insets left="5.0" right="5.0" top="5.0" />
                      </padding>

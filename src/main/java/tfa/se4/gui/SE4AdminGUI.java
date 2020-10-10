@@ -19,7 +19,7 @@ public class SE4AdminGUI extends Application
         s_hostServices = HostServicesFactory.getInstance(this);
         s_primaryStage = primaryStage;
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("MainPane.fxml"));
-        primaryStage.setTitle("SE4 Admin");
+        primaryStage.setTitle("SE4 Server Administrator " + tfa.se4.Version.BUILD_VERSION);
         final StartupSettings.Settings settings = StartupSettings.readSettings();
 
         if (settings == null)

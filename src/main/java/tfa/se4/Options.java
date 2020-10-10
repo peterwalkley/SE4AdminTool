@@ -60,11 +60,26 @@ public class Options
         m_ipStackAPIKey = props.getProperty("ipstack.api.key", "").trim();
         m_closedProfilePolicy = getOptionalInt(props, "closed.profile.policy", 0, 0, 2);
         m_closedProfileMessage = props.getProperty("closed.profile.message", "Hello #PlayerName#, please open your steam profile to public.").trim();
+    }
 
-        if ((m_applyVACBans || m_applyGameBans || m_closedProfilePolicy != CLOSED_PROFILE_IGNORE) && StringUtils.isBlank(m_steamAPIKey))
-        {
-            throw new Exception("Kicking of VAC or Game banned player and managing closed profiles requires a steam API key for checks to be performed");
-        }
+    /**
+     * Check if the settings are inconsistent, i.e. trying to use features that need a steam API key.
+     * @return true/false if we
+     */
+    public boolean hasInvalidSteamSettings()
+    {
+        return (m_applyVACBans || m_applyGameBans || m_closedProfilePolicy != CLOSED_PROFILE_IGNORE) && StringUtils.isBlank(m_steamAPIKey);
+    }
+
+    /**
+     * Change settings so that we won't try and use things that require a steam API key.
+     * @return
+     */
+    public void makeSteamSettingsConsistent()
+    {
+        m_applyVACBans = false;
+        m_applyGameBans = false;
+        m_closedProfilePolicy = CLOSED_PROFILE_IGNORE;
     }
 
     /**

@@ -6,7 +6,7 @@
 
   <groupId>tfa</groupId>
   <artifactId>se4</artifactId>
-  <version>0.0.6-SNAPSHOT</version>
+  <version>1.0</version>
 
   <name>TFA SE4 Administrator</name>
   <url>https://github.com/peterwalkley/SE4AdminTool</url>
@@ -108,24 +108,41 @@
           <artifactId>maven-shade-plugin</artifactId>
           <version>3.2.4</version>
         </plugin>
-          <plugin>
-              <groupId>com.github.spotbugs</groupId>
-              <artifactId>spotbugs-maven-plugin</artifactId>
-              <version>4.0.4</version>
-              <dependencies>
-                  <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
-                  <dependency>
-                      <groupId>com.github.spotbugs</groupId>
-                      <artifactId>spotbugs</artifactId>
-                      <version>4.1.2</version>
-                  </dependency>
-              </dependencies>
-          </plugin>
+        <plugin>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
+            <version>4.0.4</version>
+            <dependencies>
+                <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
+                <dependency>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs</artifactId>
+                    <version>4.1.2</version>
+                </dependency>
+             </dependencies>
+        </plugin>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>templating-maven-plugin</artifactId>
+            <version>1.0.0</version>
+        </plugin>
       </plugins>
     </pluginManagement>
 	<finalName>SE4AdminTool</finalName>
 	<plugins>
-		<plugin>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>templating-maven-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>filtering-java-templates</id>
+                    <goals>
+                        <goal>filter-sources</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-shade-plugin</artifactId>
 			<executions>

@@ -6,15 +6,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.stage.FileChooser;
 import tfa.se4.Options;
+import tfa.se4.VersionUtils;
 
 public class MainPaneController implements Initializable
 {
@@ -24,6 +28,10 @@ public class MainPaneController implements Initializable
     private Button connectButton;
     @FXML
     private Button closeButton;
+    @FXML
+    private Hyperlink statusHyperlink;
+    @FXML
+    private Label statusLabel;
 
     @Override
     public void initialize(URL location, ResourceBundle resources)
@@ -34,11 +42,41 @@ public class MainPaneController implements Initializable
         {
             settings.filesToReOpen.forEach(f -> openTab(new File(f)));
         }
+
+        statusHyperlink.setOnAction(x -> {
+            SE4AdminGUI.showDocument(statusHyperlink.getText());
+            statusHyperlink.setVisited(false);
+        });
+
+        Platform.runLater(this::checkForUpdate);
     }
 
+    /**
+     * Check online at github to see if there is an updated version.
+     */
+    private void checkForUpdate()
+    {
+        statusLabel.setText("Checking for new version");
+        switch (VersionUtils.checkForNewVersion())
+        {
+            case ON_LATEST:
+                statusLabel.setText("Version is up to date. For help and to report issues, please check the website at:");
+                break;
+            case NEW_VERSION:
+                statusLabel.setText("A new version is available. Please check the website at:");
+                statusLabel.setStyle("-fx-font-weight: bold;");
+                break;
+            case CHECK_ERROR:
+                statusLabel.setText("Unable to check for new version");
+                break;
+        }
+    }
+
+    /**
+     * Handler for the connect button being clicked.
+     */
     public void connectButtonClicked()
     {
-
         FileChooser chooser = new FileChooser();
         chooser.setInitialDirectory(new File(System.getProperty("user.dir")));
         chooser.getExtensionFilters().addAll(
@@ -67,13 +105,25 @@ public class MainPaneController implements Initializable
         }
     }
 
+    /**
+     * Helper to open a tab for a given configuration file.
+     * @param selected File to open
+     * @return New tab or null when a problem opening
+     */
     private Tab openTab(File selected)
     {
         final Tab newTab = new Tab(selected.getName());
         newTab.setId(selected.getAbsolutePath());
+
+        boolean warnSettings = false;
         try
         {
             final Options opts = new Options(selected.getAbsolutePath());
+            if (opts.hasInvalidSteamSettings())
+            {
+                opts.makeSteamSettingsConsistent();
+                warnSettings = true;
+            }
             final MonitoredServerConnection conn = new MonitoredServerConnection(opts);
             final ServerPaneController controller = new ServerPaneController(conn);
             newTab.setOnCloseRequest(e -> controller.close());
@@ -81,7 +131,6 @@ public class MainPaneController implements Initializable
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ServerPane.fxml"));
             loader.setController(controller);
             newTab.setContent(loader.load());
-
         }
         catch (Exception e)
         {
@@ -92,6 +141,14 @@ public class MainPaneController implements Initializable
             errorAlert.setContentText(e.getLocalizedMessage());
             errorAlert.showAndWait();
             return null;
+        }
+
+        if (warnSettings)
+        {
+            Alert steamAlert = new Alert(Alert.AlertType.WARNING);
+            steamAlert.setHeaderText("Configuration is Inconsistent");
+            steamAlert.setContentText("Kicking of VAC or Game banned player and managing closed profiles requires a steam API key for checks to be performed.\nThese features will be disabled.  Please update your configuration.");
+            steamAlert.showAndWait();
         }
 
         tabPane.getTabs().add(newTab);

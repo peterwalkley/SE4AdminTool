@@ -24,6 +24,7 @@ public class GameModel
     private StringProperty maxPlayers = new SimpleStringProperty(this, "maxPlayers", "unknown");
     private StringProperty bytesSent = new SimpleStringProperty(this, "bytesSent", "unknown");
     private StringProperty bytesReceived = new SimpleStringProperty(this, "bytesReceived", "unknown");
+    private StringProperty timeLeft = new SimpleStringProperty(this, "timeLeft", "unknown");
 
     private ObservableList<Player> players = FXCollections.observableArrayList();
     private ObservableList<String> logLines = FXCollections.observableArrayList();
@@ -230,4 +231,20 @@ public class GameModel
     {
         this.map.set(map);
     }
+
+    public String getTimeLeft()
+    {
+        return timeLeft.get();
+    }
+
+    public StringProperty timeLeftProperty()
+    {
+        return timeLeft;
+    }
+
+    public void setTimeLeft(String timeLeft)
+    {
+        this.timeLeft.set(timeLeft);
+    }
+
 }

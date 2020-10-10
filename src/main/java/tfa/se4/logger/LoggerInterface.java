@@ -23,6 +23,7 @@ public interface LoggerInterface
         CHECK("CHECK"),
         GAMEBAN("GAMEBAN"),
         GAME_DATA("GAME_DATA"),
+        GAME_STARTED("GAME_STARTED"),
         GAME_ENDED("GAME_ENDED"),
         IPBAN("IPBAN"),
         PLAYERBAN("PLAYERBAN"),

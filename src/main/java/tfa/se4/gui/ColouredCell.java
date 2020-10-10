@@ -22,7 +22,6 @@ public class ColouredCell extends ListCell<String>
     public void updateItem(String text, boolean empty)
     {
         super.updateItem(text, empty);
-        this.setTextFill(LogColours.getDefault(m_logger));
 
         if (StringUtils.isBlank(text) || empty)
         {
@@ -38,6 +37,7 @@ public class ColouredCell extends ListCell<String>
                 return;
 
             }
+            setTextFill(LogColours.getDefault(m_logger));
             setText(text);
             final List<LogColours.LogColour> colourMatches = LogColours.getColours(m_logger);
 

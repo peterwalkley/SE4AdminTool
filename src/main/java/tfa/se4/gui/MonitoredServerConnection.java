@@ -9,6 +9,7 @@ import tfa.se4.json.ServerStatus;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Instant;
+import java.util.concurrent.TimeUnit;
 
 @WebSocket
 public class MonitoredServerConnection extends SEAdminServerConnection
@@ -66,6 +67,16 @@ public class MonitoredServerConnection extends SEAdminServerConnection
                 model.setServerName(status.getServer().getName());
                 model.setServerHost(status.getServer().getHost());
             }
+
+            if (getGameStartTime() == 0)
+            {
+                model.setTimeLeft(null);
+            }
+            else
+            {
+                final long endTime = getGameStartTime() + status.getGameData().getCurrentMap().getTimeLimit().intValue() * 60000;
+                model.setTimeLeft(formatTimeLeft(endTime - System.currentTimeMillis()));
+            }
         });
     }
 
@@ -79,7 +90,6 @@ public class MonitoredServerConnection extends SEAdminServerConnection
     @Override
     public void log(LogLevel level, LogType type, Throwable t, String message, Object... args)
     {
-
         if (isFilterMessage(level))
         {
             return;
@@ -163,6 +173,25 @@ public class MonitoredServerConnection extends SEAdminServerConnection
         else
         {
             return String.format("%.2f gb", (float) bytes / (1024.0 * 1024.0 * 1024.0));
+        }
+    }
+
+    private String formatTimeLeft(final long millis)
+    {
+        final long hours = TimeUnit.MILLISECONDS.toHours(millis);
+        final long minutes = TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis));
+        final long secs = TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis));
+        if (hours > 0)
+        {
+            return String.format("%02d:%02d:%02d", hours, minutes, secs);
+        }
+        else if (minutes > 0)
+        {
+            return String.format("%02d:%02d", minutes, secs);
+        }
+        else
+        {
+            return String.format("%02d", secs);
         }
     }
 

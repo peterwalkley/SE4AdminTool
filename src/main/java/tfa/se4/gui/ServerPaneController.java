@@ -67,6 +67,10 @@ public class ServerPaneController implements Initializable
     @FXML
     private Label bytesReceivedLabel;
     @FXML
+    private Label remainingLabel; // the label that says remaining time
+    @FXML
+    private Label timeLeftLabel; // the VALUE of the remaining time
+    @FXML
     private TableView<Player> playersTable;
     @FXML
     private TableColumn<Player, String> name;
@@ -122,6 +126,9 @@ public class ServerPaneController implements Initializable
         fpsLabel.textProperty().bind(m_connection.getModel().fpsProperty());
         bytesSentLabel.textProperty().bind(m_connection.getModel().bytesSentProperty());
         bytesReceivedLabel.textProperty().bind(m_connection.getModel().bytesReceivedProperty());
+        remainingLabel.visibleProperty().bind(m_connection.getModel().timeLeftProperty().isNotNull());
+        timeLeftLabel.visibleProperty().bind(m_connection.getModel().timeLeftProperty().isNotNull());
+        timeLeftLabel.textProperty().bind(m_connection.getModel().timeLeftProperty());
 
         // Players table
         name.setCellValueFactory(new PropertyValueFactory<>("name"));
