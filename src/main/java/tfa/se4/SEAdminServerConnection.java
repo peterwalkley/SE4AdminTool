@@ -33,6 +33,7 @@ import tfa.se4.json.Player;
 import tfa.se4.json.ServerStatus;
 import tfa.se4.logger.LoggerInterface;
 import tfa.se4.steam.SteamAPI;
+import tfa.se4.steam.json.PlayerSummaryInfo;
 
 /**
  * Main handler class for a connection to SE4 server.
@@ -54,6 +55,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     private boolean m_isClose = false;
     private Options m_options;
     private long m_gameStartTime = 0;
+    private int m_retryTimeoutSecs = 10;
 
     /**
      * Set up and manage connection based on properties configuration.
@@ -81,7 +83,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
 
     /**
      * Management thread. Polls for dead connection and tries
-     * reconnect after 10 seconds.
+     * reconnect after 10 seconds, then increase timeout to a max
      */
     @Override
     public void run()
@@ -95,14 +97,15 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
                     final WebSocketClient client = new WebSocketClient();
                     client.start();
                     Future<Session> future = client.connect(this, this.getURI());
-                    future.get(10, TimeUnit.SECONDS);
+                    future.get(5000, TimeUnit.SECONDS);
                     m_client = client;
                 }
                 catch (final Exception ex)
                 {
-                    log(LogLevel.INFO, LogType.SYSTEM, "Connect failed. Retrying in 10 seconds.");
+                    log(LogLevel.INFO, LogType.SYSTEM, "Connect failed. Retrying in " + m_retryTimeoutSecs + " seconds.");
                     log(LogLevel.TRACE, LogType.SYSTEM, ex, "Connection error");
-                    sleep(10000);
+                    sleep(m_retryTimeoutSecs * 1000L);
+                    m_retryTimeoutSecs = getNextRetryTimeSecs(m_retryTimeoutSecs);
                 }
             }
             else
@@ -137,6 +140,47 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         {
             m_client = null;
             m_session = null;
+        }
+    }
+
+    /**
+     * Do a gradual increase of connect retry time up to 10 minutes between retries.
+     * @param currentTime Current retry time
+     * @return New retry time
+     */
+    private int getNextRetryTimeSecs(final int currentTime)
+    {
+        if (currentTime <= 10)
+        {
+            return 20;
+        }
+        else if (currentTime <= 20)
+        {
+            return 30;
+        }
+        else if (currentTime <= 30)
+        {
+            return 40;
+        }
+        else if (currentTime <= 40)
+        {
+            return 60;
+        }
+        else if (currentTime <= 60)
+        {
+            return 90;
+        }
+        else if (currentTime <= 90)
+        {
+            return 180;
+        }
+        else if (currentTime <= 180)
+        {
+            return 300;
+        }
+        else
+        {
+            return 600;
         }
     }
 
@@ -260,6 +304,48 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             }
         }
 
+        // Now check rules for LINKED accounts
+        if (m_steamAPI != null)
+        {
+            final String linkedID = m_steamAPI.getLinkedProfileID(p.getSteamId(), p.getName(), this);
+            if (linkedID != null)
+            {
+                final PlayerSummaryInfo other = m_steamAPI.getProfileInfo(linkedID, "LINK", this);
+                log(LogLevel.INFO, LogType.STEAM, "Player %s steam ID %s has link to %s steam id %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid());
+
+                if (m_banList.getBan(other.getSteamid()) != null)
+                {
+                    final Ban banInfo = m_banList.getBan(other.getSteamid());
+                    log(LogLevel.INFO, LogType.PLAYERBAN, "Banned player %s steam ID %s for link to banned account %s / %s original ban reason was %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid(), banInfo.reason);
+                    banPlayer(p, "link to banned account " + other.getPersonaname() + " / " + other.getSteamid());
+                    return;
+                }
+
+                final tfa.se4.steam.json.PlayerBanInfo linkedBanInfo = m_steamAPI.getBanInfo(other.getSteamid(), other.getPersonaname(), this);
+                if (linkedBanInfo != null)
+                {
+                    if (m_options.isApplyVACBans() && linkedBanInfo.getVACBanned())
+                    {
+                        log(LogLevel.INFO, LogType.VAC, "Player %s steam ID %s has link to VAC banned account %s / %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid());
+                        banPlayer(p, "VAC ban on linked account" + other.getPersonaname() + " / " + other.getSteamid());
+                        return;
+                    }
+
+                    if (m_options.isApplyGameBans() && linkedBanInfo.getNumberOfGameBans() > 0)
+                    {
+                        log(LogLevel.INFO, LogType.GAMEBAN, "Player %s steam ID %s has link to game banned account %s / %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid());
+                        banPlayer(p, "Game ban on linked account" + other.getPersonaname() + " / " + other.getSteamid());
+                        return;
+                    }
+                }
+
+            }
+            else
+            {
+                log(LogLevel.INFO, LogType.STEAM, "Player %s steam ID %s has no link to other accounts", p.getName(), p.getSteamId());
+            }
+        }
+
         // Passed all other checks.
         doGreeting(p);
     }
@@ -310,13 +396,16 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             @Override
             public void run()
             {
-                m_banList.addBan(p.getSteamId(), p.getName(), reason);
+                final boolean banAdded = m_banList.addBan(p.getSteamId(), p.getName(), reason);
                 // Do a steam ID ban to make sure they are added to server ban list
                 final String steamIDBan = "Server.KickBanSteamID " + p.getSteamId();
                 sendMessage(Protocol.REQUEST_SEND_COMMAND, steamIDBan.getBytes());
 
                 // Make the ban public
-                final String msg = "Server.Say BANNING " + p.getName() + " for " + reason;
+                final String msg = banAdded ?
+                        "Server.Say BANNING " + p.getName() + " for " + reason :
+                        "Server.Say kicking banned player " + p.getName() + " for " + reason ;
+
                 sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
 
                 // Delay 5 seconds
@@ -625,6 +714,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     @OnWebSocketConnect
     public void onConnect(Session session)
     {
+        m_retryTimeoutSecs = 10; // reset
         log(LogLevel.INFO, LogType.SYSTEM, "Connected to %s", session.getRemoteAddress().toString());
         m_session = session;
         if (m_session.isOpen())
@@ -700,7 +790,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
      *
      * @param millis Milliseconds.
      */
-    private static void sleep(final int millis)
+    private static void sleep(final long millis)
     {
         try
         {

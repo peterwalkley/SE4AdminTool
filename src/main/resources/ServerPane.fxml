@@ -208,7 +208,8 @@
           <TableColumn fx:id="kills" editable="false" prefWidth="65.0" style="-fx-alignment: CENTER_RIGHT;" text="Kills" />
           <TableColumn fx:id="assists" editable="false" prefWidth="65.0" style="-fx-alignment: CENTER_RIGHT;" text="Assists" />
           <TableColumn fx:id="longestShot" editable="false" prefWidth="65.0" style="-fx-alignment: CENTER_RIGHT;" text="Distance" />
-            <TableColumn fx:id="location" editable="false" prefWidth="150.0" text="Location" />
+          <TableColumn fx:id="playedHours" editable="false" prefWidth="65.0" style="-fx-alignment: CENTER_RIGHT;" text="Play hours" />
+          <TableColumn fx:id="location" editable="false" prefWidth="150.0" text="Location" />
         </columns>
       </TableView>
       <ListView fx:id="logList" prefHeight="400.0" prefWidth="838.0" SplitPane.resizableWithParent="true"/>

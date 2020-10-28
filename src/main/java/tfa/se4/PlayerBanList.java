@@ -73,7 +73,7 @@ public final class PlayerBanList implements Runnable
                             }
                             else
                             {
-                                m_logger.log(LogLevel.INFO, LogType.SYSTEM, "Invalid ban entry '%s'  bans read from %s was ignored", line, m_file.getName());
+                                m_logger.log(LogLevel.INFO, LogType.SYSTEM, "Invalid ban entry '%s' read from %s was ignored", line, m_file.getName());
                             }
                         }
 
@@ -109,22 +109,29 @@ public final class PlayerBanList implements Runnable
      * @param steamID    Steam ID
      * @param playerName Player name
      * @param reason     Reason for the ban
+     * @return true if ban added, false if was already present
      */
-    public void addBan(final String steamID, final String playerName, final String reason)
+    public boolean addBan(final String steamID, final String playerName, final String reason)
     {
-        final String banText = steamID + " # " + playerName.replace('#', 'x') + " # " + reason;
+        if (getBan(steamID) == null)
+        {
+            final String banText = steamID + " # " + playerName.replace('#', 'x') + " # " + reason;
 
-        try
-        {
-            PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(m_file.getAbsolutePath(), true)));
-            out.println(banText);
-            out.close();
+            try
+            {
+                PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(m_file.getAbsolutePath(), true)));
+                out.println(banText);
+                out.close();
+            }
+            catch (IOException e)
+            {
+                // Ignore as we can't do much
+                System.out.println("Error adding banned player to ban list");
+                e.printStackTrace();
+            }
+            return true;
         }
-        catch (IOException e)
-        {
-            // Ignore as we can't do much
-            System.out.println("Error adding banned player to ban list");
-            e.printStackTrace();
-        }
+
+        return false;
     }
 }

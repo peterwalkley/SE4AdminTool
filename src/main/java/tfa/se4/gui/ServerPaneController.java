@@ -13,7 +13,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
 import org.apache.commons.lang3.StringUtils;
@@ -91,6 +90,8 @@ public class ServerPaneController implements Initializable
     @FXML
     private TableColumn<Player, Double> longestShot;
     @FXML
+    private TableColumn<Player, String> playedHours;
+    @FXML
     private TableColumn<Player, String> location;
     @FXML
     private ListView<String> logList;
@@ -141,6 +142,7 @@ public class ServerPaneController implements Initializable
         assists.setCellValueFactory(new PropertyValueFactory<>("assists"));
         longestShot.setCellValueFactory(new PropertyValueFactory<>("longestShot"));
         longestShot.setCellFactory(new ColumnFormatter<Player, Double>(new DecimalFormat("0.00")));
+        playedHours.setCellValueFactory(new PropertyValueFactory<>("playhours"));
         location.setCellValueFactory(new PropertyValueFactory<>("location"));
         if (!m_connection.ipStackSupported())
         {
@@ -200,7 +202,31 @@ public class ServerPaneController implements Initializable
                                 result.ifPresent(r -> m_connection.banPlayer(toBan, r));
                             }
                         });
-                        rowMenu.getItems().addAll(profileItem, kickItem, banItem);
+                        MenuItem copyNameItem = new MenuItem("Copy name ...");
+                        copyNameItem.setOnAction(new EventHandler<ActionEvent>()
+                        {
+                            @Override
+                            public void handle(ActionEvent event)
+                            {
+                                final Clipboard clipboard = Clipboard.getSystemClipboard();
+                                final ClipboardContent content = new ClipboardContent();
+                                content.putString(row.getItem().getName());
+                                clipboard.setContent(content);
+                            }
+                        });
+                        MenuItem copySteamIDItem = new MenuItem("Copy steam ID ...");
+                        copySteamIDItem.setOnAction(new EventHandler<ActionEvent>()
+                        {
+                            @Override
+                            public void handle(ActionEvent event)
+                            {
+                                final Clipboard clipboard = Clipboard.getSystemClipboard();
+                                final ClipboardContent content = new ClipboardContent();
+                                content.putString(row.getItem().getSteamId());
+                                clipboard.setContent(content);
+                            }
+                        });
+                        rowMenu.getItems().addAll(profileItem, kickItem, banItem, copyNameItem, copySteamIDItem);
 
                         // only display context menu for non-null items:
                         row.contextMenuProperty().bind(

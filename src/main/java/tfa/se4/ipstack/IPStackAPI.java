@@ -15,9 +15,11 @@ import java.util.Map;
  */
 public final class IPStackAPI
 {
-    private String m_APIkey;
+    /** IPStack API key. */
+    private final String m_APIkey;
 
-    private static Map<String, IPStack> s_cache = new HashMap<>();
+    /** Lookup cache to reduce hits to IP stack. */
+    private static final Map<String, IPStack> s_cache = new HashMap<>();
 
     /**
      * Initialise and remember steam API key.
@@ -36,7 +38,7 @@ public final class IPStackAPI
      * @param logger Logger for catching errors
      * @return IP address information.
      */
-    public IPStack getIPAddressInfo(final String ip, final LoggerInterface logger)
+    private IPStack getIPAddressInfo(final String ip, final LoggerInterface logger)
     {
         if (s_cache.get(ip) != null)
         {

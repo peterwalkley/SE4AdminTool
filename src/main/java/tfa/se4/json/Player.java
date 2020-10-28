@@ -40,6 +40,7 @@ public class Player
 
     private boolean skipGreeting;
     private String location = "N/A";
+    private String playhours = "N/A";
 
     @JsonProperty("Id")
     public String getId()
@@ -191,6 +192,16 @@ public class Player
     public void setLocation(String s)
     {
         location = s;
+    }
+
+    public String getPlayhours()
+    {
+        return playhours;
+    }
+
+    public void setPlayhours(String s)
+    {
+        playhours = s;
     }
 
     @Override

@@ -63,4 +63,44 @@ public final class JSONUtils
             return null;
         }
     }
+
+    /**
+     * Convert supplied JSON string to PlayingSharedGameResponse structure.
+     *
+     * @param json   JSON from steam.
+     * @param logger Logger for writing error information.
+     * @return Object or null when fails to unmarshal.
+     */
+    public static PlayingSharedGameResponse unMarshalPlayingSharedGame(final String json, final LoggerInterface logger)
+    {
+        try
+        {
+            return MAPPER.readValue(json, PlayingSharedGameResponse.class);
+        }
+        catch (JsonProcessingException e)
+        {
+            logger.log(LogLevel.ERROR, LogType.SYSTEM, e, "Bad JSON %s", json);
+            return null;
+        }
+    }
+
+    /**
+     * Convert supplied JSON string to RecentlyPlayedGamesResponse structure.
+     *
+     * @param json   JSON from steam.
+     * @param logger Logger for writing error information.
+     * @return Object or null when fails to unmarshal.
+     */
+    public static RecentlyPlayedGamesResponse unMarshalRecentlyPlayedGamesResponse(final String json, final LoggerInterface logger)
+    {
+        try
+        {
+            return MAPPER.readValue(json, RecentlyPlayedGamesResponse.class);
+        }
+        catch (JsonProcessingException e)
+        {
+            logger.log(LogLevel.ERROR, LogType.SYSTEM, e, "Bad JSON %s", json);
+            return null;
+        }
+    }
 }

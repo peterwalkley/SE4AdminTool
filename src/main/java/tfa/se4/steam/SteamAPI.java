@@ -1,13 +1,21 @@
 package tfa.se4.steam;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.http.client.fluent.Request;
 
 import tfa.se4.steam.json.JSONUtils;
+import tfa.se4.steam.json.PlayerBanInfo;
 import tfa.se4.steam.json.PlayerBansQueryResult;
+import tfa.se4.steam.json.PlayerSummaryInfo;
+import tfa.se4.steam.json.PlayerSummaryQueryResult;
+import tfa.se4.steam.json.PlayingSharedGameResponse;
 
 import tfa.se4.logger.LoggerInterface;
+import tfa.se4.steam.json.RecentlyPlayedGame;
+import tfa.se4.steam.json.RecentlyPlayedGamesResponse;
 
 import static tfa.se4.logger.LoggerInterface.LogLevel;
 import static tfa.se4.logger.LoggerInterface.LogType;
@@ -17,7 +25,14 @@ import static tfa.se4.logger.LoggerInterface.LogType;
  */
 public final class SteamAPI
 {
-    private String m_steamAPIkey;
+    /** Steam API key. */
+    private final String m_steamAPIkey;
+
+    /** Sniper Elite 4 steam APP ID. */
+    private static final String APP_ID = "312660";
+
+    /** Lookup cache to reduce hits to IP stack. */
+    private static final Map<String, RecentlyPlayedGamesResponse> s_recentlyPlayedCache = new HashMap<>();
 
     /**
      * Initialise and remember steam API key.
@@ -36,9 +51,9 @@ public final class SteamAPI
      * @param logger  Logger for catching errors
      * @return Ban information or null if we were not able to fetch it.
      */
-    public tfa.se4.steam.json.PlayerBanInfo getBanInfo(final String steamID, final String playerName, final LoggerInterface logger)
+    public PlayerBanInfo getBanInfo(final String steamID, final String playerName, final LoggerInterface logger)
     {
-        logger.log(LogLevel.INFO, LogType.STEAM, "Checking player %s steam ID %s for bans", playerName, steamID);
+        logger.log(LogLevel.DEBUG, LogType.STEAM, "Checking player %s steam ID %s for bans", playerName, steamID);
         final String urltemplate = "http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key=##STEAMAPIKEY##&steamids=##STEAMID##";
 
         final String url = urltemplate
@@ -55,7 +70,7 @@ public final class SteamAPI
                 return bans.getPlayers().get(0);
             }
 
-            logger.log(LogLevel.ERROR, LogType.STEAM, "Unable to fetch steam ban info for %s empty return data", steamID);
+            logger.log(LogLevel.ERROR, LogType.STEAM, "Unable to fetch steam ban info for %s due to empty return data", steamID);
         }
         catch (IOException e)
         {
@@ -71,9 +86,9 @@ public final class SteamAPI
      * @param logger  Logger for catching errors
      * @return Ban information or null if we were not able to fetch it.
      */
-    public tfa.se4.steam.json.PlayerSummaryInfo getProfileInfo(final String steamID, final String playerName, final LoggerInterface logger)
+    public PlayerSummaryInfo getProfileInfo(final String steamID, final String playerName, final LoggerInterface logger)
     {
-        logger.log(LogLevel.INFO, LogType.STEAM, "Checking player %s steam ID %s for profile visibility", playerName, steamID);
+        logger.log(LogLevel.DEBUG, LogType.STEAM, "Checking player %s steam ID %s for profile visibility", playerName, steamID);
         final String urltemplate = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=##STEAMAPIKEY##&steamids=##STEAMID##";
 
         final String url = urltemplate
@@ -82,7 +97,7 @@ public final class SteamAPI
 
         try
         {
-            final tfa.se4.steam.json.PlayerSummaryQueryResult info = JSONUtils.unMarshalPlayerSummary(
+            final PlayerSummaryQueryResult info = JSONUtils.unMarshalPlayerSummary(
                     Request.Get(url).connectTimeout(2000).socketTimeout(2000).execute().returnContent().asString(), logger);
 
             if (info != null && info.getResponse() != null && info.getResponse().getPlayers() != null && !info.getResponse().getPlayers().isEmpty())
@@ -90,7 +105,7 @@ public final class SteamAPI
                 return info.getResponse().getPlayers().get(0);
             }
 
-            logger.log(LogLevel.ERROR, LogType.STEAM, "Unable to fetch steam player summary info for %s empty return data", steamID);
+            logger.log(LogLevel.ERROR, LogType.STEAM, "Unable to fetch steam player summary info for %s due to empty return data", steamID);
         }
         catch (IOException e)
         {
@@ -98,4 +113,109 @@ public final class SteamAPI
         }
         return null;
     }
+
+    /**
+     * Get steamID of any linked profile we can find.
+     *
+     * @param steamID SteamId of player to query
+     * @param logger  Logger for catching errors
+     * @return SteamID of any linked profile we can find or null when none present.
+     */
+    public String getLinkedProfileID(final String steamID, final String playerName, final LoggerInterface logger)
+    {
+        logger.log(LogLevel.DEBUG, LogType.STEAM, "Checking player %s steam ID %s for linked profile", playerName, steamID);
+        final String urltemplate = "https://api.steampowered.com/IPlayerService/IsPlayingSharedGame/v1/?key=##STEAMAPIKEY##&steamid=##STEAMID##&appid_playing=##APPID##";
+
+        final String url = urltemplate
+                .replace("##APPID##", APP_ID)
+                .replace("##STEAMID##", steamID)
+                .replace("##STEAMAPIKEY##", m_steamAPIkey);
+
+        try
+        {
+            final PlayingSharedGameResponse info = JSONUtils.unMarshalPlayingSharedGame(
+                    Request.Get(url).connectTimeout(2000).socketTimeout(2000).execute().returnContent().asString(), logger);
+
+            if (info == null || info.getResponse() == null)
+            {
+                logger.log(LogLevel.ERROR, LogType.STEAM, "Unable to fetch linked profile info for %s due to empty return data", steamID);
+                return null;
+            }
+            final String linkedSteamID = info.getResponse().getLenderSteamid();
+            if (linkedSteamID == null || "0".equals(linkedSteamID))
+            {
+                return null;
+            }
+
+            return linkedSteamID;
+        }
+        catch (IOException e)
+        {
+            logger.log(LogLevel.ERROR, LogType.STEAM, e, "Unable to fetch linked profile for %s", steamID);
+        }
+        return null;
+    }
+
+    /**
+     * Get total playtime (in hours) for SE 4.
+     *
+     * @param steamID SteamId of player to query
+     * @param logger  Logger for catching errors
+     * @return playtime in hours or null if we can't get the information.
+     */
+    public synchronized String getTotalPlaytimeHours(final String steamID, final String playerName, final LoggerInterface logger)
+    {
+        if (s_recentlyPlayedCache.containsKey(steamID))
+        {
+            return getHours(s_recentlyPlayedCache.get(steamID));
+        }
+
+        logger.log(LogLevel.DEBUG, LogType.STEAM, "Checking player %s steam ID %s for total play time", playerName, steamID);
+        final String urltemplate = "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/?key=##STEAMAPIKEY##&steamid=##STEAMID##";
+
+        final String url = urltemplate
+                .replace("##STEAMID##", steamID)
+                .replace("##STEAMAPIKEY##", m_steamAPIkey);
+
+        try
+        {
+            final RecentlyPlayedGamesResponse info = JSONUtils.unMarshalRecentlyPlayedGamesResponse(
+                    Request.Get(url).connectTimeout(2000).socketTimeout(2000).execute().returnContent().asString(), logger);
+
+            s_recentlyPlayedCache.put(steamID, info);
+            final String hours = getHours(info);
+            logger.log(LogLevel.INFO, LogType.STEAM, "Player %s steam ID %s has %s hours total play time", playerName, steamID, hours);
+            return hours;
+        }
+        catch (IOException e)
+        {
+            logger.log(LogLevel.ERROR, LogType.STEAM, e, "Unable to fetch recently played games info for %s", steamID);
+        }
+        return "-";
+    }
+
+    /**
+     * Get hours play time or null if not present.
+     * @param info RecentlyPlayedGamesResponse
+     * @return hours or '-' for none
+     */
+    private String getHours(final RecentlyPlayedGamesResponse info)
+    {
+        if (info == null || info.getResponse() == null || info.getResponse().getGames() == null)
+        {
+            return "-";
+        }
+
+        for (final RecentlyPlayedGame g : info.getResponse().getGames())
+        {
+            if (APP_ID.equals(g.getAppid().toString()))
+            {
+                int mins = g.getPlaytimeForever().intValue();
+                return Integer.toString(mins / 60);
+            }
+        }
+
+        return "-";
+    }
+
 }

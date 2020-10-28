@@ -59,6 +59,12 @@ public class MonitoredServerConnection extends SEAdminServerConnection
                 {
                     status.getLobby().getPlayers().forEach(p -> p.setLocation(getIPStackAPI().getLocation(p.getIPv4(), this)));
                 }
+
+                if (getSteamAPI() != null)
+                {
+                    status.getLobby().getPlayers().forEach(p -> p.setPlayhours(getSteamAPI().getTotalPlaytimeHours(p.getSteamId(), p.getName(), this)));
+
+                }
                 model.setPlayers(status.getLobby().getPlayers());
             }
 
