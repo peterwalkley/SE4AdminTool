@@ -14,7 +14,8 @@ an example.
 you to provide your own Steam API key. Obtain one from <https://steamcommunity.com/dev/apikey> and
 add it to your configuration files.  Note that Game bans could be for any game, not just Sniper Elite.
 For a guide to steam policies refer to <https://steamcommunity.com/sharedfiles/filedetails/?id=961168214>,
-particularly section 5.
+particularly section 5.  **New for 1.1 update: This will also apply if the player is using a shared account
+with a ban.**
 - Players with closed steam profiles can (optionally) be kicked or requested to open their profiles via an in-game message.
 Note this also requires a steam API key.
 - Players can be **whitelisted** so that ban checks are skipped. This allows administrators to grant
@@ -31,10 +32,10 @@ from <https://ipstack.com/>. A free key will allow 10,000 lookups per month.
 
 ![Example Screenshot](images/screenshot.png)
 ## Installation
-A windows installer can be downloaded from <https://github.com/peterwalkley/SE4AdminTool/releases/download/v1.0/TFA.SE4.Administrator_1.0.exe>. 
+A windows installer can be downloaded from <https://github.com/peterwalkley/SE4AdminTool/releases/download/v1.1/TFA.SE4.Administrator_1.1.exe>. 
 This will install the GUI and a java runtime environment for the application.
 
-The zip file <https://github.com/peterwalkley/SE4AdminTool/releases/download/v1.0/TFA.SE4.Administrator-1.0.zip> is available as an alternative,
+The zip file <https://github.com/peterwalkley/SE4AdminTool/releases/download/v1.1/TFA.SE4.Administrator-1.1.zip> is available as an alternative,
 download, unzip to a directory and run the exe within.
 
 Before using the application for the first time
@@ -45,7 +46,7 @@ servers at the same time in the GUI, each will appear in its own application tab
 ## Configuration
 
 An example server properties file, `config.properties` is included. Make a copy of this for each server you
-wish to managed and then update the contents of the copies to match the server details.
+wish to manage and then update the contents of the copies to match the server details.
 At the very least you will need to change its contents to
 match your server IP address, RCON port and RCON password. Include your steam API key if you
 want to be able to check for VAC bans and closed profiles.
@@ -66,6 +67,13 @@ usual: `seadmin.bat myserver.properties* > myserver.log`
 
  
  ## Changelog
+ ### 1.1 RELEASE
+- Check if player is using a shared game instance and apply bans if the original game owner was banned. This requires a Steam API key.
+- Display hours played in players table. This requires a Steam API key and that the player has made the information public.
+- Fix issue where duplicate bans could be added to ban list.
+- Change re-connect handler to apply a increasing retry delay starting at 10 seconds and going up to 10 minutes.
+- Add copy to clipboard options for player name and steam id on the player table pop-up menu.
+
  ### 1.0 RELEASE
 - Move to release versioning from pre-release
 - Display game countdown timer on GUI
