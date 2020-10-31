@@ -80,7 +80,7 @@ public class MonitoredServerConnection extends SEAdminServerConnection
             }
             else
             {
-                final long endTime = getGameStartTime() + status.getGameData().getCurrentMap().getTimeLimit().intValue() * 60000;
+                final long endTime = getGameStartTime() + status.getGameData().getCurrentMap().getTimeLimit() * 60000;
                 model.setTimeLeft(formatTimeLeft(endTime - System.currentTimeMillis()));
             }
         });
@@ -138,7 +138,7 @@ public class MonitoredServerConnection extends SEAdminServerConnection
     /**
      * Is the IP stack in use ?
      *
-     * @return
+     * @return Whether IP stack is in use.
      */
     public boolean ipStackSupported()
     {
@@ -147,9 +147,9 @@ public class MonitoredServerConnection extends SEAdminServerConnection
     }
 
     /**
-     * Is the IP stack in use ?
+     * Is steam in use ?
      *
-     * @return
+     * @return Whether steam is in use
      */
     public boolean isSteamSupported()
     {

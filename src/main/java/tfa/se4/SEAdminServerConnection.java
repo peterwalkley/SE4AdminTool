@@ -321,24 +321,26 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
                     return;
                 }
 
-                final tfa.se4.steam.json.PlayerBanInfo linkedBanInfo = m_steamAPI.getBanInfo(other.getSteamid(), other.getPersonaname(), this);
-                if (linkedBanInfo != null)
+                if (m_options.isApplyVACBans() || m_options.isApplyGameBans())
                 {
-                    if (m_options.isApplyVACBans() && linkedBanInfo.getVACBanned())
+                    final tfa.se4.steam.json.PlayerBanInfo linkedBanInfo = m_steamAPI.getBanInfo(other.getSteamid(), other.getPersonaname(), this);
+                    if (linkedBanInfo != null)
                     {
-                        log(LogLevel.INFO, LogType.VAC, "Player %s steam ID %s has link to VAC banned account %s / %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid());
-                        banPlayer(p, "VAC ban on linked account" + other.getPersonaname() + " / " + other.getSteamid());
-                        return;
-                    }
+                        if (m_options.isApplyVACBans() && linkedBanInfo.getVACBanned())
+                        {
+                            log(LogLevel.INFO, LogType.VAC, "Player %s steam ID %s has link to VAC banned account %s / %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid());
+                            banPlayer(p, "VAC ban on linked account " + other.getPersonaname() + " / " + other.getSteamid());
+                            return;
+                        }
 
-                    if (m_options.isApplyGameBans() && linkedBanInfo.getNumberOfGameBans() > 0)
-                    {
-                        log(LogLevel.INFO, LogType.GAMEBAN, "Player %s steam ID %s has link to game banned account %s / %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid());
-                        banPlayer(p, "Game ban on linked account" + other.getPersonaname() + " / " + other.getSteamid());
-                        return;
+                        if (m_options.isApplyGameBans() && linkedBanInfo.getNumberOfGameBans() > 0)
+                        {
+                            log(LogLevel.INFO, LogType.GAMEBAN, "Player %s steam ID %s has link to game banned account %s / %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid());
+                            banPlayer(p, "Game ban on linked account " + other.getPersonaname() + " / " + other.getSteamid());
+                            return;
+                        }
                     }
                 }
-
             }
             else
             {

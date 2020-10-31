@@ -148,6 +148,10 @@ public class ServerPaneController implements Initializable
         {
             location.setVisible(false);
         }
+        if (!m_connection.isSteamSupported())
+        {
+            playedHours.setVisible(false);
+        }
 
         playersTable.setItems(m_connection.getModel().getPlayers());
 

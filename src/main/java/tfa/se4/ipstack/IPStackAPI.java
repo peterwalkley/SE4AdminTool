@@ -46,9 +46,9 @@ public final class IPStackAPI
 
         }
         logger.log(LoggerInterface.LogLevel.DEBUG, LoggerInterface.LogType.IPSTACK, "Fetching IP address information for %s", ip);
-        final String urltemplate = "http://api.ipstack.com/##IP##?access_key=##API_KEY##";
+        final String urlTemplate = "http://api.ipstack.com/##IP##?access_key=##API_KEY##";
 
-        final String url = urltemplate
+        final String url = urlTemplate
                 .replace("##IP##", ip)
                 .replace("##API_KEY##", m_APIkey);
 
@@ -61,7 +61,7 @@ public final class IPStackAPI
             logger.log(LoggerInterface.LogLevel.INFO, LoggerInterface.LogType.IPSTACK, "IP location for %s is %s", ip, toLocation(result));
             return result;
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             logger.log(LoggerInterface.LogLevel.ERROR, LoggerInterface.LogType.IPSTACK, e, "Unable to fetch IP info for %s", ip);
         }
