@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +15,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpHeaders;
+import org.apache.http.StatusLine;
+import org.apache.http.client.fluent.Request;
 import org.apache.commons.lang3.StringUtils;
 
 // Jetty documentation:  https://www.eclipse.org/jetty/documentation/current/websocket-jetty.html
+import org.apache.http.entity.ContentType;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -297,7 +303,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         if (m_options.getClosedProfilePolicy() != tfa.se4.Options.CLOSED_PROFILE_IGNORE)
         {
             final tfa.se4.steam.json.PlayerSummaryInfo info = m_steamAPI.getProfileInfo(p.getSteamId(), p.getName(), this);
-            if (info.getCommunityvisibilitystate() == 1) // private profile
+            if (info != null && info.getCommunityvisibilitystate() == 1) // private profile
             {
                 handleClosedProfile(p);
                 return;
@@ -311,33 +317,40 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             if (linkedID != null)
             {
                 final PlayerSummaryInfo other = m_steamAPI.getProfileInfo(linkedID, "LINK", this);
-                log(LogLevel.INFO, LogType.STEAM, "Player %s steam ID %s has link to %s steam id %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid());
-
-                if (m_banList.getBan(other.getSteamid()) != null)
+                if (other == null)
                 {
-                    final Ban banInfo = m_banList.getBan(other.getSteamid());
-                    log(LogLevel.INFO, LogType.PLAYERBAN, "Banned player %s steam ID %s for link to banned account %s / %s original ban reason was %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid(), banInfo.reason);
-                    banPlayer(p, "link to banned account " + other.getPersonaname() + " / " + other.getSteamid());
-                    return;
+                    log(LogLevel.INFO, LogType.STEAM, "Player %s steam ID %s has link to empty steam id %s", p.getName(), p.getSteamId(), linkedID);
                 }
-
-                if (m_options.isApplyVACBans() || m_options.isApplyGameBans())
+                else
                 {
-                    final tfa.se4.steam.json.PlayerBanInfo linkedBanInfo = m_steamAPI.getBanInfo(other.getSteamid(), other.getPersonaname(), this);
-                    if (linkedBanInfo != null)
-                    {
-                        if (m_options.isApplyVACBans() && linkedBanInfo.getVACBanned())
-                        {
-                            log(LogLevel.INFO, LogType.VAC, "Player %s steam ID %s has link to VAC banned account %s / %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid());
-                            banPlayer(p, "VAC ban on linked account " + other.getPersonaname() + " / " + other.getSteamid());
-                            return;
-                        }
+                    log(LogLevel.INFO, LogType.STEAM, "Player %s steam ID %s has link to %s steam id %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid());
 
-                        if (m_options.isApplyGameBans() && linkedBanInfo.getNumberOfGameBans() > 0)
+                    if (m_banList.getBan(other.getSteamid()) != null)
+                    {
+                        final Ban banInfo = m_banList.getBan(other.getSteamid());
+                        log(LogLevel.INFO, LogType.PLAYERBAN, "Banned player %s steam ID %s for link to banned account %s / %s original ban reason was %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid(), banInfo.reason);
+                        banPlayer(p, "link to banned account " + other.getPersonaname() + " / " + other.getSteamid());
+                        return;
+                    }
+
+                    if (m_options.isApplyVACBans() || m_options.isApplyGameBans())
+                    {
+                        final tfa.se4.steam.json.PlayerBanInfo linkedBanInfo = m_steamAPI.getBanInfo(other.getSteamid(), other.getPersonaname(), this);
+                        if (linkedBanInfo != null)
                         {
-                            log(LogLevel.INFO, LogType.GAMEBAN, "Player %s steam ID %s has link to game banned account %s / %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid());
-                            banPlayer(p, "Game ban on linked account " + other.getPersonaname() + " / " + other.getSteamid());
-                            return;
+                            if (m_options.isApplyVACBans() && linkedBanInfo.getVACBanned())
+                            {
+                                log(LogLevel.INFO, LogType.VAC, "Player %s steam ID %s has link to VAC banned account %s / %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid());
+                                banPlayer(p, "VAC ban on linked account " + other.getPersonaname() + " / " + other.getSteamid());
+                                return;
+                            }
+
+                            if (m_options.isApplyGameBans() && linkedBanInfo.getNumberOfGameBans() > 0)
+                            {
+                                log(LogLevel.INFO, LogType.GAMEBAN, "Player %s steam ID %s has link to game banned account %s / %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid());
+                                banPlayer(p, "Game ban on linked account " + other.getPersonaname() + " / " + other.getSteamid());
+                                return;
+                            }
                         }
                     }
                 }
@@ -557,6 +570,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             if (Protocol.IN_GAME.equals(oldGameState))
             {
                 log(LogLevel.INFO, LogType.GAME_ENDED, JSONUtils.marshalServerStatus(m_serverStatus, this));
+                publishScores(m_serverStatus);
                 m_gameStartTime = 0;
             }
             else
@@ -566,6 +580,47 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         }
 
         setServerStatus(status);
+    }
+
+    /**
+     * Publish game scores to external host if one is configured.
+     * @param status Game state.
+     */
+    private void publishScores(final ServerStatus status)
+    {
+        if (StringUtils.isBlank(m_options.getPostResultsURL()))
+        {
+            return; // Function not configured to be used
+        }
+        if (status == null || status.getLobby() == null || status.getLobby().getPlayers() == null || status.getLobby().getPlayers().size() == 0)
+        {
+            return; // empty game
+        }
+
+        final String postBody = JSONUtils.marshalServerStatus(status, this);
+        String auth = m_options.getPostResultsUser() + ":" + m_options.getPostResultsPassword();
+
+        byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
+        String authHeader = "Basic " + new String(encodedAuth);
+        new Thread(() -> {
+            try
+            {
+                final StatusLine result = Request.
+                        Post(m_options.getPostResultsURL()).
+                        addHeader(HttpHeaders.AUTHORIZATION, authHeader).
+                        connectTimeout(30000).
+                        socketTimeout(30000).
+                        bodyString(postBody, ContentType.APPLICATION_JSON).
+                        execute().
+                        returnResponse().
+                        getStatusLine();
+                log(LogLevel.INFO, LogType.SYSTEM, "Scores published to " + m_options.getPostResultsURL() + " Response: " + result.getReasonPhrase());
+            }
+            catch (IOException e)
+            {
+                log(LogLevel.ERROR, LogType.SYSTEM, "Unable to publish scores to " + m_options.getPostResultsURL() + " " + e.getMessage());
+            }
+        }).start();
     }
 
     /**
@@ -778,13 +833,13 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         )
         {
             log(LogLevel.INFO, LogType.SYSTEM, "WebSocket error handled as connection death");
-            m_session = null;
-            m_client = null;
         }
         else
         {
-            log(LogLevel.ERROR, LogType.SYSTEM, cause, "Unhandled webSocket Error");
+            log(LogLevel.ERROR, LogType.SYSTEM, cause, "Unhandled webSocket Error. Treating as fatal");
         }
+        m_session = null;
+        m_client = null;
     }
 
     /**

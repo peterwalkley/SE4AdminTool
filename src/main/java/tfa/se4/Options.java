@@ -26,6 +26,9 @@ public class Options
     private boolean m_applyGameBans;
     private int m_closedProfilePolicy;
     private String m_closedProfileMessage;
+    private String m_postResultsURL;
+    private String m_postResultsUser;
+    private String m_postResultsPassword;
 
     /**
      * Collect properties.
@@ -60,6 +63,10 @@ public class Options
         m_ipStackAPIKey = props.getProperty("ipstack.api.key", "").trim();
         m_closedProfilePolicy = getOptionalInt(props, "closed.profile.policy", 0, 0, 2);
         m_closedProfileMessage = props.getProperty("closed.profile.message", "Hello #PlayerName#, please open your steam profile to public.").trim();
+
+        m_postResultsURL = props.getProperty("results.post.url", "").trim();
+        m_postResultsUser = props.getProperty("results.post.user", "").trim();
+        m_postResultsPassword = props.getProperty("results.post.password", "").trim();
     }
 
     /**
@@ -275,5 +282,35 @@ public class Options
     public int getClosedProfilePolicy()
     {
         return m_closedProfilePolicy;
+    }
+
+    /**
+     * Get URL for POST results function.
+     *
+     * @return URL (can be blank)
+     */
+    public String getPostResultsURL()
+    {
+        return m_postResultsURL;
+    }
+
+    /**
+     * Get user for POST results function.
+     *
+     * @return user (can be blank)
+     */
+    public String getPostResultsUser()
+    {
+        return m_postResultsUser;
+    }
+
+    /**
+     * Get password for POST results function.
+     *
+     * @return password (can be blank)
+     */
+    public String getPostResultsPassword()
+    {
+        return m_postResultsPassword;
     }
 }
