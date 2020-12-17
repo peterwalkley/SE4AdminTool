@@ -18,7 +18,7 @@
          <children>
             <VBox>
                <children>
-                  <Label text="Status">
+                  <Label text="Status" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
                      <padding>
                         <Insets left="5.0" right="5.0" top="5.0" />
                      </padding>
@@ -29,7 +29,7 @@
                         <Insets left="10.0" />
                      </VBox.margin>
                   </Label>
-                  <Label text="Map" VBox.vgrow="NEVER">
+                  <Label text="Map" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
                      <padding>
                         <Insets left="5.0" right="5.0" top="5.0" />
                      </padding>
@@ -40,7 +40,7 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Label>
-                  <Label text="Mode" VBox.vgrow="NEVER">
+                  <Label text="Mode" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
                      <padding>
                         <Insets left="5.0" right="5.0" top="5.0" />
                      </padding>
@@ -51,7 +51,7 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Label>
-                  <Label text="Score Limit" VBox.vgrow="NEVER">
+                  <Label text="Score Limit" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
                      <padding>
                         <Insets left="5.0" right="5.0" top="5.0" />
                      </padding>
@@ -62,7 +62,7 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Label>
-                  <Label text="Time Limit" VBox.vgrow="NEVER">
+                  <Label text="Time Limit" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
                      <padding>
                         <Insets left="5.0" right="5.0" top="5.0" />
                      </padding>
@@ -77,7 +77,7 @@
             </VBox>
             <VBox HBox.hgrow="NEVER">
                <children>
-                  <Label fx:id="statusLabel" text="some status">
+                  <Label fx:id="statusLabel" text="some status" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
                      <VBox.margin>
                         <Insets left="10.0" />
                      </VBox.margin>
@@ -85,7 +85,7 @@
                         <Insets left="5.0" right="5.0" top="5.0" />
                      </padding>
                   </Label>
-                  <Label fx:id="mapLabel" text="some map" VBox.vgrow="NEVER">
+                  <Label fx:id="mapLabel" text="some map" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
                      <padding>
                         <Insets left="5.0" right="5.0" top="5.0" />
                      </padding>
@@ -93,7 +93,7 @@
                         <Insets left="10.0" />
                      </VBox.margin>
                   </Label>
-                  <Label fx:id="modeLabel" prefHeight="22.0" prefWidth="134.0" text="some mode" VBox.vgrow="NEVER">
+                  <Label fx:id="modeLabel" prefHeight="22.0" prefWidth="134.0" text="some mode" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
                      <padding>
                         <Insets left="5.0" right="5.0" top="5.0" />
                      </padding>
@@ -101,7 +101,7 @@
                         <Insets left="10.0" />
                      </VBox.margin>
                   </Label>
-                  <Label fx:id="scoreLabel" text="score" textAlignment="RIGHT" VBox.vgrow="NEVER">
+                  <Label fx:id="scoreLabel" text="score" textAlignment="RIGHT" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
                      <padding>
                         <Insets left="5.0" right="5.0" top="5.0" />
                      </padding>
@@ -109,7 +109,7 @@
                         <Insets left="10.0" />
                      </VBox.margin>
                   </Label>
-                  <Label fx:id="timeLabel" text="time" textAlignment="RIGHT" VBox.vgrow="NEVER">
+                  <Label fx:id="timeLabel" text="time" textAlignment="RIGHT" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
                      <padding>
                         <Insets left="5.0" right="5.0" top="5.0" />
                      </padding>
@@ -198,6 +198,7 @@
          </effect>
       </HBox>
       <TableView fx:id="playersTable" minHeight="320.0" maxHeight="320" prefHeight="320.0" prefWidth="200.0">
+         <placeholder><Label text="No players connected"/></placeholder>
         <columns>
           <TableColumn fx:id="name" editable="false" prefWidth="135.0" text="Name" />
           <TableColumn fx:id="steamID" editable="false" prefWidth="125.0" text="Steam ID" />

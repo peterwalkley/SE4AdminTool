@@ -38,7 +38,7 @@ public final class IPStackAPI
      * @param logger Logger for catching errors
      * @return IP address information.
      */
-    private IPStack getIPAddressInfo(final String ip, final LoggerInterface logger)
+    public IPStack getIPAddressInfo(final String ip, final LoggerInterface logger)
     {
         if (s_cache.get(ip) != null)
         {

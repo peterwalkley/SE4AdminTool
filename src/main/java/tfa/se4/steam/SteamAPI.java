@@ -46,6 +46,7 @@ public final class SteamAPI
 
     /**
      * Get player ban information.
+     * @see {https://partner.steamgames.com/doc/webapi/ISteamUser#GetPlayerBans}
      *
      * @param steamID SteamId of player to query
      * @param logger  Logger for catching errors
@@ -81,6 +82,7 @@ public final class SteamAPI
 
     /**
      * Get player profile information.
+     * @see {https://partner.steamgames.com/doc/webapi/ISteamUser#GetPlayerSummaries}
      *
      * @param steamID SteamId of player to query
      * @param logger  Logger for catching errors
@@ -116,6 +118,7 @@ public final class SteamAPI
 
     /**
      * Get steamID of any linked profile we can find.
+     * @see {https://partner.steamgames.com/doc/webapi/IPlayerService#IsPlayingSharedGame)
      *
      * @param steamID SteamId of player to query
      * @param logger  Logger for catching errors
@@ -158,7 +161,7 @@ public final class SteamAPI
 
     /**
      * Get total playtime (in hours) for SE 4.
-     *
+     * @see {https://partner.steamgames.com/doc/webapi/IPlayerService#GetRecentlyPlayedGames}
      * @param steamID SteamId of player to query
      * @param logger  Logger for catching errors
      * @return playtime in hours or null if we can't get the information.
@@ -210,12 +213,11 @@ public final class SteamAPI
         {
             if (APP_ID.equals(g.getAppid().toString()))
             {
-                int mins = g.getPlaytimeForever().intValue();
+                int mins = g.getPlaytimeForever();
                 return Integer.toString(mins / 60);
             }
         }
 
         return "-";
     }
-
 }

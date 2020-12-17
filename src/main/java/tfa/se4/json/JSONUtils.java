@@ -61,6 +61,26 @@ public final class JSONUtils
     }
 
     /**
+     * Marshal the player object structure back to JSON.
+     *
+     * @param p player
+     * @param logger Logger for writing error information.
+     * @return Marshalled string or empty when marshalling error.
+     */
+    public static String marshalPlayer(final Player p, final LoggerInterface logger)
+    {
+        try
+        {
+            return getMapper().writeValueAsString(p);
+        }
+        catch (JsonProcessingException e)
+        {
+            logger.log(LogLevel.ERROR, LogType.SYSTEM, e, "Marshalling error");
+            return "";
+        }
+    }
+
+    /**
      * Marshal the ServerStatus object structure back to JSON.
      *
      * @param status ServerStatus

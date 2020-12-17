@@ -13,22 +13,19 @@ public class Options
     public static final int CLOSED_PROFILE_WARN = 1;
     public static final int CLOSED_PROFILE_KICK = 2;
 
-    private String m_hostname;
-    private String m_port;
-    private String m_password;
-    private String m_ipBansFile;
-    private String m_whiteListFile;
-    private String m_bansListFile;
-    private String m_playerGreeting;
-    private String m_steamAPIKey;
-    private String m_ipStackAPIKey;
+    private final String m_hostname;
+    private final String m_port;
+    private final String m_password;
+    private final String m_ipBansFile;
+    private final String m_whiteListFile;
+    private final String m_bansListFile;
+    private final String m_playerGreeting;
+    private final String m_steamAPIKey;
+    private final String m_ipStackAPIKey;
     private boolean m_applyVACBans;
     private boolean m_applyGameBans;
     private int m_closedProfilePolicy;
-    private String m_closedProfileMessage;
-    private String m_postResultsURL;
-    private String m_postResultsUser;
-    private String m_postResultsPassword;
+    private final String m_closedProfileMessage;
 
     /**
      * Collect properties.
@@ -63,10 +60,6 @@ public class Options
         m_ipStackAPIKey = props.getProperty("ipstack.api.key", "").trim();
         m_closedProfilePolicy = getOptionalInt(props, "closed.profile.policy", 0, 0, 2);
         m_closedProfileMessage = props.getProperty("closed.profile.message", "Hello #PlayerName#, please open your steam profile to public.").trim();
-
-        m_postResultsURL = props.getProperty("results.post.url", "").trim();
-        m_postResultsUser = props.getProperty("results.post.user", "").trim();
-        m_postResultsPassword = props.getProperty("results.post.password", "").trim();
     }
 
     /**
@@ -80,7 +73,6 @@ public class Options
 
     /**
      * Change settings so that we won't try and use things that require a steam API key.
-     * @return
      */
     public void makeSteamSettingsConsistent()
     {
@@ -282,35 +274,5 @@ public class Options
     public int getClosedProfilePolicy()
     {
         return m_closedProfilePolicy;
-    }
-
-    /**
-     * Get URL for POST results function.
-     *
-     * @return URL (can be blank)
-     */
-    public String getPostResultsURL()
-    {
-        return m_postResultsURL;
-    }
-
-    /**
-     * Get user for POST results function.
-     *
-     * @return user (can be blank)
-     */
-    public String getPostResultsUser()
-    {
-        return m_postResultsUser;
-    }
-
-    /**
-     * Get password for POST results function.
-     *
-     * @return password (can be blank)
-     */
-    public String getPostResultsPassword()
-    {
-        return m_postResultsPassword;
     }
 }

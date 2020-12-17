@@ -35,6 +35,8 @@ public class Player
     private Long assists;
     @JsonProperty("LongestShot")
     private Double longestShot;
+    @JsonProperty("GamePlaySeconds")
+    private Long gamePlaySeconds;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<>();
 
@@ -202,6 +204,18 @@ public class Player
     public void setPlayhours(String s)
     {
         playhours = s;
+    }
+
+    @JsonProperty("GamePlaySeconds")
+    public Long getGamePlaySeconds()
+    {
+        return gamePlaySeconds;
+    }
+
+    @JsonProperty("GamePlaySeconds")
+    public void setGamePlaySeconds(Long gamePlaySeconds)
+    {
+        this.gamePlaySeconds = gamePlaySeconds;
     }
 
     @Override
