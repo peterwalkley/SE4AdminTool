@@ -65,6 +65,12 @@ The command-line version can be run via the batch file supplied, for example `se
 Run multiple instances if you wish to monitor multiple servers. For logging to a file, re-direct as
 usual: `seadmin.bat myserver.properties* > myserver.log`
 
+## Help and Support
+Server administrators should join the steam group <https://steamcommunity.com/groups/SniperEliteAdmins> as the forum
+covers a range of topics related to running servers, not just this tool.
+
+I will also accept friend requests
+via my steam profile <https://steamcommunity.com/profiles/76561198022231968/> unless you have a VAC ban.
  
  ## Changelog
  ### 1.1 RELEASE
