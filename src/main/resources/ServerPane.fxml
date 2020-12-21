@@ -8,197 +8,166 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.effect.SepiaTone?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
-<SplitPane fx:id="paneId"  orientation="VERTICAL" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" SplitPane.resizableWithParent="true">
+
+<SplitPane fx:id="paneId" dividerPositions="0.15, 0.5, 0.5" orientation="VERTICAL" SplitPane.resizableWithParent="true" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
   <items>
-      <HBox minHeight="115.0" maxHeight="115.0" prefHeight="115.0">
+      <GridPane alignment="CENTER_LEFT" maxHeight="125.0" prefHeight="125.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="80.0" minWidth="10.0" prefWidth="80.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="250.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="12.0" prefHeight="16.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="12.0" prefHeight="16.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="12.0" prefHeight="16.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="12.0" prefHeight="16.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="12.0" prefHeight="16.0" vgrow="SOMETIMES" />
+        </rowConstraints>
          <children>
-            <VBox>
-               <children>
-                  <Label text="Status" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
-                     <padding>
-                        <Insets left="5.0" right="5.0" top="5.0" />
-                     </padding>
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets left="10.0" />
-                     </VBox.margin>
-                  </Label>
-                  <Label text="Map" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
-                     <padding>
-                        <Insets left="5.0" right="5.0" top="5.0" />
-                     </padding>
-                     <VBox.margin>
-                        <Insets left="10.0" />
-                     </VBox.margin>
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                  </Label>
-                  <Label text="Mode" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
-                     <padding>
-                        <Insets left="5.0" right="5.0" top="5.0" />
-                     </padding>
-                     <VBox.margin>
-                        <Insets left="10.0" />
-                     </VBox.margin>
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                  </Label>
-                  <Label text="Score Limit" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
-                     <padding>
-                        <Insets left="5.0" right="5.0" top="5.0" />
-                     </padding>
-                     <VBox.margin>
-                        <Insets left="10.0" />
-                     </VBox.margin>
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                  </Label>
-                  <Label text="Time Limit" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
-                     <padding>
-                        <Insets left="5.0" right="5.0" top="5.0" />
-                     </padding>
-                     <VBox.margin>
-                        <Insets left="10.0" />
-                     </VBox.margin>
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                  </Label>
-               </children>
-            </VBox>
-            <VBox HBox.hgrow="NEVER">
-               <children>
-                  <Label fx:id="statusLabel" text="some status" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
-                     <VBox.margin>
-                        <Insets left="10.0" />
-                     </VBox.margin>
-                     <padding>
-                        <Insets left="5.0" right="5.0" top="5.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="mapLabel" text="some map" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
-                     <padding>
-                        <Insets left="5.0" right="5.0" top="5.0" />
-                     </padding>
-                     <VBox.margin>
-                        <Insets left="10.0" />
-                     </VBox.margin>
-                  </Label>
-                  <Label fx:id="modeLabel" prefHeight="22.0" prefWidth="134.0" text="some mode" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
-                     <padding>
-                        <Insets left="5.0" right="5.0" top="5.0" />
-                     </padding>
-                     <VBox.margin>
-                        <Insets left="10.0" />
-                     </VBox.margin>
-                  </Label>
-                  <Label fx:id="scoreLabel" text="score" textAlignment="RIGHT" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
-                     <padding>
-                        <Insets left="5.0" right="5.0" top="5.0" />
-                     </padding>
-                     <VBox.margin>
-                        <Insets left="10.0" />
-                     </VBox.margin>
-                  </Label>
-                  <Label fx:id="timeLabel" text="time" textAlignment="RIGHT" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
-                     <padding>
-                        <Insets left="5.0" right="5.0" top="5.0" />
-                     </padding>
-                     <VBox.margin>
-                        <Insets left="10.0" />
-                     </VBox.margin>
-                  </Label>
-               </children>
-            </VBox>
-            <VBox HBox.hgrow="NEVER">
-               <children>
-                  <Label text="Server Name">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                     <padding>
-                        <Insets left="50.0" right="5.0" top="5.0" />
-                     </padding>
-                  </Label>
-                  <Label text="FPS">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                     <padding>
-                        <Insets left="50.0" right="5.0" top="5.0" />
-                     </padding>
-                  </Label>
-                  <Label text="Sent">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                     <padding>
-                        <Insets left="50.0" right="5.0" top="5.0" />
-                     </padding>
-                  </Label>
-                  <Label text="Received">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                     <padding>
-                        <Insets left="50.0" right="5.0" top="5.0" />
-                     </padding>
-                  </Label>
-                  <Label text="Remaining" fx:id="remainingLabel">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                     <padding>
-                        <Insets left="50.0" right="5.0" top="5.0" />
-                     </padding>
-                  </Label>
-               </children>
-            </VBox>
-            <VBox prefHeight="161.0" prefWidth="454.0">
-               <children>
-                  <Label fx:id="serverNameLabel" text="Label">
-                     <padding>
-                        <Insets left="5.0" right="50.0" top="5.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="fpsLabel" alignment="CENTER_RIGHT" text="Label">
-                     <padding>
-                        <Insets left="5.0" right="5.0" top="5.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="bytesSentLabel" alignment="CENTER_RIGHT" text="Label">
-                     <padding>
-                        <Insets left="5.0" right="5.0" top="5.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="bytesReceivedLabel" alignment="CENTER_RIGHT" text="Label">
-                     <padding>
-                        <Insets left="5.0" right="5.0" top="5.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="timeLeftLabel" alignment="CENTER_RIGHT" text="Label">
-                     <padding>
-                        <Insets left="5.0" right="5.0" top="5.0" />
-                     </padding>
-                  </Label>
-               </children>
-            </VBox>
+            <Label alignment="CENTER_LEFT" text="Status">
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER_LEFT" text="Map" GridPane.rowIndex="1">
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER_LEFT" text="Mode" GridPane.rowIndex="2">
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER_LEFT" text="Score Limit" GridPane.rowIndex="3">
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER_LEFT" text="Time Limit" GridPane.rowIndex="4">
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="statusLabel" alignment="CENTER_LEFT" text="some status" GridPane.columnIndex="1">
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label fx:id="mapLabel" alignment="CENTER_LEFT" text="some map" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label fx:id="modeLabel" alignment="CENTER_LEFT" prefHeight="22.0" prefWidth="134.0" text="some mode" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label fx:id="scoreLabel" alignment="CENTER_LEFT" text="score" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="3">
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label fx:id="timeLabel" alignment="CENTER_LEFT" text="time" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="4">
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label text="Server Name" GridPane.columnIndex="2">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label text="FPS" GridPane.columnIndex="2" GridPane.rowIndex="1">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label text="Sent" GridPane.columnIndex="2" GridPane.rowIndex="2">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label text="Received" GridPane.columnIndex="2" GridPane.rowIndex="3">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label fx:id="remainingLabel" text="Remaining" GridPane.columnIndex="2" GridPane.rowIndex="4">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label fx:id="serverNameLabel" text="Label" GridPane.columnIndex="3">
+               <padding>
+                  <Insets left="5.0" right="50.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label fx:id="fpsLabel" alignment="CENTER_RIGHT" text="Label" GridPane.columnIndex="3" GridPane.rowIndex="1">
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label fx:id="bytesSentLabel" alignment="CENTER_RIGHT" text="Label" GridPane.columnIndex="3" GridPane.rowIndex="2">
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label fx:id="bytesReceivedLabel" alignment="CENTER_RIGHT" text="Label" GridPane.columnIndex="3" GridPane.rowIndex="3">
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label fx:id="timeLeftLabel" alignment="CENTER_RIGHT" text="Label" GridPane.columnIndex="3" GridPane.rowIndex="4">
+               <padding>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </Label>
          </children>
-         <effect>
-            <SepiaTone />
-         </effect>
-      </HBox>
-      <TableView fx:id="playersTable" minHeight="320.0" maxHeight="320" prefHeight="320.0" prefWidth="200.0">
-         <placeholder><Label text="No players connected"/></placeholder>
+         <padding>
+            <Insets bottom="5.0" />
+         </padding>
+      </GridPane>
+      <TableView fx:id="playersTable" maxHeight="400.0" minHeight="320.0" prefHeight="400.0" prefWidth="838.0">
+         <placeholder><Label text="No players connected" /></placeholder>
         <columns>
           <TableColumn fx:id="name" editable="false" prefWidth="135.0" text="Name" />
           <TableColumn fx:id="steamID" editable="false" prefWidth="125.0" text="Steam ID" />
@@ -213,8 +182,8 @@
           <TableColumn fx:id="location" editable="false" prefWidth="150.0" text="Location" />
         </columns>
       </TableView>
-      <ListView fx:id="logList" prefHeight="400.0" prefWidth="838.0" SplitPane.resizableWithParent="true"/>
-      <HBox fillHeight="false" minHeight="40.0" maxHeight="40.0" prefHeight="40.0" prefWidth="838.0">
+      <ListView fx:id="logList" prefHeight="400.0" prefWidth="838.0" SplitPane.resizableWithParent="true" />
+      <HBox fillHeight="false" maxHeight="40.0" minHeight="40.0" prefHeight="40.0" prefWidth="838.0">
          <children>
             <Label text="Server command" HBox.hgrow="NEVER">
                <font>
