@@ -32,10 +32,10 @@ from <https://ipstack.com/>. A free key will allow 10,000 lookups per month.
 
 ![Example Screenshot](images/screenshot.png)
 ## Installation
-A windows installer can be downloaded from <https://github.com/peterwalkley/SE4AdminTool/releases/download/v1.1/TFA.SE4.Administrator_1.1.exe>. 
+A windows installer can be downloaded from <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.2/TFA.SE4.Administrator_1.2.exe>. 
 This will install the GUI and a java runtime environment for the application.
 
-The zip file <https://github.com/peterwalkley/SE4AdminTool/releases/download/v1.1/TFA.SE4.Administrator-1.1.zip> is available as an alternative,
+The zip file <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.2/TFA.SE4.Administrator-1.2.zip> is available as an alternative,
 download, unzip to a directory and run the exe within.
 
 Before using the application for the first time
@@ -73,6 +73,13 @@ I will also accept friend requests
 via my steam profile <https://steamcommunity.com/profiles/76561198022231968/> unless you have a VAC ban.
  
  ## Changelog
+ ### 1.2 RELEASE
+- Change detection of private profiles to match changes by steam.
+- Handle linked player account no longer existing more gracefully.
+- Improve detection and handling of server restarts and disconnects. 
+- Log more information when game ends and player leaves to assist with data analysis.
+- Change layout controls for server information pane. Text is misaligned for some people.
+
  ### 1.1 RELEASE
 - Check if player is using a shared game instance and apply bans if the original game owner was banned. This requires a Steam API key.
 - Display hours played in players table. This requires a Steam API key and that the player has made the information public.
