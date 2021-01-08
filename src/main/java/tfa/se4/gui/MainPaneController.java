@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -32,6 +33,8 @@ public class MainPaneController implements Initializable
     private Hyperlink statusHyperlink;
     @FXML
     private Label statusLabel;
+    @FXML
+    private CheckBox darkTheme;
 
     @Override
     public void initialize(URL location, ResourceBundle resources)
@@ -41,6 +44,7 @@ public class MainPaneController implements Initializable
         if (settings != null && settings.filesToReOpen != null)
         {
             settings.filesToReOpen.forEach(f -> openTab(new File(f)));
+            darkTheme.setSelected(settings.isDarkTheme);
         }
 
         statusHyperlink.setOnAction(x -> {
@@ -48,6 +52,7 @@ public class MainPaneController implements Initializable
             statusHyperlink.setVisited(false);
         });
 
+        Platform.runLater(this::darkThemeClicked);
         Platform.runLater(this::checkForUpdate);
     }
 
@@ -82,6 +87,7 @@ public class MainPaneController implements Initializable
         chooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Setting Files", "*.properties")
         );
+
         File selected = chooser.showOpenDialog(SE4AdminGUI.getPrimaryStage());
         if (selected == null)
         {
@@ -166,7 +172,8 @@ public class MainPaneController implements Initializable
                 SE4AdminGUI.getPrimaryStage().getX(),
                 SE4AdminGUI.getPrimaryStage().getY(),
                 SE4AdminGUI.getPrimaryStage().getWidth(),
-                SE4AdminGUI.getPrimaryStage().getHeight());
+                SE4AdminGUI.getPrimaryStage().getHeight(),
+                darkTheme.isSelected());
         tabPane.getTabs().forEach(t -> ((MonitoredServerConnection) t.getUserData()).closeConnection());
 
         // Give threads above a little time to close.
@@ -180,5 +187,13 @@ public class MainPaneController implements Initializable
         }
         SE4AdminGUI.getPrimaryStage().close();
         System.exit(0);
+    }
+
+    /**
+     * Handler for the dark theme being toggled.
+     */
+    public void darkThemeClicked()
+    {
+        SE4AdminGUI.setDarkTheme(darkTheme.isSelected());
     }
 }

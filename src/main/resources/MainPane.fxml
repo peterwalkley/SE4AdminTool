@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.SplitPane?>
@@ -29,6 +30,11 @@
                </padding>
             </Hyperlink>
             <Region HBox.hgrow="ALWAYS" />
+            <CheckBox fx:id="darkTheme" mnemonicParsing="false" onAction="#darkThemeClicked" text="Dark Theme" alignment="CENTER_LEFT">
+               <padding>
+                  <Insets right="5.0" />
+               </padding>
+            </CheckBox>
             <Button fx:id="closeButton" mnemonicParsing="false" onAction="#closeButtonClicked" text="Quit" />
          </children>
          <padding>

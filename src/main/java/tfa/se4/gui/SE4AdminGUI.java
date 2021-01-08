@@ -12,6 +12,7 @@ public class SE4AdminGUI extends Application
 {
     private static Stage s_primaryStage;
     private static HostServicesDelegate s_hostServices;
+    private static boolean s_isDarkTheme;
 
     @Override
     public void start(Stage primaryStage) throws Exception
@@ -24,7 +25,7 @@ public class SE4AdminGUI extends Application
 
         if (settings == null)
         {
-            primaryStage.setScene(new Scene(root, 800, 600));
+            primaryStage.setScene(new Scene(root, 1000, 600));
         }
         else
         {
@@ -50,6 +51,17 @@ public class SE4AdminGUI extends Application
     {
         return s_primaryStage;
     }
+
+    public static void setDarkTheme(final boolean isSet)
+    {
+        s_isDarkTheme = isSet;
+        if (s_isDarkTheme)
+            getPrimaryStage().getScene().getStylesheets().add("dark-theme.css");
+        else
+            getPrimaryStage().getScene().getStylesheets().remove("dark-theme.css");
+    }
+
+    public static boolean isDarkTheme() { return s_isDarkTheme; }
 
     public static void main(String[] args)
     {

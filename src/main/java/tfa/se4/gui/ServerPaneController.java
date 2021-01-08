@@ -184,6 +184,8 @@ public class ServerPaneController implements Initializable
                                 dialog.setTitle("Kick " + toKick.getName());
                                 dialog.setHeaderText("Select reason for kicking " + toKick.getName());
                                 dialog.setContentText("Reason:");
+                                if (SE4AdminGUI.isDarkTheme())
+                                    dialog.getDialogPane().getStylesheets().add("dark-theme.css");
 
                                 Optional<String> result = dialog.showAndWait();
                                 result.ifPresent(r -> m_connection.kickPlayer(toKick, r));
@@ -201,6 +203,8 @@ public class ServerPaneController implements Initializable
                                 dialog.setTitle("Ban " + toBan.getName());
                                 dialog.setHeaderText("Select reason for banning " + toBan.getName());
                                 dialog.setContentText("Reason:");
+                                if (SE4AdminGUI.isDarkTheme())
+                                    dialog.getDialogPane().getStylesheets().add("dark-theme.css");
 
                                 Optional<String> result = dialog.showAndWait();
                                 result.ifPresent(r -> m_connection.banPlayer(toBan, r));

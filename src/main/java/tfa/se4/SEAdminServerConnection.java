@@ -728,7 +728,10 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
                 break;
 
             default:
-                log(LogLevel.INFO, LogType.SYSTEM, "Unhandled message id = %s payload = %s", "" + messageId, Protocol.bytesToString(content.array()));
+                log(LogLevel.INFO, LogType.SYSTEM, "Unhandled message id = %s payload raw = %s  string = %s",
+                        Integer.toString(messageId),
+                        Protocol.bytesToString(content.array()),
+                        Protocol.payloadAsUTF8String(content));
         }
     }
 

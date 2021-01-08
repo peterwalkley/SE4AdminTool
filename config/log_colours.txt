@@ -5,8 +5,8 @@
 #     https://docs.oracle.com/javase/8/javafx/api/javafx/scene/paint/Color.html#web-java.lang.String-
 #
 
-default = black
-chat = darkblue
+default = gray
+chat = steelblue
 
 
 # These entries allow you to match specific text in the log window to a colour. Set the text you want to match,

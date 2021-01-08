@@ -22,6 +22,7 @@ public class StartupSettings
         public double width;
         public double height;
         public List<String> filesToReOpen;
+        public boolean isDarkTheme;
 
         private Settings()
         {
@@ -32,8 +33,11 @@ public class StartupSettings
     // File to save settings to
     private static final File SETTINGS_FILE = new File(System.getProperty("user.dir"), ".saved_settings");
 
-    // Version control for settings file in case we add more later on.
-    private static final String VERSION = "V1";
+    // Original settings file version.
+    private static final String VERSION_1 = "V1";
+
+    //V2 file version. Added dark theme
+    private static final String VERSION_2 = "V2";
 
     /**
      * Save stuff
@@ -43,15 +47,17 @@ public class StartupSettings
      * @param y         Y location of main window
      * @param width     width of main window
      * @param height    height of main window
+     * @param darkTheme Whether dark theme enabled or not
      */
-    public static void saveSettings(final List<String> openFiles, final double x, final double y, final double width, final double height)
+    public static void saveSettings(final List<String> openFiles, final double x, final double y, final double width, final double height, final boolean darkTheme)
     {
         final ArrayList<String> toWrite = new ArrayList<>();
-        toWrite.add(VERSION);
+        toWrite.add(VERSION_2);
         toWrite.add(Double.toString(x));
         toWrite.add(Double.toString(y));
         toWrite.add(Double.toString(width));
         toWrite.add(Double.toString(height));
+        toWrite.add(Boolean.toString(darkTheme));
         toWrite.addAll(openFiles);
 
         try
@@ -71,8 +77,6 @@ public class StartupSettings
      */
     public static Settings readSettings()
     {
-        Settings result = new Settings();
-
         try
         {
             final List<String> lines = FileUtils.readLines(SETTINGS_FILE, Charset.defaultCharset());
@@ -82,26 +86,63 @@ public class StartupSettings
             }
 
             // first line always the version flag. If we change the file format later on,
-            // need to retain ability to read old versions.
-            result.x = Double.parseDouble(lines.get(1));
-            result.y = Double.parseDouble(lines.get(2));
-            result.width = Double.parseDouble(lines.get(3));
-            result.height = Double.parseDouble(lines.get(4));
-            if (lines.size() == 5)
-            {
-                result.filesToReOpen = new ArrayList<String>();
-            }
-            else
-            {
-                result.filesToReOpen = lines.subList(5, lines.size());
-            }
-
-            return result;
+            if (VERSION_1.equals(lines.get(0)))
+                return getFromV1Version(lines);
+            else if (VERSION_2.equals(lines.get(0)))
+                return getFromV2Version(lines);
         }
         catch (final NumberFormatException | IOException e)
         {
             // ignore
         }
         return null;
+    }
+
+    /**
+     * Read version 1 settings file.
+     * @param lines
+     * @return
+     */
+    private static Settings getFromV1Version(final List<String> lines)
+    {
+        Settings result = new Settings();
+        result.x = Double.parseDouble(lines.get(1));
+        result.y = Double.parseDouble(lines.get(2));
+        result.width = Double.parseDouble(lines.get(3));
+        result.height = Double.parseDouble(lines.get(4));
+        result.isDarkTheme = false;
+        if (lines.size() == 5)
+        {
+            result.filesToReOpen = new ArrayList<>();
+        }
+        else
+        {
+            result.filesToReOpen = lines.subList(5, lines.size());
+        }
+        return result;
+    }
+
+    /**
+     * Read version 2 settings file.
+     * @param lines
+     * @return
+     */
+    private static Settings getFromV2Version(final List<String> lines)
+    {
+        Settings result = new Settings();
+        result.x = Double.parseDouble(lines.get(1));
+        result.y = Double.parseDouble(lines.get(2));
+        result.width = Double.parseDouble(lines.get(3));
+        result.height = Double.parseDouble(lines.get(4));
+        result.isDarkTheme = Boolean.parseBoolean(lines.get(5));
+        if (lines.size() == 6)
+        {
+            result.filesToReOpen = new ArrayList<>();
+        }
+        else
+        {
+            result.filesToReOpen = lines.subList(6, lines.size());
+        }
+        return result;
     }
 }
