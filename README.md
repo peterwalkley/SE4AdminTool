@@ -43,6 +43,8 @@ you will need to set up a properties files for each server you wish to administe
 file as a template and create a new file for each server you wish to administer.  You can open connections to multiple
 servers at the same time in the GUI, each will appear in its own application tab.
 
+**NOTE: If you are re-installing, make sure to take a backup of your existing configuration and ban list files first.**
+
 ## Configuration
 
 An example server properties file, `config.properties` is included. Make a copy of this for each server you
