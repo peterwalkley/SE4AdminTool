@@ -17,6 +17,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 
 // Jetty documentation:  https://www.eclipse.org/jetty/documentation/current/websocket-jetty.html
 import org.eclipse.jetty.websocket.api.Session;
@@ -114,12 +115,12 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             }
             else
             {
-                while (!m_playersToCheck.isEmpty())
+                if (!m_playersToCheck.isEmpty())
                 {
                     checkPlayer(m_playersToCheck.remove());
                 }
-                sleep(1000);
             }
+            sleep(1000);
         }
 
         try
@@ -234,16 +235,16 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
      */
     private void checkPlayer(final Player p)
     {
-        if (m_ipStackAPI != null)
-        {
-            LoggerInterface loggerRef = this;
-            new Thread(() -> p.setLocation(m_ipStackAPI.getLocation(p.getIPv4(), loggerRef))).start();
-        }
-
         if (!m_serverStatus.getLobby().getPlayers().contains(p))
         {
             log(LogLevel.INFO, LogType.CHECK, "Player %s steam ID %s from IP address %s left before checks performed", p.getName(), p.getSteamId(), p.getIPv4());
             return;
+        }
+
+        if (m_ipStackAPI != null)
+        {
+            LoggerInterface loggerRef = this;
+            new Thread(() -> p.setLocation(m_ipStackAPI.getLocation(p.getIPv4(), loggerRef))).start();
         }
 
         if (m_whiteList.isWhitelisted(p.getSteamId()))
@@ -273,7 +274,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             final tfa.se4.steam.json.PlayerBanInfo banInfo = m_steamAPI.getBanInfo(p.getSteamId(), p.getName(), this);
             if (banInfo != null)
             {
-                if (m_options.isApplyVACBans() && banInfo.getVACBanned())
+                if (m_options.isApplyVACBans() && Boolean.TRUE.equals(banInfo.getVACBanned()))
                 {
                     log(LogLevel.INFO, LogType.VAC, "Player %s steam ID %s has VAC ban", p.getName(), p.getSteamId());
                     banPlayer(p, "VAC ban");
@@ -295,7 +296,6 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             if (info != null && info.getCommunityvisibilitystate() != 3) // anything but 3 is private profile
             {
                 handleClosedProfile(p);
-                return;
             }
         }
 
@@ -327,7 +327,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
                         final tfa.se4.steam.json.PlayerBanInfo linkedBanInfo = m_steamAPI.getBanInfo(other.getSteamid(), other.getPersonaname(), this);
                         if (linkedBanInfo != null)
                         {
-                            if (m_options.isApplyVACBans() && linkedBanInfo.getVACBanned())
+                            if (m_options.isApplyVACBans() && Boolean.TRUE.equals(linkedBanInfo.getVACBanned()))
                             {
                                 log(LogLevel.INFO, LogType.VAC, "Player %s steam ID %s has link to VAC banned account %s / %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid());
                                 banPlayer(p, "VAC ban on linked account " + other.getPersonaname() + " / " + other.getSteamid());
@@ -364,8 +364,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     {
         new Thread(() -> {
             // Make the ban public
-            final String msg = "Server.Say KICKING " + p.getName() + " for " + reason;
-            sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
+            serverSay("KICKING " + p.getName() + " for " + reason);
 
             // Delay 5 seconds
             sleep(5000);
@@ -395,10 +394,9 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
 
             // Make the ban public
             final String msg = banAdded ?
-                    "Server.Say BANNING " + p.getName() + " for " + reason :
-                    "Server.Say kicking banned player " + p.getName() + " for " + reason ;
-
-            sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
+                    "BANNING " + p.getName() + " for " + reason :
+                    "KICKING banned player " + p.getName() + " for " + reason ;
+            serverSay(msg);
 
             // Delay 5 seconds
             sleep(5000);
@@ -420,9 +418,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     public void handleClosedProfile(final Player p)
     {
         new Thread(() -> {
-            final String msg = "Server.Say " + m_options.getClosedProfileMessage().
-                    replace("#PlayerName#", p.getName());
-            sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
+            serverSay(m_options.getClosedProfileMessage().replace("#PlayerName#", p.getName()));
 
             if (m_options.getClosedProfilePolicy() == Options.CLOSED_PROFILE_KICK)
             {
@@ -433,6 +429,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             }
         }).start();
     }
+
     /**
      * Send a player greeting message (if configured)
      *
@@ -443,11 +440,9 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         // Don't greet for when we've just started up or there's no greeting message
         if (StringUtils.isNotBlank(m_options.getPlayerGreeting()) && !p.isSkipGreeting())
         {
-            final String msg = "Server.Say " + m_options.getPlayerGreeting().
+            serverSay(m_options.getPlayerGreeting().
                     replace("#PlayerName#", p.getName()).
-                    replace("#ServerName#", m_serverStatus.getServer().getName());
-            sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
-            sleep(1000);
+                    replace("#ServerName#", m_serverStatus.getServer().getName()));
         }
     }
 
@@ -470,6 +465,19 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     public URI getURI() throws URISyntaxException
     {
         return new URI("ws://" + m_options.getHost() + ":" + m_options.getPort());
+    }
+
+    /**
+     * Display message in-game, splitting to multiple lines if needed.
+     * @param message Message to display
+     */
+    private void serverSay(final String message)
+    {
+        for (final String s : WordUtils.wrap(message, 70).split(System.lineSeparator()))
+        {
+            final String msg = "Server.Say " + s;
+            sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
+        }
     }
 
     /**
@@ -550,7 +558,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
      */
     private void logGameEndEvent(final ServerStatus status, final long gameStartTime, final long gameEndTime)
     {
-        if (status == null || status.getLobby() == null || status.getLobby().getPlayers() == null || status.getLobby().getPlayers().size() == 0)
+        if (status == null || status.getLobby() == null || status.getLobby().getPlayers() == null || status.getLobby().getPlayers().isEmpty())
         {
             return; // empty game
         }

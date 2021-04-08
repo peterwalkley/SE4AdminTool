@@ -31,7 +31,7 @@ public final class SteamAPI
     /** Sniper Elite 4 steam APP ID. */
     private static final String APP_ID = "312660";
 
-    /** Lookup cache to reduce hits to IP stack. */
+    /** Lookup cache to reduce hits to steam. */
     private static final Map<String, RecentlyPlayedGamesResponse> s_recentlyPlayedCache = new HashMap<>();
 
     /**

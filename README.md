@@ -126,6 +126,8 @@ via my steam profile <https://steamcommunity.com/profiles/76561198022231968/> un
 
 
 ## TODO (if sufficient demand)
+- From MateiSim.  Allow restriction of players who can connect by play hours - kick those
+  with too many or who have closed profiles.
 - No JRE installer and shell scripts for unix home server running the command line version
 - Create configuration properties files via GUI
  
