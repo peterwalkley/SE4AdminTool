@@ -78,13 +78,15 @@ public class LogColours
     }
 
     /**
+     * Read the log colours configuration.
      *
      * @param logger
      */
     private static synchronized void readConfiguration(LoggerInterface logger)
     {
-        final File curDir = new File(System.getProperty("user.dir"));
-        final File toRead = new File(curDir.getPath() + File.separator + "config" + File.separator + "log_colours.txt");
+        final String filename = "log_colours.txt";
+        FileHelper.cloneConfigFileFromExampleIfMissing(filename);
+        final File toRead = FileHelper.getConfigFile(filename);
 
         final List<String> lines;
         try
@@ -93,7 +95,7 @@ public class LogColours
         }
         catch (final IOException e)
         {
-            logger.log(LoggerInterface.LogLevel.INFO, LoggerInterface.LogType.SYSTEM, "Unable to read %s, %s ", toRead.getName(), e.getLocalizedMessage());
+            logger.log(LoggerInterface.LogLevel.INFO, LoggerInterface.LogType.SYSTEM, "Unable to read %s ", toRead.getName(), e.getLocalizedMessage());
             s_logColours = new ArrayList<>();
             return;
         }

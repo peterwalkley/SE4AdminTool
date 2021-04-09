@@ -7,7 +7,5 @@
 # Check a profile via web page e.g.:  https://steamcommunity.com/profiles/76561198153548463
 #
 #
-76561198338105564 # DELIAF # VAC Ban
-76561198298877273 # tino1958(FR) # Unspecified
-76561198153548463 # 温柔有多柔 # Game Ban
-76561198148129948 # big sechs # VAC ban
+76560000000000000 # example_player_name # VAC Ban
+76561111111111111 # another_player # Shoulder aim

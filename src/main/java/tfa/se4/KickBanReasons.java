@@ -36,8 +36,10 @@ public final class KickBanReasons implements Runnable
      */
     public KickBanReasons(final LoggerInterface logger)
     {
-        final File f = new File(System.getProperty("user.dir"));
-        m_file = new File(f.getPath() + File.separator + "config" + File.separator + "kick_ban_reasons.txt");
+        final String filename = "kick_ban_reasons.txt";
+        FileHelper.cloneConfigFileFromExampleIfMissing(filename);
+        m_file = FileHelper.getConfigFile(filename);
+
         m_logger = logger;
         new Thread(this).start();
     }

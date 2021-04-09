@@ -181,7 +181,7 @@
                         -->
                         <groupId>io.github.fvarrui</groupId>
                         <artifactId>javapackager</artifactId>
-                        <version>1.1.0</version>
+                        <version>1.5.1</version>
                         <executions>
                             <execution>
                                 <id>exe-installer</id>
@@ -190,6 +190,7 @@
                                     <goal>package</goal>
                                 </goals>
                                 <configuration>
+                                    <administratorRequired>true</administratorRequired>
                                     <mainClass>tfa.se4.gui.SE4AdminGUI</mainClass>
                                     <bundleJre>true</bundleJre>
                                     <customizedJre>false</customizedJre>
@@ -211,6 +212,10 @@
                                         <generateMsi>false</generateMsi>
                                         <companyName>Peter Walkley</companyName>
                                         <productName>TFA Sniper Elite 4 Serer Administration Tool</productName>
+                                        <setupMode>askTheUser</setupMode>
+                                        <setupLanguages>
+                                            <english>compiler:Default.isl</english>
+                                        </setupLanguages>
                                         <disableDirPage>false</disableDirPage>
                                         <disableProgramGroupPage>false</disableProgramGroupPage>
                                         <disableFinishedPage>false</disableFinishedPage>

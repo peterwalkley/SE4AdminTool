@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.commons.io.*;
 import org.apache.commons.lang3.StringUtils;
 
 public class Options
@@ -134,14 +135,14 @@ public class Options
      * @param props Properties contents
      * @param prop  property to get
      * @return Value
-     * @throws Exception When value is missing or is not a file
      */
     private String getMandatoryFile(final Properties props, final String prop) throws Exception
     {
         final String val = getMandatoryProperty(props, prop);
 		if (!(new File(val)).isFile())
 		{
-			throw new Exception("Property " + prop + " does not refer to a file");
+		    // create empty one
+            FileUtils.touch(new File(val));
 		}
 
         return val;
