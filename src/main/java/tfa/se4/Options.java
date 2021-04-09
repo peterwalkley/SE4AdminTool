@@ -27,6 +27,7 @@ public class Options
     private boolean m_applyGameBans;
     private int m_closedProfilePolicy;
     private final String m_closedProfileMessage;
+    private int m_playHoursLimit;
 
     /**
      * Collect properties.
@@ -61,15 +62,16 @@ public class Options
         m_ipStackAPIKey = props.getProperty("ipstack.api.key", "").trim();
         m_closedProfilePolicy = getOptionalInt(props, "closed.profile.policy", 0, 0, 2);
         m_closedProfileMessage = props.getProperty("closed.profile.message", "Hello #PlayerName#, please open your steam profile to public.").trim();
+        m_playHoursLimit = getOptionalInt(props, "maximum.playhours", -1, 0, Integer.MAX_VALUE);
     }
 
     /**
      * Check if the settings are inconsistent, i.e. trying to use features that need a steam API key.
-     * @return true/false if we
+     * @return true/false if we are invalid
      */
     public boolean hasInvalidSteamSettings()
     {
-        return (m_applyVACBans || m_applyGameBans || m_closedProfilePolicy != CLOSED_PROFILE_IGNORE) && StringUtils.isBlank(m_steamAPIKey);
+        return (m_applyVACBans || m_applyGameBans || m_closedProfilePolicy != CLOSED_PROFILE_IGNORE || m_playHoursLimit != -1) && StringUtils.isBlank(m_steamAPIKey);
     }
 
     /**
@@ -80,6 +82,7 @@ public class Options
         m_applyVACBans = false;
         m_applyGameBans = false;
         m_closedProfilePolicy = CLOSED_PROFILE_IGNORE;
+        m_playHoursLimit = -1;
     }
 
     /**
@@ -275,5 +278,14 @@ public class Options
     public int getClosedProfilePolicy()
     {
         return m_closedProfilePolicy;
+    }
+
+    /**
+     * Get play hours limit.
+     * @return Limit applied for play hours
+     */
+    public int getPlayHoursLimit()
+    {
+        return m_playHoursLimit;
     }
 }

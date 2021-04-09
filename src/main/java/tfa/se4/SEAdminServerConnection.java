@@ -74,7 +74,11 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         m_ipBans = new IPBanList(options.getIPBansFile(), this);
         m_whiteList = new PlayerWhiteList(options.getWhiteListFile(), this);
         m_banList = new PlayerBanList(options.getPlayerBansListFile(), this);
-        if ((m_options.isApplyVACBans() || m_options.isApplyGameBans() || m_options.getClosedProfilePolicy() != tfa.se4.Options.CLOSED_PROFILE_IGNORE) && StringUtils.isNotBlank(options.getSteamAPIKey()))
+        if ((    m_options.isApplyVACBans() ||
+                 m_options.isApplyGameBans() ||
+                 m_options.getPlayHoursLimit() > 0 ||
+                 m_options.getClosedProfilePolicy() != tfa.se4.Options.CLOSED_PROFILE_IGNORE)
+             && StringUtils.isNotBlank(options.getSteamAPIKey()))
         {
             m_steamAPI = new SteamAPI(options.getSteamAPIKey());
         }
@@ -299,6 +303,22 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             }
         }
 
+        if (m_options.getPlayHoursLimit() > 0)
+        {
+            final String playHours = getSteamAPI().getTotalPlaytimeHours(p.getSteamId(), p.getName(), this);
+            if (playHours == null)
+            {
+                kickPlayer(p, "closed profile. This server is restricted to players with less than " + m_options.getPlayHoursLimit() + " hours play time.  Please open your steam profile to allow us to view your play time.");
+                return;
+            }
+            final int playtime = Integer.parseInt(playHours);
+            if (playtime > m_options.getPlayHoursLimit())
+            {
+                kickPlayer(p, "too much experience. This server is restricted to players with less than " + m_options.getPlayHoursLimit() + " hours play time.");
+                return;
+            }
+        }
+
         // Now check rules for LINKED accounts
         if (m_steamAPI != null)
         {
@@ -363,7 +383,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     public void kickPlayer(final Player p, final String reason)
     {
         new Thread(() -> {
-            // Make the ban public
+            // Make the kick public
             serverSay("KICKING " + p.getName() + " for " + reason);
 
             // Delay 5 seconds
@@ -944,7 +964,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         if (opts.hasInvalidSteamSettings())
         {
             opts.makeSteamSettingsConsistent();
-            System.out.println("Kicking of VAC or Game banned player and managing closed profiles requires a steam API key for checks to be performed. These features will be disabled.  Please update your configuration.");
+            System.out.println("Kicking of VAC or Game banned player, managing closed profiles and limiting play hours requires a steam API key for checks to be performed. These features will be disabled.  Please update your configuration.");
         }
         final SEAdminServerConnection socket = new SEAdminServerConnection(opts);
         try
