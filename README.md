@@ -18,6 +18,7 @@ particularly section 5.  **New for 1.1 update: This will also apply if the playe
 with a ban.**
 - Players with closed steam profiles can (optionally) be kicked or requested to open their profiles via an in-game message.
 Note this also requires a steam API key.
+- Players can be kicked if they have play hours over an (optionally) configured threshold.
 - Players can be **whitelisted** so that ban checks are skipped. This allows administrators to grant
 specific players access to a server even if they have a steam VAC or game ban.
 
@@ -32,10 +33,10 @@ from <https://ipstack.com/>. A free key will allow 10,000 lookups per month.
 
 ![Example Screenshot](images/screenshot.png)
 ## Installation
-A windows installer can be downloaded from <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.2/TFA.SE4.Administrator_1.2.exe>. 
+A windows installer can be downloaded from <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.3/TFA.SE4.Administrator_1.3.exe>. 
 This will install the GUI and a java runtime environment for the application.
 
-The zip file <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.2/TFA.SE4.Administrator-1.2.zip> is available as an alternative,
+The zip file <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.3/TFA.SE4.Administrator-1.3.zip> is available as an alternative,
 download, unzip to a directory and run the exe within.
 
 Before using the application for the first time
@@ -56,11 +57,16 @@ want to be able to check for VAC bans and closed profiles.
 *config directory files:*
 
 The formats of these files is hopefully fairly self-explanatory:
-- `ban_list.txt` is the player bans
-- `ip_bans.txt` is the list of blacklisted IP addresses
-- `kick_ban_reasons.txt` is the list of choices show when kicking or banning a player
-- `log_colours.txt` is the control for using coloured text in the logging window
-- `whitelist.txt` is the list of whitelisted players.
+- `example_ban_list.txt` is the player bans
+- `example_ip_bans.txt` is the list of blacklisted IP addresses
+- `example_kick_ban_reasons.txt` is the list of choices show when kicking or banning a player
+- `example_log_colours.txt` is the control for using coloured text in the logging window
+- `example_whitelist.txt` is the list of whitelisted players.
+
+DO NOT use these files directly as you will lose any changes made when updating the tool with newer versions:
+make sure to refer to different name as in the example `config.properties`. The tool will try and copy the
+example file to your real file if it is missing.
+
 
 ## Command Line Version
 The command-line version can be run via the batch file supplied, for example `seadmin.bat myserver.properties`  
@@ -75,6 +81,14 @@ I will also accept friend requests
 via my steam profile <https://steamcommunity.com/profiles/76561198022231968/> unless you have a VAC ban.
  
  ## Changelog
+### 1.3 RELEASE
+- A dark theme mode as requested by a few people - see the checkbox at the bottom right.
+- Split long messages into multiple lines as the server just silently ignores them otherwise.
+- Modify example configurations so that any local changes don't get lost when you install new versions of the tool (issue noticed by Sidz)
+- Allow an optional upper limit of player experience. Requested by MateiSim to support a server just for new players.
+- Installer now requests administrator access due to a number of people unable to change their configuration files
+after installing.
+
  ### 1.2 RELEASE
 - Change detection of private profiles to match changes by steam.
 - Handle linked player account no longer existing more gracefully.
@@ -126,8 +140,6 @@ via my steam profile <https://steamcommunity.com/profiles/76561198022231968/> un
 
 
 ## TODO (if sufficient demand)
-- From MateiSim.  Allow restriction of players who can connect by play hours - kick those
-  with too many or who have closed profiles.
 - No JRE installer and shell scripts for unix home server running the command line version
 - Create configuration properties files via GUI
  
