@@ -79,8 +79,13 @@ covers a range of topics related to running servers, not just this tool.
 
 I will also accept friend requests
 via my steam profile <https://steamcommunity.com/profiles/76561198022231968/> unless you have a VAC ban.
- 
- ## Changelog
+
+## Known Issues
+- If the server is configured with a map rotation and also to allow map votes between games (`Lobby.AutoTriggerMapVote 1`)
+then the server does not send the correct map name to the admin tool, but instead always send the first map in the rotation.
+  
+
+## Changelog
 ### 1.3 RELEASE
 - A dark theme mode as requested by a few people - see the checkbox at the bottom right.
 - Split long messages into multiple lines as the server just silently ignores them otherwise.
