@@ -913,7 +913,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         sb.append('|');
         sb.append(type.label);
         sb.append('|');
-        sb.append(String.format(message, args));
+        sb.append(args == null ? message : String.format(message, args));
 
         if (t != null)
         {
