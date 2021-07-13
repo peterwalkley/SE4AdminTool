@@ -493,7 +493,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
      */
     private void serverSay(final String message)
     {
-        for (final String s : WordUtils.wrap(message, 70).split(System.lineSeparator()))
+        for (final String s : WordUtils.wrap(message, 125).split(System.lineSeparator()))
         {
             final String msg = "Server.Say " + s;
             sendMessage(Protocol.REQUEST_SEND_COMMAND, msg.getBytes());
