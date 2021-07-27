@@ -9,7 +9,7 @@ import java.text.Format;
 
 public class ColumnFormatter<S, T> implements Callback<TableColumn<S, T>, TableCell<S, T>>
 {
-    private Format format;
+    private final Format format;
 
     public ColumnFormatter(Format format)
     {

@@ -63,7 +63,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     private final Map<String,Long> m_playerJoinTime = new HashMap<>();
 
     /**
-     * Set up and manage connection based on properties configuration.
+     * Set up and manage connection based on property configuration.
      *
      * @param options Configuration options.
      */
@@ -91,7 +91,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     }
 
     /**
-     * Management thread. Polls for dead connection and tries
+     * Management thread. Polls for dead connection and try to
      * reconnect after 10 seconds, then increase timeout to a max
      */
     @Override
@@ -206,7 +206,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     /**
      * Provide inherited classes access to the steam API
      *
-     * @return Steam API (may be null)
+     * @return Steam API (can be null)
      */
     protected SteamAPI getSteamAPI()
     {
@@ -306,7 +306,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         if (m_options.getPlayHoursLimit() > 0)
         {
             final String playHours = getSteamAPI().getTotalPlaytimeHours(p.getSteamId(), p.getName(), this);
-            if (playHours == null)
+            if (playHours.equals("-"))
             {
                 kickPlayer(p, "closed profile. This server is restricted to players with less than " + m_options.getPlayHoursLimit() + " hours play time.  Please open your steam profile to allow us to view your play time.");
                 return;
@@ -390,7 +390,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             sleep(5000);
 
             // Kick them by re-searching the current players list to get
-            // latest id and then kick by id.
+            // the latest id and then kick by id.
             m_serverStatus.getLobby().getPlayers().stream().filter(x -> x.equals(p)).findFirst().ifPresent( x -> {
                 final String ban = "Server.KickIndex " + x.getId();
                 sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
@@ -422,7 +422,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             sleep(5000);
 
             // Kick ban them by re-searching the current players list to get
-            // latest id and then kick by id.
+            // the latest id and then kick by id.
             m_serverStatus.getLobby().getPlayers().stream().filter(x -> x.equals(p)).findFirst().ifPresent( x -> {
                 final String ban = "Server.KickBanIndex " + x.getId();
                 sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
@@ -587,7 +587,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         {
             if (gameStartTime == 0)
             {
-                // Should only happens when tool started during a game
+                // Should only happen when tool started during a game
                 p.setGamePlaySeconds(0L);
             }
             else
@@ -921,10 +921,10 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             PrintWriter pw = new PrintWriter(sw);
             t.printStackTrace(pw);
             sb.append('\n');
-            sb.append(sw.toString());
+            sb.append(sw);
         }
 
-        System.out.println(sb.toString());
+        System.out.println(sb);
     }
 
     /**

@@ -39,7 +39,7 @@ public class LogColours
      * @param logger Logger if problem
      * @return Default.
      */
-    public static final Color getDefault(final LoggerInterface logger)
+    public static Color getDefault(final LoggerInterface logger)
     {
         if (s_logColours == null)
         {
@@ -53,7 +53,7 @@ public class LogColours
      * @param logger Logger if problem
      * @return Default.
      */
-    public static final Color getDefaultChat(final LoggerInterface logger)
+    public static Color getDefaultChat(final LoggerInterface logger)
     {
         if (s_logColours == null)
         {
@@ -63,7 +63,7 @@ public class LogColours
     }
 
     /**
-     * Get configured mappings of text strings to colours.
+     * Get configured mappings of text string to colour.
      * @param logger Logger if problem
      * @return List of colours
      */
@@ -80,7 +80,7 @@ public class LogColours
     /**
      * Read the log colours configuration.
      *
-     * @param logger
+     * @param logger Logger
      */
     private static synchronized void readConfiguration(LoggerInterface logger)
     {
@@ -175,7 +175,7 @@ public class LogColours
      * Parse a colour from string. Log if it fails and return null.
      * @param logger Logger to log to
      * @param s String to try and parse as a colour
-     * @return Color or null if its not parseable.
+     * @return Color or null if it's not parseable.
      */
     private static Color parseColour(final LoggerInterface logger, final String s)
     {

@@ -21,7 +21,7 @@ import static tfa.se4.logger.LoggerInterface.LogLevel;
 import static tfa.se4.logger.LoggerInterface.LogType;
 
 /**
- * Holder class for anything we use to talk to Steam.
+ * Holder class for anything we do to talk to Steam.
  */
 public final class SteamAPI
 {
@@ -46,7 +46,7 @@ public final class SteamAPI
 
     /**
      * Get player ban information.
-     * @see {https://partner.steamgames.com/doc/webapi/ISteamUser#GetPlayerBans}
+     * @see "https://partner.steamgames.com/doc/webapi/ISteamUser#GetPlayerBans"
      *
      * @param steamID SteamId of player to query
      * @param logger  Logger for catching errors
@@ -55,9 +55,9 @@ public final class SteamAPI
     public PlayerBanInfo getBanInfo(final String steamID, final String playerName, final LoggerInterface logger)
     {
         logger.log(LogLevel.DEBUG, LogType.STEAM, "Checking player %s steam ID %s for bans", playerName, steamID);
-        final String urltemplate = "http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key=##STEAMAPIKEY##&steamids=##STEAMID##";
+        final String urlTemplate = "http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key=##STEAMAPIKEY##&steamids=##STEAMID##";
 
-        final String url = urltemplate
+        final String url = urlTemplate
                 .replace("##STEAMID##", steamID)
                 .replace("##STEAMAPIKEY##", m_steamAPIkey);
 
@@ -82,7 +82,7 @@ public final class SteamAPI
 
     /**
      * Get player profile information.
-     * @see {https://partner.steamgames.com/doc/webapi/ISteamUser#GetPlayerSummaries}
+     * @see "https://partner.steamgames.com/doc/webapi/ISteamUser#GetPlayerSummaries"
      *
      * @param steamID SteamId of player to query
      * @param logger  Logger for catching errors
@@ -91,9 +91,9 @@ public final class SteamAPI
     public PlayerSummaryInfo getProfileInfo(final String steamID, final String playerName, final LoggerInterface logger)
     {
         logger.log(LogLevel.DEBUG, LogType.STEAM, "Checking player %s steam ID %s for profile visibility", playerName, steamID);
-        final String urltemplate = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=##STEAMAPIKEY##&steamids=##STEAMID##";
+        final String urlTemplate = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=##STEAMAPIKEY##&steamids=##STEAMID##";
 
-        final String url = urltemplate
+        final String url = urlTemplate
                 .replace("##STEAMID##", steamID)
                 .replace("##STEAMAPIKEY##", m_steamAPIkey);
 
@@ -118,7 +118,7 @@ public final class SteamAPI
 
     /**
      * Get steamID of any linked profile we can find.
-     * @see {https://partner.steamgames.com/doc/webapi/IPlayerService#IsPlayingSharedGame)
+     * @see "https://partner.steamgames.com/doc/webapi/IPlayerService#IsPlayingSharedGame"
      *
      * @param steamID SteamId of player to query
      * @param logger  Logger for catching errors
@@ -127,9 +127,9 @@ public final class SteamAPI
     public String getLinkedProfileID(final String steamID, final String playerName, final LoggerInterface logger)
     {
         logger.log(LogLevel.DEBUG, LogType.STEAM, "Checking player %s steam ID %s for linked profile", playerName, steamID);
-        final String urltemplate = "https://api.steampowered.com/IPlayerService/IsPlayingSharedGame/v1/?key=##STEAMAPIKEY##&steamid=##STEAMID##&appid_playing=##APPID##";
+        final String urlTemplate = "https://api.steampowered.com/IPlayerService/IsPlayingSharedGame/v1/?key=##STEAMAPIKEY##&steamid=##STEAMID##&appid_playing=##APPID##";
 
-        final String url = urltemplate
+        final String url = urlTemplate
                 .replace("##APPID##", APP_ID)
                 .replace("##STEAMID##", steamID)
                 .replace("##STEAMAPIKEY##", m_steamAPIkey);
@@ -161,7 +161,7 @@ public final class SteamAPI
 
     /**
      * Get total playtime (in hours) for SE 4.
-     * @see {https://partner.steamgames.com/doc/webapi/IPlayerService#GetRecentlyPlayedGames}
+     * @see "https://partner.steamgames.com/doc/webapi/IPlayerService#GetRecentlyPlayedGames"
      * @param steamID SteamId of player to query
      * @param logger  Logger for catching errors
      * @return playtime in hours or null if we can't get the information.
@@ -174,9 +174,9 @@ public final class SteamAPI
         }
 
         logger.log(LogLevel.DEBUG, LogType.STEAM, "Checking player %s steam ID %s for total play time", playerName, steamID);
-        final String urltemplate = "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/?key=##STEAMAPIKEY##&steamid=##STEAMID##";
+        final String urlTemplate = "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/?key=##STEAMAPIKEY##&steamid=##STEAMID##";
 
-        final String url = urltemplate
+        final String url = urlTemplate
                 .replace("##STEAMID##", steamID)
                 .replace("##STEAMAPIKEY##", m_steamAPIkey);
 
@@ -213,8 +213,8 @@ public final class SteamAPI
         {
             if (APP_ID.equals(g.getAppid().toString()))
             {
-                int mins = g.getPlaytimeForever();
-                return Integer.toString(mins / 60);
+                int minutes = g.getPlaytimeForever();
+                return Integer.toString(minutes / 60);
             }
         }
 

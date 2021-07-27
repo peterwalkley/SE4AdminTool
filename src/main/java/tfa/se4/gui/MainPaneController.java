@@ -57,7 +57,7 @@ public class MainPaneController implements Initializable
     }
 
     /**
-     * Check online at github to see if there is an updated version.
+     * Check online at GitHub to see if there is an updated version.
      */
     private void checkForUpdate()
     {

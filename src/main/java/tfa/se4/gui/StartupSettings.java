@@ -85,7 +85,7 @@ public class StartupSettings
                 return null;
             }
 
-            // first line always the version flag. If we change the file format later on,
+            // first line is always the version flag. If we change the file format later on,
             if (VERSION_1.equals(lines.get(0)))
                 return getFromV1Version(lines);
             else if (VERSION_2.equals(lines.get(0)))
@@ -100,8 +100,8 @@ public class StartupSettings
 
     /**
      * Read version 1 settings file.
-     * @param lines
-     * @return
+     * @param lines Lines read from saved data
+     * @return Settings
      */
     private static Settings getFromV1Version(final List<String> lines)
     {
@@ -124,8 +124,8 @@ public class StartupSettings
 
     /**
      * Read version 2 settings file.
-     * @param lines
-     * @return
+     * @param lines Lines read from saved data.
+     * @return Settings
      */
     private static Settings getFromV2Version(final List<String> lines)
     {

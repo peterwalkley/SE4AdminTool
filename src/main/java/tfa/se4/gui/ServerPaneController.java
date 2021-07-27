@@ -100,7 +100,7 @@ public class ServerPaneController implements Initializable
     @FXML
     private Button sendButton;
 
-    private MonitoredServerConnection m_connection;
+    private final MonitoredServerConnection m_connection;
     private KickBanReasons m_reasons;
 
     public ServerPaneController(final MonitoredServerConnection connection)
@@ -164,14 +164,7 @@ public class ServerPaneController implements Initializable
                         final TableRow<Player> row = new TableRow<>();
                         final ContextMenu rowMenu = new ContextMenu();
                         MenuItem profileItem = new MenuItem("Profile ...");
-                        profileItem.setOnAction(new EventHandler<ActionEvent>()
-                        {
-                            @Override
-                            public void handle(ActionEvent event)
-                            {
-                                SE4AdminGUI.showDocument("https://steamcommunity.com/profiles/" + row.getItem().getSteamId());
-                            }
-                        });
+                        profileItem.setOnAction(event -> SE4AdminGUI.showDocument("https://steamcommunity.com/profiles/" + row.getItem().getSteamId()));
                         MenuItem kickItem = new MenuItem("Kick ...");
                         kickItem.setOnAction(new EventHandler<ActionEvent>()
                         {
@@ -297,21 +290,14 @@ public class ServerPaneController implements Initializable
         logList.setItems(m_connection.getModel().getLogLines());
         logList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         logList.setContextMenu(logMenu);
-        logList.setCellFactory(new Callback<ListView<String>, ListCell<String>>()
-        {
-            @Override
-            public ListCell<String> call(ListView<String> param)
-            {
-                return new ColouredCell(m_connection);
-            }
-        });
+        logList.setCellFactory(param -> new ColouredCell(m_connection));
 
         // command window section
         final ContextMenu commandsMenu = new ContextMenu();
         final Map<String, Menu> childMenus = new HashMap<>();
         S_COMMANDS.forEach(command -> {
             String parentName = null;
-            String itemName = null;
+            String itemName;
 
             if (command.indexOf('.') != -1)
             {

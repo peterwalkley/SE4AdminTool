@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Holder class for anything we use to talk to IPStack.
+ * Holder class for anything we do to talk to IPStack.
  */
 public final class IPStackAPI
 {

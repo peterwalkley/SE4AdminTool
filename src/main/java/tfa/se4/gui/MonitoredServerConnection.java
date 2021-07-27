@@ -15,10 +15,10 @@ import java.util.concurrent.TimeUnit;
 public class MonitoredServerConnection extends SEAdminServerConnection
 {
 
-    private GameModel model;
+    private final GameModel model;
 
     /**
-     * Set up and manage connection based on properties configuration.
+     * Set up and manage connection based on property configuration.
      *
      * @param options Configuration options.
      */
@@ -73,7 +73,7 @@ public class MonitoredServerConnection extends SEAdminServerConnection
                 model.setServerHost(status.getServer().getHost());
             }
 
-            if (getGameStartTime() == 0)
+            if (getGameStartTime() == 0 || status == null)
             {
                 model.setTimeLeft(null);
             }
@@ -115,7 +115,7 @@ public class MonitoredServerConnection extends SEAdminServerConnection
             PrintWriter pw = new PrintWriter(sw);
             t.printStackTrace(pw);
             sb.append('\n');
-            sb.append(sw.toString());
+            sb.append(sw);
         }
 
         Platform.runLater(() -> model.addLogLine(sb.toString()));

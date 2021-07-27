@@ -35,9 +35,9 @@ public final class PlayerBanList implements Runnable
     }
 
     private Map<String, Ban> m_bans = new HashMap<>();
-    private File m_file;
+    private final File m_file;
     private long m_lastRead = 0;
-    private LoggerInterface m_logger;
+    private final LoggerInterface m_logger;
 
     public PlayerBanList(final String fileName, final LoggerInterface logger)
     {
@@ -104,7 +104,7 @@ public final class PlayerBanList implements Runnable
     }
 
     /**
-     * Add a ban to to ban list.
+     * Add a ban to ban list.
      *
      * @param steamID    Steam ID
      * @param playerName Player name

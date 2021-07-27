@@ -74,10 +74,7 @@ public final class Protocol
 		else
 		{
 			final byte[] load = new byte[b.length - 2];
-			if (load.length >= 0)
-			{
-				System.arraycopy(b, 2, load, 0, load.length);
-			}
+            System.arraycopy(b, 2, load, 0, load.length);
 
 			result.payload = ByteBuffer.wrap(load);
 		}

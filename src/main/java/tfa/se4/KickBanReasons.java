@@ -25,8 +25,8 @@ public final class KickBanReasons implements Runnable
 {
     private List<String> m_reasons = new ArrayList<>();
     private long m_lastRead = 0;
-    private LoggerInterface m_logger;
-    private File m_file;
+    private final LoggerInterface m_logger;
+    private final File m_file;
 
     /**
      * Use 'kick_ban_reasons.txt' reasons file located in same directory as

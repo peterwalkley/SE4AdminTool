@@ -1,17 +1,15 @@
 package tfa.se4.gui;
 
 import javafx.scene.control.ListCell;
-import javafx.scene.paint.Color;
 import org.apache.commons.lang3.StringUtils;
 import tfa.se4.LogColours;
 import tfa.se4.logger.LoggerInterface;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 public class ColouredCell extends ListCell<String>
 {
-    private LoggerInterface m_logger;
+    private final LoggerInterface m_logger;
 
     public ColouredCell(final LoggerInterface logger)
     {

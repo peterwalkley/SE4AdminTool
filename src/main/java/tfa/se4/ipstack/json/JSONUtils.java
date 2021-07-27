@@ -3,7 +3,6 @@ package tfa.se4.ipstack.json;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import tfa.se4.logger.LoggerInterface;
-import tfa.se4.ipstack.json.IPStack;
 
 public final class JSONUtils
 {

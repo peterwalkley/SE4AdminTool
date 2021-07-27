@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.apache.http.client.fluent.Request;
 
 /**
- * Helper to check at github to see if there is a newer version available.
+ * Helper to check at GitHub to see if there is a newer version available.
  */
 public final class VersionUtils
 {

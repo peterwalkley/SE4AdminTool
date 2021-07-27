@@ -24,9 +24,9 @@ import static tfa.se4.logger.LoggerInterface.LogType;
 public final class IPBanList implements Runnable
 {
     private HashSet<String> m_ips = new HashSet<>();
-    private File m_file;
+    private final File m_file;
     private long m_lastRead = 0;
-    private LoggerInterface m_logger;
+    private final LoggerInterface m_logger;
 
     public IPBanList(final String fileName, final LoggerInterface logger)
     {
