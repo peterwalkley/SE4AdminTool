@@ -33,10 +33,10 @@ from <https://extreme-ip-lookup.com/>. A free key will allow 10,000 lookups per 
 
 ![Example Screenshot](images/screenshot.png)
 ## Installation
-A windows installer can be downloaded from <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.3/TFA.SE4.Administrator_1.3.exe>. 
+A windows installer can be downloaded from <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.4/TFA.SE4.Administrator_1.4.exe>. 
 This will install the GUI and a java runtime environment for the application.
 
-The zip file <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.3/TFA.SE4.Administrator-1.3.zip> is available as an alternative,
+The zip file <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.4/TFA.SE4.Administrator-1.4.zip> is available as an alternative,
 download, unzip to a directory and run the exe within.
 
 Before using the application for the first time
