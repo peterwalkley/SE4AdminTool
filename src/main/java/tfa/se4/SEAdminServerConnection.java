@@ -30,8 +30,10 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import tfa.se4.PlayerBanList.Ban;
 import tfa.se4.Protocol.ReplyMessage;
-import tfa.se4.ipstack.IPStackAPI;
-import tfa.se4.ipstack.json.IPStack;
+import tfa.se4.iplookup.IPInformation;
+import tfa.se4.iplookup.IPLookupInterface;
+import tfa.se4.iplookup.extremeip.ExtremeIPAPI;
+import tfa.se4.iplookup.ipstack.IPStackAPI;
 import tfa.se4.json.JSONUtils;
 import tfa.se4.json.Player;
 import tfa.se4.json.ServerStatus;
@@ -53,7 +55,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     private final PlayerBanList m_banList;
     private WebSocketClient m_client = null;
     private SteamAPI m_steamAPI;
-    private IPStackAPI m_ipStackAPI;
+    private IPLookupInterface m_ipLookup;
     private final ConcurrentLinkedQueue<Player> m_playersToCheck = new ConcurrentLinkedQueue<>();
     private final LogLevel m_displayLogLevel = LogLevel.INFO;
     private boolean m_isClose = false;
@@ -83,9 +85,15 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             m_steamAPI = new SteamAPI(options.getSteamAPIKey());
         }
 
-        if (StringUtils.isNotBlank(options.getIPStackAPIKey()))
+        if (StringUtils.isNotBlank(options.getExtremeIPAPIKey()))
         {
-            m_ipStackAPI = new IPStackAPI(options.getIPStackAPIKey());
+            this.log(LogLevel.INFO, LogType.IPINFO, "Initialising Extreme IP");
+            m_ipLookup = new ExtremeIPAPI(options.getExtremeIPAPIKey());
+        }
+        else if (StringUtils.isNotBlank(options.getIPStackAPIKey()))
+        {
+            this.log(LogLevel.INFO, LogType.IPINFO, "Initialising IPStack");
+            m_ipLookup = new IPStackAPI(options.getIPStackAPIKey());
         }
         new Thread(this).start();
     }
@@ -198,9 +206,9 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
      *
      * @return IP stack API (may be null)
      */
-    protected IPStackAPI getIPStackAPI()
+    protected IPLookupInterface getIPLookup()
     {
-        return m_ipStackAPI;
+        return m_ipLookup;
     }
 
     /**
@@ -245,10 +253,10 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             return;
         }
 
-        if (m_ipStackAPI != null)
+        if (m_ipLookup != null)
         {
             LoggerInterface loggerRef = this;
-            new Thread(() -> p.setLocation(m_ipStackAPI.getLocation(p.getIPv4(), loggerRef))).start();
+            new Thread(() -> p.setLocation(m_ipLookup.getIPAddressInformation(p.getIPv4(), loggerRef).toString())).start();
         }
 
         if (m_whiteList.isWhitelisted(p.getSteamId()))
@@ -596,17 +604,16 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
                 p.setGamePlaySeconds((gameEndTime - start) / 1000L);
             }
 
-            if (m_ipStackAPI != null)
+            if (m_ipLookup != null)
             {
-                final IPStack ipInfo = m_ipStackAPI.getIPAddressInfo(p.getIPv4(), this);
+                final IPInformation ipInfo = m_ipLookup.getIPAddressInformation(p.getIPv4(), this);
                 if (ipInfo != null)
                 {
                     p.setAdditionalProperty("Latitude", ipInfo.getLatitude());
                     p.setAdditionalProperty("Longitude", ipInfo.getLongitude());
                     p.setAdditionalProperty("City", ipInfo.getCity());
-                    p.setAdditionalProperty("Region", ipInfo.getRegionName());
-                    p.setAdditionalProperty("Country", ipInfo.getCountryName());
-                    p.setAdditionalProperty("ZIP", ipInfo.getZip());
+                    p.setAdditionalProperty("Region", ipInfo.getRegion());
+                    p.setAdditionalProperty("Country", ipInfo.getCountry());
                 }
             }
         }
@@ -636,17 +643,16 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         p.setScore(null);
         p.setAdditionalProperty("ConnectionTimeSeconds", joinedSecs);
         p.setAdditionalProperty("Host", m_serverStatus.getServer().getHost());
-        if (m_ipStackAPI != null)
+        if (m_ipLookup != null)
         {
-            final IPStack ipInfo = m_ipStackAPI.getIPAddressInfo(p.getIPv4(), this);
+            final IPInformation ipInfo = m_ipLookup.getIPAddressInformation(p.getIPv4(), this);
             if (ipInfo != null)
             {
                 p.setAdditionalProperty("Latitude", ipInfo.getLatitude());
                 p.setAdditionalProperty("Longitude", ipInfo.getLongitude());
                 p.setAdditionalProperty("City", ipInfo.getCity());
-                p.setAdditionalProperty("Region", ipInfo.getRegionName());
-                p.setAdditionalProperty("Country", ipInfo.getCountryName());
-                p.setAdditionalProperty("ZIP", ipInfo.getZip());
+                p.setAdditionalProperty("Region", ipInfo.getRegion());
+                p.setAdditionalProperty("Country", ipInfo.getCountry());
             }
         }
         final String postBody = JSONUtils.marshalPlayer(p, this);

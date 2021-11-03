@@ -23,6 +23,7 @@ public class Options
     private final String m_playerGreeting;
     private final String m_steamAPIKey;
     private final String m_ipStackAPIKey;
+    private final String m_extremeIPAPIKey;
     private boolean m_applyVACBans;
     private boolean m_applyGameBans;
     private int m_closedProfilePolicy;
@@ -60,6 +61,7 @@ public class Options
         m_applyGameBans = Boolean.parseBoolean(props.getProperty("kick.game.banned", "false").trim());
         m_steamAPIKey = props.getProperty("steam.api.key", "").trim();
         m_ipStackAPIKey = props.getProperty("ipstack.api.key", "").trim();
+        m_extremeIPAPIKey = props.getProperty("extremeip.api.key", "").trim();
         m_closedProfilePolicy = getOptionalInt(props, "closed.profile.policy", 0, 0, 2);
         m_closedProfileMessage = props.getProperty("closed.profile.message", "Hello #PlayerName#, please open your steam profile to public.").trim();
         m_playHoursLimit = getOptionalInt(props, "maximum.playhours", -1, 0, Integer.MAX_VALUE);
@@ -259,6 +261,16 @@ public class Options
     public String getIPStackAPIKey()
     {
         return m_ipStackAPIKey;
+    }
+
+    /**
+     * Get Extreme IP API key.
+     *
+     * @return Key
+     */
+    public String getExtremeIPAPIKey()
+    {
+        return m_extremeIPAPIKey;
     }
 
     /**

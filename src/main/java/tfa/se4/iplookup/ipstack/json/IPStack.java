@@ -1,4 +1,4 @@
-package tfa.se4.ipstack.json;
+package tfa.se4.iplookup.ipstack.json;
 
 import java.util.HashMap;
 import java.util.Map;

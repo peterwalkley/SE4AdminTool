@@ -25,7 +25,7 @@ specific players access to a server even if they have a steam VAC or game ban.
 ## Additional Features only on GUI Version
 - Player information display during a game including steam ID, score, kills, longest shot.
 - (Optional) See players' location (City, State, Country) based on IP address. This feature requires that you provide an API key
-from <https://ipstack.com/>. A free key will allow 10,000 lookups per month.
+from <https://extreme-ip-lookup.com/>. A free key will allow 10,000 lookups per month.
 - Kick or Ban a player (right click on player name).
 - See players steam profile (right click on player name).
 - Send server commands using a free text input box. Commands list is also visible via right-click on the input box.
@@ -86,6 +86,16 @@ then the server does not send the correct map name to the admin tool, but instea
   
 
 ## Changelog
+### 1.4 RELEASE
+- Change of preferred IP address lookup to <https://extreme-ip-lookup.com/> following IP stack reducing their
+free tier from 10,000 requests per month to 100. Please note you will need to:
+  - Go to <https://extreme-ip-lookup.com/> and sign up to the free service to receive an API key.
+  - Edit your server settings file to add the new key:
+  
+    ``extremeip.api.key=YOUR KEY HERE``
+
+- Change word wrap for messages to 125 characters from 70.
+ 
 ### 1.3 RELEASE
 - A dark theme mode as requested by a few people - see the checkbox at the bottom right.
 - Split long messages into multiple lines as the server just silently ignores them otherwise.

@@ -1,4 +1,4 @@
-package tfa.se4.ipstack.json;
+package tfa.se4.iplookup.ipstack.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -33,7 +33,7 @@ public class MonitoredServerConnection extends SEAdminServerConnection
 
         if (!ipStackSupported())
         {
-            log(LogLevel.INFO, LogType.IPSTACK, "IPStack access is disabled. No location lookups will be performed.");
+            log(LogLevel.INFO, LogType.IPINFO, "IPStack access is disabled. No location lookups will be performed.");
         }
     }
 
@@ -55,9 +55,9 @@ public class MonitoredServerConnection extends SEAdminServerConnection
             {
                 model.setState(status.getLobby().getState());
                 model.setMaxPlayers(status.getLobby().getMaxPlayers().toString());
-                if (getIPStackAPI() != null)
+                if (getIPLookup() != null)
                 {
-                    status.getLobby().getPlayers().forEach(p -> p.setLocation(getIPStackAPI().getLocation(p.getIPv4(), this)));
+                    status.getLobby().getPlayers().forEach(p -> p.setLocation(getIPLookup().getIPAddressInformation(p.getIPv4(), this).toString()));
                 }
 
                 if (getSteamAPI() != null)
@@ -141,7 +141,7 @@ public class MonitoredServerConnection extends SEAdminServerConnection
      */
     public boolean ipStackSupported()
     {
-        return getIPStackAPI() != null;
+        return getIPLookup() != null;
 
     }
 

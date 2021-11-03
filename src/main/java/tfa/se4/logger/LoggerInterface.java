@@ -28,7 +28,7 @@ public interface LoggerInterface
         IPBAN("IPBAN"),
         PLAYERBAN("PLAYERBAN"),
         MSG("MSG"),
-        IPSTACK("IPSTACK"),
+        IPINFO("IPINFO"),
         STEAM("STEAM"),
         LEAVE("LEAVE"),
         JOIN("JOIN"),
