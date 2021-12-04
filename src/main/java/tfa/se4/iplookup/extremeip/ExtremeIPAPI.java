@@ -17,7 +17,7 @@ public final class ExtremeIPAPI implements IPLookupInterface
     /** For rate limit. */
     private static long lastLookup = 0;
 
-    /** IPStack API key. */
+    /** API key. */
     private final String m_APIkey;
 
     /** Lookup cache to reduce hits to IP stack. */
@@ -51,10 +51,16 @@ public final class ExtremeIPAPI implements IPLookupInterface
     }
 
     @Override
-    public IPInformation getIPAddressInformation(final String ip, final LoggerInterface logger)
+    public IPInformation getIPAddressInformation(final String ip, final LoggerInterface logger, final boolean waitForResult)
     {
         if (s_cache.get(ip) != null)
             return s_cache.get(ip);
+
+        if (!waitForResult) {
+            return IPInformation.
+                    create().
+                    setIpAddress(ip);
+        }
 
         logger.log(LoggerInterface.LogLevel.DEBUG, LoggerInterface.LogType.IPINFO, "Fetching IP address information for %s", ip);
         applyRateLimit();

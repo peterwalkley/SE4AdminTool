@@ -144,7 +144,7 @@ public class ServerPaneController implements Initializable
         longestShot.setCellFactory(new ColumnFormatter<Player, Double>(new DecimalFormat("0.00")));
         playedHours.setCellValueFactory(new PropertyValueFactory<>("playhours"));
         location.setCellValueFactory(new PropertyValueFactory<>("location"));
-        if (!m_connection.ipStackSupported())
+        if (!m_connection.ipLookupSupported())
         {
             location.setVisible(false);
         }

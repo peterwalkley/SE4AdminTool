@@ -11,5 +11,5 @@ public interface IPLookupInterface
      * @param logger Logger for catching errors
      * @return IP address information.
      */
-    public IPInformation getIPAddressInformation(String ipAddress, LoggerInterface logger);
+    public IPInformation getIPAddressInformation(String ipAddress, LoggerInterface logger, boolean waitForResult);
 }

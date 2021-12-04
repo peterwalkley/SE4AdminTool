@@ -2,7 +2,6 @@ package tfa.se4.iplookup.extremeip;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import tfa.se4.iplookup.ipstack.json.IPStack;
 import tfa.se4.logger.LoggerInterface;
 
 public final class JSONUtils
@@ -22,7 +21,7 @@ public final class JSONUtils
     }
 
     /**
-     * Convert supplied JSON string to IPStack result structure.
+     * Convert supplied JSON string to result structure.
      *
      * @param json   JSON from IP stack.
      * @param logger Logger for writing error information.

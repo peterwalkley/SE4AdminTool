@@ -7,7 +7,7 @@ public class IPInformation {
     private String longitude;
     private String city;
     private String region;
-    private String country = "N/A";
+    private String country;
     private String ipAddress;
 
     public static final IPInformation create() {
@@ -70,6 +70,9 @@ public class IPInformation {
 
     @Override
     public String toString() {
+        if (StringUtils.isBlank(country))
+            return ipAddress;
+
         final StringBuilder sb = new StringBuilder();
         if (StringUtils.isNotBlank(city))
         {

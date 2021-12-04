@@ -33,7 +33,6 @@ import tfa.se4.Protocol.ReplyMessage;
 import tfa.se4.iplookup.IPInformation;
 import tfa.se4.iplookup.IPLookupInterface;
 import tfa.se4.iplookup.extremeip.ExtremeIPAPI;
-import tfa.se4.iplookup.ipstack.IPStackAPI;
 import tfa.se4.json.JSONUtils;
 import tfa.se4.json.Player;
 import tfa.se4.json.ServerStatus;
@@ -89,11 +88,6 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         {
             this.log(LogLevel.INFO, LogType.IPINFO, "Initialising Extreme IP");
             m_ipLookup = new ExtremeIPAPI(options.getExtremeIPAPIKey());
-        }
-        else if (StringUtils.isNotBlank(options.getIPStackAPIKey()))
-        {
-            this.log(LogLevel.INFO, LogType.IPINFO, "Initialising IPStack");
-            m_ipLookup = new IPStackAPI(options.getIPStackAPIKey());
         }
         new Thread(this).start();
     }
@@ -256,7 +250,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         if (m_ipLookup != null)
         {
             LoggerInterface loggerRef = this;
-            new Thread(() -> p.setLocation(m_ipLookup.getIPAddressInformation(p.getIPv4(), loggerRef).toString())).start();
+            new Thread(() -> p.setLocation(m_ipLookup.getIPAddressInformation(p.getIPv4(), loggerRef, true).toString())).start();
         }
 
         if (m_whiteList.isWhitelisted(p.getSteamId()))
@@ -606,7 +600,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
 
             if (m_ipLookup != null)
             {
-                final IPInformation ipInfo = m_ipLookup.getIPAddressInformation(p.getIPv4(), this);
+                final IPInformation ipInfo = m_ipLookup.getIPAddressInformation(p.getIPv4(), this, false);
                 if (ipInfo != null)
                 {
                     p.setAdditionalProperty("Latitude", ipInfo.getLatitude());
@@ -645,7 +639,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         p.setAdditionalProperty("Host", m_serverStatus.getServer().getHost());
         if (m_ipLookup != null)
         {
-            final IPInformation ipInfo = m_ipLookup.getIPAddressInformation(p.getIPv4(), this);
+            final IPInformation ipInfo = m_ipLookup.getIPAddressInformation(p.getIPv4(), this, false);
             if (ipInfo != null)
             {
                 p.setAdditionalProperty("Latitude", ipInfo.getLatitude());

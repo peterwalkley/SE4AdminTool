@@ -31,9 +31,9 @@ public class MonitoredServerConnection extends SEAdminServerConnection
             log(LogLevel.INFO, LogType.STEAM, "Steam access is disabled. No automatic ban checks will be performed.");
         }
 
-        if (!ipStackSupported())
+        if (!ipLookupSupported())
         {
-            log(LogLevel.INFO, LogType.IPINFO, "IPStack access is disabled. No location lookups will be performed.");
+            log(LogLevel.INFO, LogType.IPINFO, "IP address checking is disabled. No location lookups will be performed.");
         }
     }
 
@@ -57,7 +57,7 @@ public class MonitoredServerConnection extends SEAdminServerConnection
                 model.setMaxPlayers(status.getLobby().getMaxPlayers().toString());
                 if (getIPLookup() != null)
                 {
-                    status.getLobby().getPlayers().forEach(p -> p.setLocation(getIPLookup().getIPAddressInformation(p.getIPv4(), this).toString()));
+                    status.getLobby().getPlayers().forEach(p -> p.setLocation(getIPLookup().getIPAddressInformation(p.getIPv4(), this, false).toString()));
                 }
 
                 if (getSteamAPI() != null)
@@ -135,11 +135,11 @@ public class MonitoredServerConnection extends SEAdminServerConnection
     }
 
     /**
-     * Is the IP stack in use ?
+     * Is IP address lookup supported
      *
      * @return Whether IP stack is in use.
      */
-    public boolean ipStackSupported()
+    public boolean ipLookupSupported()
     {
         return getIPLookup() != null;
 
