@@ -33,10 +33,10 @@ from <https://extreme-ip-lookup.com/>. A free key will allow 10,000 lookups per 
 
 ![Example Screenshot](images/screenshot.png)
 ## Installation
-A windows installer can be downloaded from <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.4/TFA.SE4.Administrator_1.4.exe>. 
+A windows installer can be downloaded from <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.5/TFA.SE4.Administrator_1.5.exe>. 
 This will install the GUI and a java runtime environment for the application.
 
-The zip file <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.4/TFA.SE4.Administrator-1.4.zip> is available as an alternative,
+The zip file <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.5/TFA.SE4.Administrator-1.5.zip> is available as an alternative,
 download, unzip to a directory and run the exe within.
 
 Before using the application for the first time
@@ -86,6 +86,15 @@ then the server does not send the correct map name to the admin tool, but instea
   
 
 ## Changelog
+### 1.5 RELEASE
+- Remove all support for IPStack. It is causing more problems than I am prepared to support.
+- Changed the IP address checking to reduce delay on connecting to a server with several players already online. 
+Extreme IP limits the number of checks to 20 per minute, so connecting the tool to a full server was resulting
+in an initial delay up to 45 seconds before displaying any player information. The lookups are now performed
+in the background and the player IP address is shown until the real location information can be collected. 
+Online player locations will be collected with a delay of 3.5 seconds between each one.
+
+
 ### 1.4 RELEASE
 - Change of preferred IP address lookup to <https://extreme-ip-lookup.com/> following IP stack reducing their
 free tier from 10,000 requests per month to 100. Please note you will need to:
