@@ -75,11 +75,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         m_ipBans = new IPBanList(options.getIPBansFile(), this);
         m_whiteList = new PlayerWhiteList(options.getWhiteListFile(), this);
         m_banList = new PlayerBanList(options.getPlayerBansListFile(), this);
-        if ((    m_options.isApplyVACBans() ||
-                 m_options.isApplyGameBans() ||
-                 m_options.getPlayHoursLimit() > 0 ||
-                 m_options.getClosedProfilePolicy() != tfa.se4.Options.CLOSED_PROFILE_IGNORE)
-             && StringUtils.isNotBlank(options.getSteamAPIKey()))
+        if (StringUtils.isNotBlank(options.getSteamAPIKey()))
         {
             m_steamAPI = new SteamAPI(options.getSteamAPIKey());
         }
