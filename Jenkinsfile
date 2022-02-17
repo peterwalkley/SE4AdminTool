@@ -5,6 +5,9 @@ pipeline {
         maven "maven"
         jdk "JDK_1.8"
     }
+    environment {
+        SONAR_KEY = credentials('SNIPER_ELITE_ADMIN_SONAR_ID')
+    }
 
     stages {
         stage('build') {
@@ -19,8 +22,8 @@ pipeline {
                 maven "maven"
                 jdk "JDK_1.17"
             }
-            withSonarQubeEnv() {
-              sh "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=SniperEliteAdmin"
+            steps {
+                sh "mvn sonar:sonar -Dsonar.projectKey=SniperEliteAdmin -Dsonar.host.url=http://centosmaster:9000 -Dsonar.login=${SONAR_KEY}"
             }
         }
     }
