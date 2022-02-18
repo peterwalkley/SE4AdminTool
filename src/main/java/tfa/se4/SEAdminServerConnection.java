@@ -17,7 +17,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.text.WordUtils;
 
 // Jetty documentation:  https://www.eclipse.org/jetty/documentation/current/websocket-jetty.html
 import org.eclipse.jetty.websocket.api.Session;
@@ -56,7 +56,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     private SteamAPI mSteamAPI;
     private IPLookupInterface mIpLookup;
     private final ConcurrentLinkedQueue<Player> mPlayersToCheck = new ConcurrentLinkedQueue<>();
-    private final LogLevel mDisplayLogLevel = LogLevel.INFO;
+    private static final LogLevel mDisplayLogLevel = LogLevel.INFO;
     private boolean mIsClose = false;
     private final Options mOptions;
     private long mGameStartTime = 0;

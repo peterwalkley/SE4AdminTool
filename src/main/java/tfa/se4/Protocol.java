@@ -26,7 +26,8 @@ public final class Protocol
     public static final char REPLY_INIT = 57585;
     public static final char REPLY_CONNECTION_SUCCESS_1 = 57599;
     public static final char REPLY_CONNECTION_SUCCESS_2 = 61441;
-    //public static final char REPLY_CONNECTION_FAILURE = 61442;
+
+    //Also REPLY_CONNECTION_FAILURE is 61442;
 
     /**
      * Server status Pre-game i.e. in lobby.
@@ -183,10 +184,10 @@ public final class Protocol
             {
                 SHA1 = MessageDigest.getInstance("SHA-1");
             }
-            catch (NoSuchAlgorithmException e)
+            catch (final NoSuchAlgorithmException e)
             {
                 // Fatal error and should never be possible !
-                throw new Error(e);
+                throw new InternalError("Unable to locate SHA-1 Message digest instance", e);
             }
         }
 

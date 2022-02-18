@@ -19,6 +19,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.stage.FileChooser;
 import tfa.se4.Options;
+import tfa.se4.Utils;
 import tfa.se4.VersionUtils;
 
 public class MainPaneController implements Initializable
@@ -177,14 +178,8 @@ public class MainPaneController implements Initializable
         tabPane.getTabs().forEach(t -> ((MonitoredServerConnection) t.getUserData()).closeConnection());
 
         // Give threads above a little time to close.
-        try
-        {
-            Thread.sleep(2000);
-        }
-        catch (InterruptedException e)
-        {
-            //ignore
-        }
+        Utils.sleep(2000);
+
         SE4AdminGUI.getPrimaryStage().close();
         System.exit(0);
     }

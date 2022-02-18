@@ -1,6 +1,7 @@
 package tfa.se4.iplookup.extremeip;
 
 import org.apache.http.client.fluent.Request;
+import tfa.se4.Utils;
 import tfa.se4.iplookup.IPInformation;
 import tfa.se4.iplookup.IPLookupInterface;
 import tfa.se4.logger.LoggerInterface;
@@ -23,9 +24,6 @@ public final class ExtremeIPAPI implements IPLookupInterface
     /** Lookup cache to reduce hits to IP stack. */
     private static final Map<String, IPInformation> sCache = new HashMap<>();
 
-    /** Lock object we will use for rate limiting access. */
-    private static String sMonitor = "lock";
-
     /**
      * Initialise and remember steam API key.
      *
@@ -41,17 +39,11 @@ public final class ExtremeIPAPI implements IPLookupInterface
      */
     private static void applyRateLimit() {
 
-        synchronized (sMonitor) {
-            long diff = System.currentTimeMillis() - lastLookup;
-            if (diff < 3500) {
-                try {
-                    sMonitor.wait(3500 - diff);
-                } catch (final InterruptedException e) {
-                    // ignore
-                }
-            }
-            lastLookup = System.currentTimeMillis();
+        long diff = System.currentTimeMillis() - lastLookup;
+        if (diff < 3500) {
+            Utils.sleep(3500 - diff);
         }
+        lastLookup = System.currentTimeMillis();
     }
 
     @Override

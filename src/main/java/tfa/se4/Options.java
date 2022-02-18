@@ -34,7 +34,7 @@ public class Options
      *
      * @param configFile Properties configuration
      */
-    public Options(final String configFile) throws Exception
+    public Options(final String configFile) throws IllegalArgumentException, IOException
     {
         final Properties props = new Properties();
         try (FileInputStream input = new FileInputStream(configFile))
@@ -91,14 +91,14 @@ public class Options
      * @param props Properties contents
      * @param prop  property to get
      * @return Value
-     * @throws Exception When value is missing
+     * @throws IllegalArgumentException When value is missing
      */
-    private String getMandatoryProperty(final Properties props, final String prop) throws Exception
+    private String getMandatoryProperty(final Properties props, final String prop) throws IllegalArgumentException
     {
         final String val = props.getProperty(prop);
 		if (StringUtils.isBlank(val))
 		{
-			throw new Exception("Property " + prop + " cannot be a blank value");
+			throw new IllegalArgumentException("Property " + prop + " cannot be a blank value");
 		}
 
         return val.trim();
@@ -139,7 +139,7 @@ public class Options
      * @param prop  property to get
      * @return Value
      */
-    private String getMandatoryFile(final Properties props, final String prop) throws Exception
+    private String getMandatoryFile(final Properties props, final String prop) throws IllegalArgumentException, IOException
     {
         final String val = getMandatoryProperty(props, prop);
 		if (!(new File(val)).isFile())

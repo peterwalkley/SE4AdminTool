@@ -10,11 +10,11 @@ import static tfa.se4.logger.LoggerInterface.LogType;
 
 public final class JSONUtils
 {
-    /**
-     * Object mapper.
-     */
-
+    /** Object mapper. */
     private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    /** Bad JSON message. */
+    private static final String BAD_JSON_MSG = "Bad JSON %s";
 
     /**
      * Utility class private.
@@ -39,7 +39,7 @@ public final class JSONUtils
         }
         catch (JsonProcessingException e)
         {
-            logger.log(LogLevel.ERROR, LogType.SYSTEM, e, "Bad JSON %s", json);
+            logger.log(LogLevel.ERROR, LogType.SYSTEM, e, BAD_JSON_MSG, json);
             return null;
         }
     }
@@ -59,7 +59,7 @@ public final class JSONUtils
         }
         catch (JsonProcessingException e)
         {
-            logger.log(LogLevel.ERROR, LogType.SYSTEM, e, "Bad JSON %s", json);
+            logger.log(LogLevel.ERROR, LogType.SYSTEM, e, BAD_JSON_MSG, json);
             return null;
         }
     }
@@ -79,7 +79,7 @@ public final class JSONUtils
         }
         catch (JsonProcessingException e)
         {
-            logger.log(LogLevel.ERROR, LogType.SYSTEM, e, "Bad JSON %s", json);
+            logger.log(LogLevel.ERROR, LogType.SYSTEM, e, BAD_JSON_MSG, json);
             return null;
         }
     }
@@ -99,7 +99,7 @@ public final class JSONUtils
         }
         catch (JsonProcessingException e)
         {
-            logger.log(LogLevel.ERROR, LogType.SYSTEM, e, "Bad JSON %s", json);
+            logger.log(LogLevel.ERROR, LogType.SYSTEM, e, BAD_JSON_MSG, json);
             return null;
         }
     }
