@@ -141,8 +141,6 @@ public class MainPaneController implements Initializable
         }
         catch (Exception e)
         {
-            System.out.println(e.getLocalizedMessage());
-            e.printStackTrace();
             Alert errorAlert = new Alert(Alert.AlertType.ERROR);
             errorAlert.setHeaderText("Unable to initialise connection");
             errorAlert.setContentText(e.getLocalizedMessage());

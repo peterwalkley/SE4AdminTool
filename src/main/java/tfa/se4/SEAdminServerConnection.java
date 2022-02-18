@@ -903,7 +903,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             sb.append(sw);
         }
 
-        System.out.println(sb);
+        System.out.println(sb); //NOSONAR
     }
 
     /**
@@ -935,7 +935,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     {
         if (args.length != 1)
         {
-            System.out.println("Usage:\njava tfa.se4.SEAdminServerConnection <config file>");
+            System.out.println("Usage:\njava tfa.se4.SEAdminServerConnection <config file>"); //NOSONAR
             System.exit(0);
         }
 
@@ -943,7 +943,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         if (opts.hasInvalidSteamSettings())
         {
             opts.makeSteamSettingsConsistent();
-            System.out.println("Kicking of VAC or Game banned player, managing closed profiles and limiting play hours requires a steam API key for checks to be performed. These features will be disabled.  Please update your configuration.");
+            System.out.println("Kicking of VAC or Game banned player, managing closed profiles and limiting play hours requires a steam API key for checks to be performed. These features will be disabled.  Please update your configuration."); //NOSONAR
         }
         final SEAdminServerConnection socket = new SEAdminServerConnection(opts);
         try

@@ -37,7 +37,7 @@ public final class VersionUtils
             {
                 if (build[i] > latest[i])
                 {
-                    System.out.println("Detected developer build");
+                    System.out.println("Detected developer build"); //NOSONAR
                     return Result.CHECK_ERROR;
 
                 }

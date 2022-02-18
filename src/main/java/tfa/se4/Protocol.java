@@ -26,8 +26,7 @@ public final class Protocol
     public static final char REPLY_INIT = 57585;
     public static final char REPLY_CONNECTION_SUCCESS_1 = 57599;
     public static final char REPLY_CONNECTION_SUCCESS_2 = 61441;
-
-    //Also REPLY_CONNECTION_FAILURE is 61442;
+    public static final char REPLY_CONNECTION_FAILURE = 61442; //NOSONAR - not used, but kept for documentation
 
     /**
      * Server status Pre-game i.e. in lobby.
@@ -229,7 +228,7 @@ public final class Protocol
 			}
 			else
 			{
-				c = (char) (65536 + ((1023 & c) << 10 | 1023 & password.charAt(++i)));
+				c = (char) (65536 + ((1023 & c) << 10 | 1023 & password.charAt(++i))); //NOSONAR - ignore the complaint about changing 'i'
 				salted.add((byte) (240 | c >> 18));
 				salted.add((byte) (128 | c >> 12 & 63));
 				salted.add((byte) (128 | c >> 6 & 63));
@@ -257,10 +256,10 @@ public final class Protocol
     {
         byte[] bytes = buf.array();
         return
-                ((bytes[offset + 0] & 0xFF) << 0) |
-                        ((bytes[offset + 1] & 0xFF) << 8) |
-                        ((bytes[offset + 2] & 0xFF) << 16) |
-                        ((bytes[offset + 3] & 0xFF) << 24);
+                ((bytes[offset + 0] & 0xFF) << 0) | //NOSONAR ignore useless shift
+                ((bytes[offset + 1] & 0xFF) << 8) |
+                ((bytes[offset + 2] & 0xFF) << 16) |
+                ((bytes[offset + 3] & 0xFF) << 24);
     }
 
     /**

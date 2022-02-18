@@ -43,7 +43,7 @@ public class Options
         }
         catch (final IOException e)
         {
-            System.err.print("Unable to read configuration properties file " + configFile);
+            System.err.print("Unable to read configuration properties file " + configFile); //NOSONAR
             throw e;
         }
 

@@ -126,8 +126,7 @@ public final class PlayerBanList implements Runnable
             catch (IOException e)
             {
                 // Ignore as we can't do much
-                System.out.println("Error adding banned player to ban list");
-                e.printStackTrace();
+                mLogger.log(LogLevel.ERROR, LogType.SYSTEM, e, "Error adding banned player %s steam ID % to ban list", playerName, steamID);
             }
             return true;
         }
