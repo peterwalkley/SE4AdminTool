@@ -9,11 +9,11 @@ import java.util.List;
 
 public class ColouredCell extends ListCell<String>
 {
-    private final LoggerInterface m_logger;
+    private final LoggerInterface mLogger;
 
     public ColouredCell(final LoggerInterface logger)
     {
-        m_logger = logger;
+        mLogger = logger;
     }
 
     @Override
@@ -30,14 +30,14 @@ public class ColouredCell extends ListCell<String>
         {
             if (text.indexOf((char)1) != -1)
             {
-                setTextFill(LogColours.getDefaultChat(m_logger));
+                setTextFill(LogColours.getDefaultChat(mLogger));
                 setText(StringUtils.remove(text, (char)1));
                 return;
 
             }
-            setTextFill(LogColours.getDefault(m_logger));
+            setTextFill(LogColours.getDefault(mLogger));
             setText(text);
-            final List<LogColours.LogColour> colourMatches = LogColours.getColours(m_logger);
+            final List<LogColours.LogColour> colourMatches = LogColours.getColours(mLogger);
 
             for (final LogColours.LogColour toMatch : colourMatches)
             {

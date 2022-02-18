@@ -15,7 +15,7 @@ public final class JSONUtils
     /**
      * Object mapper.
      */
-    private static ObjectMapper S_MAPPER = null;
+    private static ObjectMapper sMapper = null;
 
     /**
      * Utility class private.
@@ -32,12 +32,12 @@ public final class JSONUtils
      */
     private static synchronized ObjectMapper getMapper()
     {
-        if (S_MAPPER == null)
+        if (sMapper == null)
         {
-            S_MAPPER = new ObjectMapper();
-            S_MAPPER.setLocale(Locale.US);
+            sMapper = new ObjectMapper();
+            sMapper.setLocale(Locale.US);
         }
-        return S_MAPPER;
+        return sMapper;
     }
 
     /**

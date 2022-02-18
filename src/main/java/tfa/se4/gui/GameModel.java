@@ -13,19 +13,20 @@ import java.util.List;
  */
 public class GameModel
 {
+    public static final String UNKNOWN = "unknown";
 
-    private final StringProperty serverName = new SimpleStringProperty(this, "serverName", "unknown");
-    private final StringProperty serverHost = new SimpleStringProperty(this, "serverHost", "unknown");
-    private final StringProperty map = new SimpleStringProperty(this, "map", "unknown");
-    private final StringProperty mode = new SimpleStringProperty(this, "mode", "unknown");
-    private final StringProperty state = new SimpleStringProperty(this, "state", "unknown");
-    private final StringProperty timeLimit = new SimpleStringProperty(this, "timeLimit", "unknown");
-    private final StringProperty scoreLimit = new SimpleStringProperty(this, "scoreLimit", "unknown");
-    private final StringProperty maxPlayers = new SimpleStringProperty(this, "maxPlayers", "unknown");
-    private final StringProperty bytesSent = new SimpleStringProperty(this, "bytesSent", "unknown");
-    private final StringProperty bytesReceived = new SimpleStringProperty(this, "bytesReceived", "unknown");
-    private final StringProperty timeLeft = new SimpleStringProperty(this, "timeLeft", "unknown");
-    private final StringProperty fps = new SimpleStringProperty(this, "fps", "unknown");
+    private final StringProperty serverName = new SimpleStringProperty(this, "serverName", UNKNOWN);
+    private final StringProperty serverHost = new SimpleStringProperty(this, "serverHost", UNKNOWN);
+    private final StringProperty map = new SimpleStringProperty(this, "map", UNKNOWN);
+    private final StringProperty mode = new SimpleStringProperty(this, "mode", UNKNOWN);
+    private final StringProperty state = new SimpleStringProperty(this, "state", UNKNOWN);
+    private final StringProperty timeLimit = new SimpleStringProperty(this, "timeLimit", UNKNOWN);
+    private final StringProperty scoreLimit = new SimpleStringProperty(this, "scoreLimit", UNKNOWN);
+    private final StringProperty maxPlayers = new SimpleStringProperty(this, "maxPlayers", UNKNOWN);
+    private final StringProperty bytesSent = new SimpleStringProperty(this, "bytesSent", UNKNOWN);
+    private final StringProperty bytesReceived = new SimpleStringProperty(this, "bytesReceived", UNKNOWN);
+    private final StringProperty timeLeft = new SimpleStringProperty(this, "timeLeft", UNKNOWN);
+    private final StringProperty fps = new SimpleStringProperty(this, "fps", UNKNOWN);
 
     private final ObservableList<Player> players = FXCollections.observableArrayList();
     private final ObservableList<String> logLines = FXCollections.observableArrayList();

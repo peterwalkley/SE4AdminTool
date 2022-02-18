@@ -14,20 +14,20 @@ public class Options
     public static final int CLOSED_PROFILE_WARN = 1;
     public static final int CLOSED_PROFILE_KICK = 2;
 
-    private final String m_hostname;
-    private final String m_port;
-    private final String m_password;
-    private final String m_ipBansFile;
-    private final String m_whiteListFile;
-    private final String m_bansListFile;
-    private final String m_playerGreeting;
-    private final String m_steamAPIKey;
-    private final String m_extremeIPAPIKey;
-    private boolean m_applyVACBans;
-    private boolean m_applyGameBans;
-    private int m_closedProfilePolicy;
-    private final String m_closedProfileMessage;
-    private int m_playHoursLimit;
+    private final String mHostname;
+    private final String mPort;
+    private final String mPassword;
+    private final String mIPBansFile;
+    private final String mWhiteListFile;
+    private final String mBansListFile;
+    private final String mPlayerGreeting;
+    private final String mSteamAPIKey;
+    private final String mExtremeIPAPIKey;
+    private boolean mApplyVACBans;
+    private boolean mApplyGameBans;
+    private int mClosedProfilePolicy;
+    private final String mClosedProfileMessage;
+    private int mPlayHoursLimit;
 
     /**
      * Collect properties.
@@ -47,22 +47,22 @@ public class Options
             throw e;
         }
 
-        m_hostname = getMandatoryProperty(props, "server.host");
-        m_port = getMandatoryProperty(props, "server.port");
-        m_password = getMandatoryProperty(props, "server.password");
+        mHostname = getMandatoryProperty(props, "server.host");
+        mPort = getMandatoryProperty(props, "server.port");
+        mPassword = getMandatoryProperty(props, "server.password");
 
-        m_playerGreeting = props.getProperty("player.greeting", "").trim();
-        m_ipBansFile = getMandatoryFile(props, "banned.ip");
-        m_bansListFile = getMandatoryFile(props, "banned.players");
-        m_whiteListFile = getMandatoryFile(props, "whitelist.players");
+        mPlayerGreeting = props.getProperty("player.greeting", "").trim();
+        mIPBansFile = getMandatoryFile(props, "banned.ip");
+        mBansListFile = getMandatoryFile(props, "banned.players");
+        mWhiteListFile = getMandatoryFile(props, "whitelist.players");
 
-        m_applyVACBans = Boolean.parseBoolean(props.getProperty("kick.vac.banned", "false").trim());
-        m_applyGameBans = Boolean.parseBoolean(props.getProperty("kick.game.banned", "false").trim());
-        m_steamAPIKey = props.getProperty("steam.api.key", "").trim();
-        m_extremeIPAPIKey = props.getProperty("extremeip.api.key", "").trim();
-        m_closedProfilePolicy = getOptionalInt(props, "closed.profile.policy", 0, 0, 2);
-        m_closedProfileMessage = props.getProperty("closed.profile.message", "Hello #PlayerName#, please open your steam profile to public.").trim();
-        m_playHoursLimit = getOptionalInt(props, "maximum.playhours", -1, 0, Integer.MAX_VALUE);
+        mApplyVACBans = Boolean.parseBoolean(props.getProperty("kick.vac.banned", "false").trim());
+        mApplyGameBans = Boolean.parseBoolean(props.getProperty("kick.game.banned", "false").trim());
+        mSteamAPIKey = props.getProperty("steam.api.key", "").trim();
+        mExtremeIPAPIKey = props.getProperty("extremeip.api.key", "").trim();
+        mClosedProfilePolicy = getOptionalInt(props, "closed.profile.policy", 0, 0, 2);
+        mClosedProfileMessage = props.getProperty("closed.profile.message", "Hello #PlayerName#, please open your steam profile to public.").trim();
+        mPlayHoursLimit = getOptionalInt(props, "maximum.playhours", -1, 0, Integer.MAX_VALUE);
     }
 
     /**
@@ -71,7 +71,7 @@ public class Options
      */
     public boolean hasInvalidSteamSettings()
     {
-        return (m_applyVACBans || m_applyGameBans || m_closedProfilePolicy != CLOSED_PROFILE_IGNORE || m_playHoursLimit != -1) && StringUtils.isBlank(m_steamAPIKey);
+        return (mApplyVACBans || mApplyGameBans || mClosedProfilePolicy != CLOSED_PROFILE_IGNORE || mPlayHoursLimit != -1) && StringUtils.isBlank(mSteamAPIKey);
     }
 
     /**
@@ -79,10 +79,10 @@ public class Options
      */
     public void makeSteamSettingsConsistent()
     {
-        m_applyVACBans = false;
-        m_applyGameBans = false;
-        m_closedProfilePolicy = CLOSED_PROFILE_IGNORE;
-        m_playHoursLimit = -1;
+        mApplyVACBans = false;
+        mApplyGameBans = false;
+        mClosedProfilePolicy = CLOSED_PROFILE_IGNORE;
+        mPlayHoursLimit = -1;
     }
 
     /**
@@ -158,7 +158,7 @@ public class Options
      */
     public String getHost()
     {
-        return m_hostname;
+        return mHostname;
     }
 
     /**
@@ -168,7 +168,7 @@ public class Options
      */
     public String getPort()
     {
-        return m_port;
+        return mPort;
     }
 
     /**
@@ -178,7 +178,7 @@ public class Options
      */
     public String getPassword()
     {
-        return m_password;
+        return mPassword;
     }
 
     /**
@@ -188,7 +188,7 @@ public class Options
      */
     public String getIPBansFile()
     {
-        return m_ipBansFile;
+        return mIPBansFile;
     }
 
     /**
@@ -198,7 +198,7 @@ public class Options
      */
     public String getWhiteListFile()
     {
-        return m_whiteListFile;
+        return mWhiteListFile;
     }
 
     /**
@@ -208,7 +208,7 @@ public class Options
      */
     public String getPlayerBansListFile()
     {
-        return m_bansListFile;
+        return mBansListFile;
     }
 
     /**
@@ -218,7 +218,7 @@ public class Options
      */
     public String getPlayerGreeting()
     {
-        return m_playerGreeting;
+        return mPlayerGreeting;
     }
 
     /**
@@ -228,7 +228,7 @@ public class Options
      */
     public boolean isApplyVACBans()
     {
-        return m_applyVACBans;
+        return mApplyVACBans;
     }
 
     /**
@@ -238,7 +238,7 @@ public class Options
      */
     public boolean isApplyGameBans()
     {
-        return m_applyGameBans;
+        return mApplyGameBans;
     }
 
     /**
@@ -248,7 +248,7 @@ public class Options
      */
     public String getSteamAPIKey()
     {
-        return m_steamAPIKey;
+        return mSteamAPIKey;
     }
 
     /**
@@ -258,7 +258,7 @@ public class Options
      */
     public String getExtremeIPAPIKey()
     {
-        return m_extremeIPAPIKey;
+        return mExtremeIPAPIKey;
     }
 
     /**
@@ -268,7 +268,7 @@ public class Options
      */
     public String getClosedProfileMessage()
     {
-        return m_closedProfileMessage;
+        return mClosedProfileMessage;
     }
 
     /**
@@ -277,7 +277,7 @@ public class Options
      */
     public int getClosedProfilePolicy()
     {
-        return m_closedProfilePolicy;
+        return mClosedProfilePolicy;
     }
 
     /**
@@ -286,6 +286,6 @@ public class Options
      */
     public int getPlayHoursLimit()
     {
-        return m_playHoursLimit;
+        return mPlayHoursLimit;
     }
 }

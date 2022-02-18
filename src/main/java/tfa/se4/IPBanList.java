@@ -23,15 +23,15 @@ import static tfa.se4.logger.LoggerInterface.LogType;
  */
 public final class IPBanList implements Runnable
 {
-    private HashSet<String> m_ips = new HashSet<>();
-    private final File m_file;
-    private long m_lastRead = 0;
-    private final LoggerInterface m_logger;
+    private HashSet<String> mIPs = new HashSet<>();
+    private final File mFile;
+    private long mLastRead = 0;
+    private final LoggerInterface mLogger;
 
     public IPBanList(final String fileName, final LoggerInterface logger)
     {
-        m_file = new File(fileName);
-        m_logger = logger;
+        mFile = new File(fileName);
+        mLogger = logger;
         new Thread(this).start();
     }
 
@@ -43,10 +43,10 @@ public final class IPBanList implements Runnable
         {
             while (true)
             {
-                if (FileUtils.isFileNewer(m_file, m_lastRead))
+                if (FileUtils.isFileNewer(mFile, mLastRead))
                 {
                     final HashSet<String> ips = new HashSet<>();
-                    final List<String> lines = FileUtils.readLines(m_file, Charset.defaultCharset());
+                    final List<String> lines = FileUtils.readLines(mFile, Charset.defaultCharset());
                     for (final String line : lines)
                     {
 						if (StringUtils.isNotBlank(line) && !line.trim().startsWith("#"))
@@ -54,16 +54,16 @@ public final class IPBanList implements Runnable
 							ips.add(StringUtils.split(line, '#')[0].trim());
 						}
                     }
-                    m_ips = ips;
-                    m_logger.log(LogLevel.INFO, LogType.SYSTEM, "%s banned IP addresses read from %s", Integer.toString(m_ips.size()), m_file.getName());
-                    m_lastRead = System.currentTimeMillis();
+                    mIPs = ips;
+                    mLogger.log(LogLevel.INFO, LogType.SYSTEM, "%s banned IP addresses read from %s", Integer.toString(mIPs.size()), mFile.getName());
+                    mLastRead = System.currentTimeMillis();
                 }
-                Thread.sleep(30000);
+                Utils.sleep(30000);
             }
         }
-        catch (final IOException | InterruptedException ex)
+        catch (final IOException ex)
         {
-            m_logger.log(LogLevel.ERROR, LogType.SYSTEM, ex, "Cannot read banned IP addresses from %s. Error is %s", m_file.getName(), ex.getMessage());
+            mLogger.log(LogLevel.ERROR, LogType.SYSTEM, ex, "Cannot read banned IP addresses from %s. Error is %s", mFile.getName(), ex.getMessage());
         }
     }
 
@@ -75,6 +75,6 @@ public final class IPBanList implements Runnable
      */
     public boolean isBanned(final String ipAddress)
     {
-        return m_ips.contains(ipAddress);
+        return mIPs.contains(ipAddress);
     }
 }

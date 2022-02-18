@@ -100,36 +100,36 @@ public class ServerPaneController implements Initializable
     @FXML
     private Button sendButton;
 
-    private final MonitoredServerConnection m_connection;
-    private KickBanReasons m_reasons;
+    private final MonitoredServerConnection mConnection;
+    private KickBanReasons mReasons;
 
     public ServerPaneController(final MonitoredServerConnection connection)
     {
-        m_connection = connection;
+        mConnection = connection;
     }
 
     // close tab
     public void close()
     {
-        m_connection.closeConnection();
+        mConnection.closeConnection();
     }
 
     @Override
     public void initialize(URL loc, ResourceBundle resources)
     {
-        m_reasons = new KickBanReasons(m_connection);
-        statusLabel.textProperty().bind(m_connection.getModel().stateProperty());
-        mapLabel.textProperty().bind(m_connection.getModel().mapProperty());
-        modeLabel.textProperty().bind(m_connection.getModel().modeProperty());
-        scoreLabel.textProperty().bind(m_connection.getModel().scoreLimitProperty());
-        timeLabel.textProperty().bind(m_connection.getModel().timeLimitProperty());
-        serverNameLabel.textProperty().bind(m_connection.getModel().serverNameProperty());
-        fpsLabel.textProperty().bind(m_connection.getModel().fpsProperty());
-        bytesSentLabel.textProperty().bind(m_connection.getModel().bytesSentProperty());
-        bytesReceivedLabel.textProperty().bind(m_connection.getModel().bytesReceivedProperty());
-        remainingLabel.visibleProperty().bind(m_connection.getModel().timeLeftProperty().isNotNull());
-        timeLeftLabel.visibleProperty().bind(m_connection.getModel().timeLeftProperty().isNotNull());
-        timeLeftLabel.textProperty().bind(m_connection.getModel().timeLeftProperty());
+        mReasons = new KickBanReasons(mConnection);
+        statusLabel.textProperty().bind(mConnection.getModel().stateProperty());
+        mapLabel.textProperty().bind(mConnection.getModel().mapProperty());
+        modeLabel.textProperty().bind(mConnection.getModel().modeProperty());
+        scoreLabel.textProperty().bind(mConnection.getModel().scoreLimitProperty());
+        timeLabel.textProperty().bind(mConnection.getModel().timeLimitProperty());
+        serverNameLabel.textProperty().bind(mConnection.getModel().serverNameProperty());
+        fpsLabel.textProperty().bind(mConnection.getModel().fpsProperty());
+        bytesSentLabel.textProperty().bind(mConnection.getModel().bytesSentProperty());
+        bytesReceivedLabel.textProperty().bind(mConnection.getModel().bytesReceivedProperty());
+        remainingLabel.visibleProperty().bind(mConnection.getModel().timeLeftProperty().isNotNull());
+        timeLeftLabel.visibleProperty().bind(mConnection.getModel().timeLeftProperty().isNotNull());
+        timeLeftLabel.textProperty().bind(mConnection.getModel().timeLeftProperty());
 
         // Players table
         name.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -144,16 +144,16 @@ public class ServerPaneController implements Initializable
         longestShot.setCellFactory(new ColumnFormatter<Player, Double>(new DecimalFormat("0.00")));
         playedHours.setCellValueFactory(new PropertyValueFactory<>("playhours"));
         location.setCellValueFactory(new PropertyValueFactory<>("location"));
-        if (!m_connection.ipLookupSupported())
+        if (!mConnection.ipLookupSupported())
         {
             location.setVisible(false);
         }
-        if (!m_connection.isSteamSupported())
+        if (!mConnection.isSteamSupported())
         {
             playedHours.setVisible(false);
         }
 
-        playersTable.setItems(m_connection.getModel().getPlayers());
+        playersTable.setItems(mConnection.getModel().getPlayers());
 
         playersTable.setRowFactory(
                 new Callback<TableView<Player>, TableRow<Player>>()
@@ -172,7 +172,7 @@ public class ServerPaneController implements Initializable
                             public void handle(ActionEvent event)
                             {
                                 final Player toKick = row.getItem();
-                                final List<String> reasons = m_reasons.getReasons();
+                                final List<String> reasons = mReasons.getReasons();
                                 ChoiceDialog<String> dialog = new ChoiceDialog<>(reasons.get(0), reasons);
                                 dialog.setTitle("Kick " + toKick.getName());
                                 dialog.setHeaderText("Select reason for kicking " + toKick.getName());
@@ -181,7 +181,7 @@ public class ServerPaneController implements Initializable
                                     dialog.getDialogPane().getStylesheets().add("dark-theme.css");
 
                                 Optional<String> result = dialog.showAndWait();
-                                result.ifPresent(r -> m_connection.kickPlayer(toKick, r));
+                                result.ifPresent(r -> mConnection.kickPlayer(toKick, r));
                             }
                         });
                         MenuItem banItem = new MenuItem("Ban ...");
@@ -191,7 +191,7 @@ public class ServerPaneController implements Initializable
                             public void handle(ActionEvent event)
                             {
                                 final Player toBan = row.getItem();
-                                final List<String> reasons = m_reasons.getReasons();
+                                final List<String> reasons = mReasons.getReasons();
                                 ChoiceDialog<String> dialog = new ChoiceDialog<>(reasons.get(0), reasons);
                                 dialog.setTitle("Ban " + toBan.getName());
                                 dialog.setHeaderText("Select reason for banning " + toBan.getName());
@@ -200,7 +200,7 @@ public class ServerPaneController implements Initializable
                                     dialog.getDialogPane().getStylesheets().add("dark-theme.css");
 
                                 Optional<String> result = dialog.showAndWait();
-                                result.ifPresent(r -> m_connection.banPlayer(toBan, r));
+                                result.ifPresent(r -> mConnection.banPlayer(toBan, r));
                             }
                         });
                         MenuItem copyNameItem = new MenuItem("Copy name ...");
@@ -249,7 +249,7 @@ public class ServerPaneController implements Initializable
                 final Clipboard clipboard = Clipboard.getSystemClipboard();
                 final ClipboardContent content = new ClipboardContent();
                 final StringBuilder sb = new StringBuilder(4096);
-                m_connection.getModel().getRawLogLines().forEach(line ->
+                mConnection.getModel().getRawLogLines().forEach(line ->
                 {
                     sb.append(line);
                     sb.append('\n');
@@ -283,14 +283,14 @@ public class ServerPaneController implements Initializable
             @Override
             public void handle(ActionEvent event)
             {
-                m_connection.getModel().clearLog();
+                mConnection.getModel().clearLog();
             }
         });
         logMenu.getItems().addAll(copyAllItem, copySelectedItem, clearItem);
-        logList.setItems(m_connection.getModel().getLogLines());
+        logList.setItems(mConnection.getModel().getLogLines());
         logList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         logList.setContextMenu(logMenu);
-        logList.setCellFactory(param -> new ColouredCell(m_connection));
+        logList.setCellFactory(param -> new ColouredCell(mConnection));
 
         // command window section
         final ContextMenu commandsMenu = new ContextMenu();
@@ -362,7 +362,7 @@ public class ServerPaneController implements Initializable
         if (StringUtils.isNotBlank(commandText.getText()))
         {
             logList.scrollTo(logList.getItems().size() - 1);
-            m_connection.sendCommand(commandText.getText());
+            mConnection.sendCommand(commandText.getText());
             commandText.clear();
         }
     }

@@ -10,15 +10,20 @@ import javafx.stage.Stage;
 
 public class SE4AdminGUI extends Application
 {
-    private static Stage s_primaryStage;
-    private static HostServicesDelegate s_hostServices;
-    private static boolean s_isDarkTheme;
+    private static Stage sPrimaryStage;
+    private static HostServicesDelegate sHostServices;
+    private static boolean sIsDarkTheme;
+
+    private static void doInit(HostServicesDelegate hostServices, Stage primaryStage)
+    {
+        sHostServices = hostServices;
+        sPrimaryStage = primaryStage;
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception
     {
-        s_hostServices = HostServicesFactory.getInstance(this);
-        s_primaryStage = primaryStage;
+        doInit(HostServicesFactory.getInstance(this), primaryStage);
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("MainPane.fxml"));
         primaryStage.setTitle("SE4 Server Administrator " + tfa.se4.Version.BUILD_VERSION);
         final StartupSettings.Settings settings = StartupSettings.readSettings();
@@ -44,24 +49,24 @@ public class SE4AdminGUI extends Application
      */
     public static void showDocument(final String url)
     {
-        s_hostServices.showDocument(url);
+        sHostServices.showDocument(url);
     }
 
     public static Stage getPrimaryStage()
     {
-        return s_primaryStage;
+        return sPrimaryStage;
     }
 
     public static void setDarkTheme(final boolean isSet)
     {
-        s_isDarkTheme = isSet;
-        if (s_isDarkTheme)
+        sIsDarkTheme = isSet;
+        if (sIsDarkTheme)
             getPrimaryStage().getScene().getStylesheets().add("dark-theme.css");
         else
             getPrimaryStage().getScene().getStylesheets().remove("dark-theme.css");
     }
 
-    public static boolean isDarkTheme() { return s_isDarkTheme; }
+    public static boolean isDarkTheme() { return sIsDarkTheme; }
 
     public static void main(String[] args)
     {

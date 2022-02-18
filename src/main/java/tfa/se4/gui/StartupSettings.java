@@ -12,17 +12,17 @@ import org.apache.commons.io.FileUtils;
  * Class to remember settings between sessions. These are saved when program exits and re-read on
  * startup.
  */
-public class StartupSettings
+public final class StartupSettings
 {
 
     public static class Settings
     {
-        public double x;
-        public double y;
-        public double width;
-        public double height;
-        public List<String> filesToReOpen;
-        public boolean isDarkTheme;
+        public double x; //NOSONAR This is a simple bean holder
+        public double y; //NOSONAR This is a simple bean holder
+        public double width; //NOSONAR This is a simple bean holder
+        public double height; //NOSONAR This is a simple bean holder
+        public List<String> filesToReOpen; //NOSONAR This is a simple bean holder
+        public boolean isDarkTheme; //NOSONAR This is a simple bean holder
 
         private Settings()
         {
@@ -38,6 +38,11 @@ public class StartupSettings
 
     //V2 file version. Added dark theme
     private static final String VERSION_2 = "V2";
+
+    private StartupSettings()
+    {
+        // Prevent instantiation
+    }
 
     /**
      * Save stuff

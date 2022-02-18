@@ -23,10 +23,10 @@ import static tfa.se4.logger.LoggerInterface.LogType;
  */
 public final class KickBanReasons implements Runnable
 {
-    private List<String> m_reasons = new ArrayList<>();
-    private long m_lastRead = 0;
-    private final LoggerInterface m_logger;
-    private final File m_file;
+    private List<String> mReasons = new ArrayList<>();
+    private long mLastRead = 0;
+    private final LoggerInterface mLogger;
+    private final File mFile;
 
     /**
      * Use 'kick_ban_reasons.txt' reasons file located in same directory as
@@ -38,9 +38,9 @@ public final class KickBanReasons implements Runnable
     {
         final String filename = "kick_ban_reasons.txt";
         FileHelper.cloneConfigFileFromExampleIfMissing(filename);
-        m_file = FileHelper.getConfigFile(filename);
+        mFile = FileHelper.getConfigFile(filename);
 
-        m_logger = logger;
+        mLogger = logger;
         new Thread(this).start();
     }
 
@@ -52,10 +52,10 @@ public final class KickBanReasons implements Runnable
         {
             while (true)
             {
-                if (FileUtils.isFileNewer(m_file, m_lastRead))
+                if (FileUtils.isFileNewer(mFile, mLastRead))
                 {
                     final List<String> reasons = new ArrayList<>();
-                    final List<String> lines = FileUtils.readLines(m_file, Charset.defaultCharset());
+                    final List<String> lines = FileUtils.readLines(mFile, Charset.defaultCharset());
                     for (final String line : lines)
                     {
                         if (StringUtils.isNotBlank(line) && !line.trim().startsWith("#"))
@@ -63,16 +63,16 @@ public final class KickBanReasons implements Runnable
                             reasons.add(StringUtils.split(line, '#')[0].trim());
                         }
                     }
-                    m_reasons = reasons;
-                    m_logger.log(LogLevel.INFO, LogType.SYSTEM, "%s kick/ban reasons read from %s", Integer.toString(m_reasons.size()), m_file.getName());
-                    m_lastRead = System.currentTimeMillis();
+                    mReasons = reasons;
+                    mLogger.log(LogLevel.INFO, LogType.SYSTEM, "%s kick/ban reasons read from %s", Integer.toString(mReasons.size()), mFile.getName());
+                    mLastRead = System.currentTimeMillis();
                 }
-                Thread.sleep(30000);
+                Utils.sleep(30000);
             }
         }
-        catch (final IOException | InterruptedException ex)
+        catch (final IOException ex)
         {
-            m_logger.log(LogLevel.ERROR, LogType.SYSTEM, ex, "Cannot read kick/ban reasons from %s. Error is %s", m_file.getName(), ex.getMessage());
+            mLogger.log(LogLevel.ERROR, LogType.SYSTEM, ex, "Cannot read kick/ban reasons from %s. Error is %s", mFile.getName(), ex.getMessage());
         }
     }
 
@@ -90,10 +90,10 @@ public final class KickBanReasons implements Runnable
      */
     public List<String> getReasons()
     {
-        if (m_reasons == null || m_reasons.isEmpty())
+        if (mReasons == null || mReasons.isEmpty())
         {
             return S_DEFAULTS;
         }
-        return m_reasons;
+        return mReasons;
     }
 }

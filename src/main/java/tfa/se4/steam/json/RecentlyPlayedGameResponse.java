@@ -22,7 +22,7 @@ public class RecentlyPlayedGameResponse {
     @JsonProperty("games")
     private List<RecentlyPlayedGame> games = null;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("total_count")
     public Integer getTotalCount() {

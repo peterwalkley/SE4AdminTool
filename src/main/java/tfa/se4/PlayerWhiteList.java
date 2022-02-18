@@ -24,15 +24,15 @@ import static tfa.se4.logger.LoggerInterface.LogType;
  */
 public final class PlayerWhiteList implements Runnable
 {
-    private HashSet<String> m_ids = new HashSet<>();
-    private final File m_file;
-    private long m_lastRead = 0;
-    private final LoggerInterface m_logger;
+    private HashSet<String> mIds = new HashSet<>();
+    private final File mFile;
+    private long mLastRead = 0;
+    private final LoggerInterface mLogger;
 
     public PlayerWhiteList(final String fileName, final LoggerInterface logger)
     {
-        m_file = new File(fileName);
-        m_logger = logger;
+        mFile = new File(fileName);
+        mLogger = logger;
         new Thread(this).start();
     }
 
@@ -44,10 +44,10 @@ public final class PlayerWhiteList implements Runnable
         {
             while (true)
             {
-                if (FileUtils.isFileNewer(m_file, m_lastRead))
+                if (FileUtils.isFileNewer(mFile, mLastRead))
                 {
                     final HashSet<String> ids = new HashSet<>();
-                    final List<String> lines = FileUtils.readLines(m_file, Charset.defaultCharset());
+                    final List<String> lines = FileUtils.readLines(mFile, Charset.defaultCharset());
                     for (final String line : lines)
                     {
                         if (StringUtils.isNotBlank(line) && !line.trim().startsWith("#"))
@@ -56,16 +56,16 @@ public final class PlayerWhiteList implements Runnable
                         }
                     }
 
-                    m_ids = ids;
-                    m_logger.log(LogLevel.INFO, LogType.SYSTEM, "%d whitelisted steam IDs read from %s", m_ids.size(), m_file.getName());
-                    m_lastRead = System.currentTimeMillis();
+                    mIds = ids;
+                    mLogger.log(LogLevel.INFO, LogType.SYSTEM, "%d whitelisted steam IDs read from %s", mIds.size(), mFile.getName());
+                    mLastRead = System.currentTimeMillis();
                 }
-                Thread.sleep(30000);
+                Utils.sleep(30000);
             }
         }
-        catch (final IOException | InterruptedException ex)
+        catch (final IOException ex)
         {
-            m_logger.log(LogLevel.ERROR, LogType.SYSTEM, ex, "Cannot read player whitelist from %s. Error is %s", m_file.getName(), ex.getMessage());
+            mLogger.log(LogLevel.ERROR, LogType.SYSTEM, ex, "Cannot read player whitelist from %s. Error is %s", mFile.getName(), ex.getMessage());
         }
     }
 
@@ -77,6 +77,6 @@ public final class PlayerWhiteList implements Runnable
      */
     public boolean isWhitelisted(final String steamID)
     {
-        return m_ids.contains(steamID);
+        return mIds.contains(steamID);
     }
 }

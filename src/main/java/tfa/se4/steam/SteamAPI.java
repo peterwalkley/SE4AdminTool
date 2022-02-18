@@ -25,14 +25,20 @@ import static tfa.se4.logger.LoggerInterface.LogType;
  */
 public final class SteamAPI
 {
+    /** Substitution string. */
+    private static final String STEAMID = "##STEAMID##";
+
+    /** Substitution string. */
+    public static final String STEAMAPIKEY = "##STEAMAPIKEY##";
+
     /** Steam API key. */
-    private final String m_steamAPIkey;
+    private final String mSteamAPIkey;
 
     /** Sniper Elite 4 steam APP ID. */
     private static final String APP_ID = "312660";
 
     /** Lookup cache to reduce hits to steam. */
-    private static final Map<String, RecentlyPlayedGamesResponse> s_recentlyPlayedCache = new HashMap<>();
+    private static final Map<String, RecentlyPlayedGamesResponse> sRecentlyPlayedCache = new HashMap<>();
 
     /**
      * Initialise and remember steam API key.
@@ -41,7 +47,7 @@ public final class SteamAPI
      */
     public SteamAPI(final String apiKey)
     {
-        m_steamAPIkey = apiKey;
+        mSteamAPIkey = apiKey;
     }
 
     /**
@@ -58,8 +64,8 @@ public final class SteamAPI
         final String urlTemplate = "http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key=##STEAMAPIKEY##&steamids=##STEAMID##";
 
         final String url = urlTemplate
-                .replace("##STEAMID##", steamID)
-                .replace("##STEAMAPIKEY##", m_steamAPIkey);
+                .replace(STEAMID, steamID)
+                .replace(STEAMAPIKEY, mSteamAPIkey);
 
         try
         {
@@ -94,8 +100,8 @@ public final class SteamAPI
         final String urlTemplate = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=##STEAMAPIKEY##&steamids=##STEAMID##";
 
         final String url = urlTemplate
-                .replace("##STEAMID##", steamID)
-                .replace("##STEAMAPIKEY##", m_steamAPIkey);
+                .replace(STEAMID, steamID)
+                .replace(STEAMAPIKEY, mSteamAPIkey);
 
         try
         {
@@ -131,8 +137,8 @@ public final class SteamAPI
 
         final String url = urlTemplate
                 .replace("##APPID##", APP_ID)
-                .replace("##STEAMID##", steamID)
-                .replace("##STEAMAPIKEY##", m_steamAPIkey);
+                .replace(STEAMID, steamID)
+                .replace(STEAMAPIKEY, mSteamAPIkey);
 
         try
         {
@@ -168,24 +174,24 @@ public final class SteamAPI
      */
     public synchronized String getTotalPlaytimeHours(final String steamID, final String playerName, final LoggerInterface logger)
     {
-        if (s_recentlyPlayedCache.containsKey(steamID))
+        if (sRecentlyPlayedCache.containsKey(steamID))
         {
-            return getHours(s_recentlyPlayedCache.get(steamID));
+            return getHours(sRecentlyPlayedCache.get(steamID));
         }
 
         logger.log(LogLevel.DEBUG, LogType.STEAM, "Checking player %s steam ID %s for total play time", playerName, steamID);
         final String urlTemplate = "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/?key=##STEAMAPIKEY##&steamid=##STEAMID##";
 
         final String url = urlTemplate
-                .replace("##STEAMID##", steamID)
-                .replace("##STEAMAPIKEY##", m_steamAPIkey);
+                .replace(STEAMID, steamID)
+                .replace(STEAMAPIKEY, mSteamAPIkey);
 
         try
         {
             final RecentlyPlayedGamesResponse info = JSONUtils.unMarshalRecentlyPlayedGamesResponse(
                     Request.Get(url).connectTimeout(2000).socketTimeout(2000).execute().returnContent().asString(), logger);
 
-            s_recentlyPlayedCache.put(steamID, info);
+            sRecentlyPlayedCache.put(steamID, info);
             final String hours = getHours(info);
             logger.log(LogLevel.INFO, LogType.STEAM, "Player %s steam ID %s has %s hours total play time", playerName, steamID, hours);
             return hours;

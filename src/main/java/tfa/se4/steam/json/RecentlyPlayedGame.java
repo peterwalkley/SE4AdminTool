@@ -42,7 +42,7 @@ public class RecentlyPlayedGame {
     @JsonProperty("playtime_linux_forever")
     private Integer playtimeLinuxForever;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("appid")
     public Integer getAppid() {

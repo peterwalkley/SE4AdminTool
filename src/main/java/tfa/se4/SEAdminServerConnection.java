@@ -46,22 +46,22 @@ import tfa.se4.steam.json.PlayerSummaryInfo;
 @WebSocket
 public class SEAdminServerConnection implements LoggerInterface, Runnable
 {
-    private final CountDownLatch m_closeLatch;
-    private Session m_session;
-    private ServerStatus m_serverStatus;
-    private final IPBanList m_ipBans;
-    private final PlayerWhiteList m_whiteList;
-    private final PlayerBanList m_banList;
-    private WebSocketClient m_client = null;
-    private SteamAPI m_steamAPI;
-    private IPLookupInterface m_ipLookup;
-    private final ConcurrentLinkedQueue<Player> m_playersToCheck = new ConcurrentLinkedQueue<>();
-    private final LogLevel m_displayLogLevel = LogLevel.INFO;
-    private boolean m_isClose = false;
-    private final Options m_options;
-    private long m_gameStartTime = 0;
-    private int m_retryTimeoutSecs = 10;
-    private final Map<String,Long> m_playerJoinTime = new HashMap<>();
+    private final CountDownLatch mCloseLatch;
+    private Session mSession;
+    private ServerStatus mServerStatus;
+    private final IPBanList mIpBans;
+    private final PlayerWhiteList mWhiteList;
+    private final PlayerBanList mBanList;
+    private WebSocketClient mClient = null;
+    private SteamAPI mSteamAPI;
+    private IPLookupInterface mIpLookup;
+    private final ConcurrentLinkedQueue<Player> mPlayersToCheck = new ConcurrentLinkedQueue<>();
+    private final LogLevel mDisplayLogLevel = LogLevel.INFO;
+    private boolean mIsClose = false;
+    private final Options mOptions;
+    private long mGameStartTime = 0;
+    private int mRetryTimeoutSecs = 10;
+    private final Map<String,Long> mPlayerJoinTime = new HashMap<>();
 
     /**
      * Set up and manage connection based on property configuration.
@@ -70,20 +70,20 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
      */
     public SEAdminServerConnection(final Options options)
     {
-        m_options = options;
-        m_closeLatch = new CountDownLatch(1);
-        m_ipBans = new IPBanList(options.getIPBansFile(), this);
-        m_whiteList = new PlayerWhiteList(options.getWhiteListFile(), this);
-        m_banList = new PlayerBanList(options.getPlayerBansListFile(), this);
+        mOptions = options;
+        mCloseLatch = new CountDownLatch(1);
+        mIpBans = new IPBanList(options.getIPBansFile(), this);
+        mWhiteList = new PlayerWhiteList(options.getWhiteListFile(), this);
+        mBanList = new PlayerBanList(options.getPlayerBansListFile(), this);
         if (StringUtils.isNotBlank(options.getSteamAPIKey()))
         {
-            m_steamAPI = new SteamAPI(options.getSteamAPIKey());
+            mSteamAPI = new SteamAPI(options.getSteamAPIKey());
         }
 
         if (StringUtils.isNotBlank(options.getExtremeIPAPIKey()))
         {
             this.log(LogLevel.INFO, LogType.IPINFO, "Initialising Extreme IP");
-            m_ipLookup = new ExtremeIPAPI(options.getExtremeIPAPIKey());
+            mIpLookup = new ExtremeIPAPI(options.getExtremeIPAPIKey());
         }
         new Thread(this).start();
     }
@@ -95,9 +95,9 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     @Override
     public void run()
     {
-        while (!m_isClose)
+        while (!mIsClose)
         {
-            if (m_client == null)
+            if (mClient == null)
             {
                 try
                 {
@@ -105,37 +105,37 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
                     client.start();
                     Future<Session> future = client.connect(this, this.getURI());
                     future.get(5000, TimeUnit.SECONDS);
-                    m_client = client;
+                    mClient = client;
                 }
                 catch (final Exception ex)
                 {
-                    log(LogLevel.INFO, LogType.SYSTEM, "Connect failed. Retrying in " + m_retryTimeoutSecs + " seconds.");
+                    log(LogLevel.INFO, LogType.SYSTEM, "Connect failed. Retrying in " + mRetryTimeoutSecs + " seconds.");
                     log(LogLevel.TRACE, LogType.SYSTEM, ex, "Connection error");
-                    sleep(m_retryTimeoutSecs * 1000L);
-                    m_retryTimeoutSecs = getNextRetryTimeSecs(m_retryTimeoutSecs);
+                    Utils.sleep(mRetryTimeoutSecs * 1000L);
+                    mRetryTimeoutSecs = getNextRetryTimeSecs(mRetryTimeoutSecs);
                 }
             }
             else
             {
-                if (!m_playersToCheck.isEmpty())
+                if (!mPlayersToCheck.isEmpty())
                 {
-                    checkPlayer(m_playersToCheck.remove());
+                    checkPlayer(mPlayersToCheck.remove());
                 }
             }
-            sleep(1000);
+            Utils.sleep(1000);
         }
 
         try
         {
-            if (m_client != null)
+            if (mClient != null)
             {
-                m_client.stop();
+                mClient.stop();
             }
 
-            if (m_session != null)
+            if (mSession != null)
             {
-                m_session.disconnect();
-                m_session.close();
+                mSession.disconnect();
+                mSession.close();
             }
         }
         catch (Exception e)
@@ -145,8 +145,8 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         }
         finally
         {
-            m_client = null;
-            m_session = null;
+            mClient = null;
+            mSession = null;
         }
     }
 
@@ -198,7 +198,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
      */
     protected IPLookupInterface getIPLookup()
     {
-        return m_ipLookup;
+        return mIpLookup;
     }
 
     /**
@@ -208,7 +208,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
      */
     protected SteamAPI getSteamAPI()
     {
-        return m_steamAPI;
+        return mSteamAPI;
     }
 
     /**
@@ -218,7 +218,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
      */
     protected long getGameStartTime()
     {
-        return m_gameStartTime;
+        return mGameStartTime;
     }
 
     /**
@@ -226,8 +226,8 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
      */
     public synchronized void closeConnection()
     {
-        log(LogLevel.INFO, LogType.SYSTEM, "Closing connection to %s:%s", m_options.getHost(), m_options.getPort());
-        m_isClose = true;
+        log(LogLevel.INFO, LogType.SYSTEM, "Closing connection to %s:%s", mOptions.getHost(), mOptions.getPort());
+        mIsClose = true;
     }
 
     /**
@@ -237,53 +237,53 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
      */
     private void checkPlayer(final Player p)
     {
-        if (!m_serverStatus.getLobby().getPlayers().contains(p))
+        if (!mServerStatus.getLobby().getPlayers().contains(p))
         {
             log(LogLevel.INFO, LogType.CHECK, "Player %s steam ID %s from IP address %s left before checks performed", p.getName(), p.getSteamId(), p.getIPv4());
             return;
         }
 
-        if (m_ipLookup != null)
+        if (mIpLookup != null)
         {
             LoggerInterface loggerRef = this;
-            new Thread(() -> p.setLocation(m_ipLookup.getIPAddressInformation(p.getIPv4(), loggerRef, true).toString())).start();
+            new Thread(() -> p.setLocation(mIpLookup.getIPAddressInformation(p.getIPv4(), loggerRef, true).toString())).start();
         }
 
-        if (m_whiteList.isWhitelisted(p.getSteamId()))
+        if (mWhiteList.isWhitelisted(p.getSteamId()))
         {
             log(LogLevel.INFO, LogType.WHITELIST, "Player %s steam ID %s joined from IP address %s", p.getName(), p.getSteamId(), p.getIPv4());
             doGreeting(p);
             return;
         }
 
-        if (m_ipBans.isBanned(p.getIPv4()))
+        if (mIpBans.isBanned(p.getIPv4()))
         {
             log(LogLevel.INFO, LogType.IPBAN, "Player %s steam ID %s joined from banned IP address %s", p.getName(), p.getSteamId(), p.getIPv4());
             banPlayer(p, "banned IP address");
             return;
         }
 
-        if (m_banList.getBan(p.getSteamId()) != null)
+        if (mBanList.getBan(p.getSteamId()) != null)
         {
-            final Ban banInfo = m_banList.getBan(p.getSteamId());
+            final Ban banInfo = mBanList.getBan(p.getSteamId());
             log(LogLevel.INFO, LogType.PLAYERBAN, "Banned player %s steam ID %s for reason '%s' joined from IP address %s. Name at ban was %s", p.getName(), p.getSteamId(), banInfo.reason, p.getIPv4(), banInfo.name);
             banPlayer(p, banInfo.reason);
             return;
         }
 
-        if (m_options.isApplyVACBans() || m_options.isApplyGameBans())
+        if (mOptions.isApplyVACBans() || mOptions.isApplyGameBans())
         {
-            final tfa.se4.steam.json.PlayerBanInfo banInfo = m_steamAPI.getBanInfo(p.getSteamId(), p.getName(), this);
+            final tfa.se4.steam.json.PlayerBanInfo banInfo = mSteamAPI.getBanInfo(p.getSteamId(), p.getName(), this);
             if (banInfo != null)
             {
-                if (m_options.isApplyVACBans() && Boolean.TRUE.equals(banInfo.getVACBanned()))
+                if (mOptions.isApplyVACBans() && Boolean.TRUE.equals(banInfo.getVACBanned()))
                 {
                     log(LogLevel.INFO, LogType.VAC, "Player %s steam ID %s has VAC ban", p.getName(), p.getSteamId());
                     banPlayer(p, "VAC ban");
                     return;
                 }
 
-                if (m_options.isApplyGameBans() && banInfo.getNumberOfGameBans() > 0)
+                if (mOptions.isApplyGameBans() && banInfo.getNumberOfGameBans() > 0)
                 {
                     log(LogLevel.INFO, LogType.GAMEBAN, "Player %s steam ID %s has game ban", p.getName(), p.getSteamId());
                     banPlayer(p, "Game ban");
@@ -292,38 +292,38 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             }
         }
 
-        if (m_options.getClosedProfilePolicy() != tfa.se4.Options.CLOSED_PROFILE_IGNORE)
+        if (mOptions.getClosedProfilePolicy() != tfa.se4.Options.CLOSED_PROFILE_IGNORE)
         {
-            final tfa.se4.steam.json.PlayerSummaryInfo info = m_steamAPI.getProfileInfo(p.getSteamId(), p.getName(), this);
+            final tfa.se4.steam.json.PlayerSummaryInfo info = mSteamAPI.getProfileInfo(p.getSteamId(), p.getName(), this);
             if (info != null && info.getCommunityvisibilitystate() != 3) // anything but 3 is private profile
             {
                 handleClosedProfile(p);
             }
         }
 
-        if (m_options.getPlayHoursLimit() > 0)
+        if (mOptions.getPlayHoursLimit() > 0)
         {
             final String playHours = getSteamAPI().getTotalPlaytimeHours(p.getSteamId(), p.getName(), this);
             if (playHours.equals("-"))
             {
-                kickPlayer(p, "closed profile. This server is restricted to players with less than " + m_options.getPlayHoursLimit() + " hours play time.  Please open your steam profile to allow us to view your play time.");
+                kickPlayer(p, "closed profile. This server is restricted to players with less than " + mOptions.getPlayHoursLimit() + " hours play time.  Please open your steam profile to allow us to view your play time.");
                 return;
             }
             final int playtime = Integer.parseInt(playHours);
-            if (playtime > m_options.getPlayHoursLimit())
+            if (playtime > mOptions.getPlayHoursLimit())
             {
-                kickPlayer(p, "too much experience. This server is restricted to players with less than " + m_options.getPlayHoursLimit() + " hours play time.");
+                kickPlayer(p, "too much experience. This server is restricted to players with less than " + mOptions.getPlayHoursLimit() + " hours play time.");
                 return;
             }
         }
 
         // Now check rules for LINKED accounts
-        if (m_steamAPI != null)
+        if (mSteamAPI != null)
         {
-            final String linkedID = m_steamAPI.getLinkedProfileID(p.getSteamId(), p.getName(), this);
+            final String linkedID = mSteamAPI.getLinkedProfileID(p.getSteamId(), p.getName(), this);
             if (linkedID != null)
             {
-                final PlayerSummaryInfo other = m_steamAPI.getProfileInfo(linkedID, "LINK", this);
+                final PlayerSummaryInfo other = mSteamAPI.getProfileInfo(linkedID, "LINK", this);
                 if (other == null)
                 {
                     log(LogLevel.INFO, LogType.STEAM, "Player %s steam ID %s has link to empty steam id %s", p.getName(), p.getSteamId(), linkedID);
@@ -332,27 +332,27 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
                 {
                     log(LogLevel.INFO, LogType.STEAM, "Player %s steam ID %s has link to %s steam id %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid());
 
-                    if (m_banList.getBan(other.getSteamid()) != null)
+                    if (mBanList.getBan(other.getSteamid()) != null)
                     {
-                        final Ban banInfo = m_banList.getBan(other.getSteamid());
+                        final Ban banInfo = mBanList.getBan(other.getSteamid());
                         log(LogLevel.INFO, LogType.PLAYERBAN, "Banned player %s steam ID %s for link to banned account %s / %s original ban reason was %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid(), banInfo.reason);
                         banPlayer(p, "link to banned account " + other.getPersonaname() + " / " + other.getSteamid());
                         return;
                     }
 
-                    if (m_options.isApplyVACBans() || m_options.isApplyGameBans())
+                    if (mOptions.isApplyVACBans() || mOptions.isApplyGameBans())
                     {
-                        final tfa.se4.steam.json.PlayerBanInfo linkedBanInfo = m_steamAPI.getBanInfo(other.getSteamid(), other.getPersonaname(), this);
+                        final tfa.se4.steam.json.PlayerBanInfo linkedBanInfo = mSteamAPI.getBanInfo(other.getSteamid(), other.getPersonaname(), this);
                         if (linkedBanInfo != null)
                         {
-                            if (m_options.isApplyVACBans() && Boolean.TRUE.equals(linkedBanInfo.getVACBanned()))
+                            if (mOptions.isApplyVACBans() && Boolean.TRUE.equals(linkedBanInfo.getVACBanned()))
                             {
                                 log(LogLevel.INFO, LogType.VAC, "Player %s steam ID %s has link to VAC banned account %s / %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid());
                                 banPlayer(p, "VAC ban on linked account " + other.getPersonaname() + " / " + other.getSteamid());
                                 return;
                             }
 
-                            if (m_options.isApplyGameBans() && linkedBanInfo.getNumberOfGameBans() > 0)
+                            if (mOptions.isApplyGameBans() && linkedBanInfo.getNumberOfGameBans() > 0)
                             {
                                 log(LogLevel.INFO, LogType.GAMEBAN, "Player %s steam ID %s has link to game banned account %s / %s", p.getName(), p.getSteamId(), other.getPersonaname(), other.getSteamid());
                                 banPlayer(p, "Game ban on linked account " + other.getPersonaname() + " / " + other.getSteamid());
@@ -385,11 +385,11 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             serverSay("KICKING " + p.getName() + " for " + reason);
 
             // Delay 5 seconds
-            sleep(5000);
+            Utils.sleep(5000);
 
             // Kick them by re-searching the current players list to get
             // the latest id and then kick by id.
-            m_serverStatus.getLobby().getPlayers().stream().filter(x -> x.equals(p)).findFirst().ifPresent( x -> {
+            mServerStatus.getLobby().getPlayers().stream().filter(x -> x.equals(p)).findFirst().ifPresent(x -> {
                 final String ban = "Server.KickIndex " + x.getId();
                 sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
             });
@@ -405,7 +405,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     public void banPlayer(final Player p, final String reason)
     {
         new Thread(() -> {
-            final boolean banAdded = m_banList.addBan(p.getSteamId(), p.getName(), reason);
+            final boolean banAdded = mBanList.addBan(p.getSteamId(), p.getName(), reason);
             // Do a steam ID ban to make sure they are added to server ban list
             final String steamIDBan = "Server.KickBanSteamID " + p.getSteamId();
             sendMessage(Protocol.REQUEST_SEND_COMMAND, steamIDBan.getBytes());
@@ -417,11 +417,11 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             serverSay(msg);
 
             // Delay 5 seconds
-            sleep(5000);
+            Utils.sleep(5000);
 
             // Kick ban them by re-searching the current players list to get
             // the latest id and then kick by id.
-            m_serverStatus.getLobby().getPlayers().stream().filter(x -> x.equals(p)).findFirst().ifPresent( x -> {
+            mServerStatus.getLobby().getPlayers().stream().filter(x -> x.equals(p)).findFirst().ifPresent(x -> {
                 final String ban = "Server.KickBanIndex " + x.getId();
                 sendMessage(Protocol.REQUEST_SEND_COMMAND, ban.getBytes());
             });
@@ -436,11 +436,11 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     public void handleClosedProfile(final Player p)
     {
         new Thread(() -> {
-            serverSay(m_options.getClosedProfileMessage().replace("#PlayerName#", p.getName()));
+            serverSay(mOptions.getClosedProfileMessage().replace("#PlayerName#", p.getName()));
 
-            if (m_options.getClosedProfilePolicy() == Options.CLOSED_PROFILE_KICK)
+            if (mOptions.getClosedProfilePolicy() == Options.CLOSED_PROFILE_KICK)
             {
-                sleep(10000);
+                Utils.sleep(10000);
                 // Kick them
                 final String kick = "Server.Kick " + p.getName();
                 sendMessage(Protocol.REQUEST_SEND_COMMAND, kick.getBytes());
@@ -456,11 +456,11 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     private void doGreeting(final Player p)
     {
         // Don't greet for when we've just started up or there's no greeting message
-        if (StringUtils.isNotBlank(m_options.getPlayerGreeting()) && !p.isSkipGreeting())
+        if (StringUtils.isNotBlank(mOptions.getPlayerGreeting()) && !p.isSkipGreeting())
         {
-            serverSay(m_options.getPlayerGreeting().
+            serverSay(mOptions.getPlayerGreeting().
                     replace("#PlayerName#", p.getName()).
-                    replace("#ServerName#", m_serverStatus.getServer().getName()));
+                    replace("#ServerName#", mServerStatus.getServer().getName()));
         }
     }
 
@@ -482,7 +482,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
      */
     public URI getURI() throws URISyntaxException
     {
-        return new URI("ws://" + m_options.getHost() + ":" + m_options.getPort());
+        return new URI("ws://" + mOptions.getHost() + ":" + mOptions.getPort());
     }
 
     /**
@@ -518,20 +518,20 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         }
 
         final List<Player> newPlayers = status.getLobby().getPlayers();
-        final List<Player> oldPlayers = m_serverStatus == null ? new ArrayList<>() : m_serverStatus.getLobby().getPlayers();
+        final List<Player> oldPlayers = mServerStatus == null ? new ArrayList<>() : mServerStatus.getLobby().getPlayers();
 
         for (final Player p : newPlayers)
         {
             if (!oldPlayers.contains(p))
             {
-                if (m_serverStatus == null) // signal to skip the greeting if we're just starting up the monitoring
+                if (mServerStatus == null) // signal to skip the greeting if we're just starting up the monitoring
                 {
                     p.setSkipGreeting(true);
                 }
 
-                m_playersToCheck.add(p);
+                mPlayersToCheck.add(p);
                 log(LogLevel.INFO, LogType.JOIN, "Player %s steam ID %s joined from IP address %s", p.getName(), p.getSteamId(), p.getIPv4());
-                m_playerJoinTime.put(p.getSteamId(), System.currentTimeMillis());
+                mPlayerJoinTime.put(p.getSteamId(), System.currentTimeMillis());
             }
         }
 
@@ -539,25 +539,25 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         {
             if (!newPlayers.contains(p))
             {
-                logPlayerLeaveEvent(p, m_playerJoinTime.getOrDefault(p.getSteamId(), System.currentTimeMillis()));
-                m_playerJoinTime.remove(p.getSteamId());
+                logPlayerLeaveEvent(p, mPlayerJoinTime.getOrDefault(p.getSteamId(), System.currentTimeMillis()));
+                mPlayerJoinTime.remove(p.getSteamId());
             }
         }
 
         final String newGameState = status.getLobby().getState();
-        final String oldGameState = m_serverStatus == null ? "unknown" : m_serverStatus.getLobby().getState();
+        final String oldGameState = mServerStatus == null ? "unknown" : mServerStatus.getLobby().getState();
         if (!oldGameState.equals(newGameState))
         {
-            if (Protocol.IN_GAME.equals(newGameState) && m_serverStatus != null)
+            if (Protocol.IN_GAME.equals(newGameState) && mServerStatus != null)
             {
-                m_gameStartTime = System.currentTimeMillis();
-                log(LogLevel.INFO, LogType.GAME_STARTED, JSONUtils.marshalServerStatus(m_serverStatus, this));
+                mGameStartTime = System.currentTimeMillis();
+                log(LogLevel.INFO, LogType.GAME_STARTED, JSONUtils.marshalServerStatus(mServerStatus, this));
             }
 
             if (Protocol.IN_GAME.equals(oldGameState))
             {
-                logGameEndEvent(m_serverStatus, m_gameStartTime, System.currentTimeMillis());
-                m_gameStartTime = 0;
+                logGameEndEvent(mServerStatus, mGameStartTime, System.currentTimeMillis());
+                mGameStartTime = 0;
             }
             else
             {
@@ -590,13 +590,13 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             }
             else
             {
-                long start = Math.max(m_playerJoinTime.getOrDefault(p.getSteamId(), 0L), gameStartTime);
+                long start = Math.max(mPlayerJoinTime.getOrDefault(p.getSteamId(), 0L), gameStartTime);
                 p.setGamePlaySeconds((gameEndTime - start) / 1000L);
             }
 
-            if (m_ipLookup != null)
+            if (mIpLookup != null)
             {
-                final IPInformation ipInfo = m_ipLookup.getIPAddressInformation(p.getIPv4(), this, false);
+                final IPInformation ipInfo = mIpLookup.getIPAddressInformation(p.getIPv4(), this, false);
                 if (ipInfo != null)
                 {
                     p.setAdditionalProperty("Latitude", ipInfo.getLatitude());
@@ -632,10 +632,10 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         p.setPlayhours(null);
         p.setScore(null);
         p.setAdditionalProperty("ConnectionTimeSeconds", joinedSecs);
-        p.setAdditionalProperty("Host", m_serverStatus.getServer().getHost());
-        if (m_ipLookup != null)
+        p.setAdditionalProperty("Host", mServerStatus.getServer().getHost());
+        if (mIpLookup != null)
         {
-            final IPInformation ipInfo = m_ipLookup.getIPAddressInformation(p.getIPv4(), this, false);
+            final IPInformation ipInfo = mIpLookup.getIPAddressInformation(p.getIPv4(), this, false);
             if (ipInfo != null)
             {
                 p.setAdditionalProperty("Latitude", ipInfo.getLatitude());
@@ -656,7 +656,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
      */
     public void setServerStatus(final ServerStatus status)
     {
-        m_serverStatus = status;
+        mServerStatus = status;
     }
 
     /**
@@ -666,7 +666,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
      */
     public void awaitClose() throws InterruptedException
     {
-        m_closeLatch.await();
+        mCloseLatch.await();
     }
 
     /**
@@ -678,7 +678,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         try
         {
             log(LogLevel.TRACE, LogType.SYSTEM, ">> %s", Protocol.bytesToString(buf.array()));
-            m_session.getRemote().sendBytes(buf);
+            mSession.getRemote().sendBytes(buf);
         }
         catch (final IOException ex)
         {
@@ -699,7 +699,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         try
         {
             log(LogLevel.TRACE, LogType.SYSTEM, ">> %s", Protocol.bytesToString(buf.array()));
-            m_session.getRemote().sendBytes(buf);
+            mSession.getRemote().sendBytes(buf);
         }
         catch (final IOException ex)
         {
@@ -720,7 +720,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             case Protocol.REPLY_INIT:
                 log(LogLevel.INFO, LogType.SYSTEM, "Authenticating");
                 final byte[] salt = Protocol.getSaltValue(content);
-                sendMessage(Protocol.REQUEST_SEND_PWD, Protocol.buildSaltedPassword(salt, m_options.getPassword()));
+                sendMessage(Protocol.REQUEST_SEND_PWD, Protocol.buildSaltedPassword(salt, mOptions.getPassword()));
                 break;
 
             case Protocol.REPLY_CONNECTION_SUCCESS_1:
@@ -798,10 +798,10 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     @OnWebSocketConnect
     public void onConnect(Session session)
     {
-        m_retryTimeoutSecs = 10; // reset
+        mRetryTimeoutSecs = 10; // reset
         log(LogLevel.INFO, LogType.SYSTEM, "Connected to %s", session.getRemoteAddress().toString());
-        m_session = session;
-        if (m_session.isOpen())
+        mSession = session;
+        if (mSession.isOpen())
         {
             sendInitMessage();
         }
@@ -817,8 +817,8 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     public void onClose(int statusCode, String reason)
     {
         log(LogLevel.INFO, LogType.SYSTEM, "Connection closed. Status code is '%s' reason is '%s", Integer.toString(statusCode), reason);
-        m_session = null;
-        m_client = null;
+        mSession = null;
+        mClient = null;
     }
 
     /**
@@ -865,25 +865,8 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         {
             log(LogLevel.ERROR, LogType.SYSTEM, cause, "Unhandled webSocket Error. Treating as fatal");
         }
-        m_session = null;
-        m_client = null;
-    }
-
-    /**
-     * Force current thread to sleep a bit.
-     *
-     * @param millis Milliseconds.
-     */
-    private static void sleep(final long millis)
-    {
-        try
-        {
-            Thread.sleep(millis);
-        }
-        catch (final Exception ex2)
-        {
-            // ignore
-        }
+        mSession = null;
+        mClient = null;
     }
 
     @Override
@@ -936,7 +919,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             return false; // always show ERROR
         }
 
-        switch (m_displayLogLevel)
+        switch (mDisplayLogLevel)
         {
             case INFO:
                 return level.equals(LogLevel.DEBUG) || level.equals(LogLevel.TRACE);

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public final class Protocol
 {
-    private static MessageDigest SHA1 = null;
+    private static MessageDigest SHA1 = null; //NOSONAR ignoring static name convetion here
 
     private static final byte[] EMPTY = new byte[]{};
 
@@ -46,8 +46,8 @@ public final class Protocol
 
     public static final class ReplyMessage
     {
-        public char messageId;
-        public ByteBuffer payload;
+        public char messageId; //NOSONAR This is a simple bean holder
+        public ByteBuffer payload; //NOSONAR This is a simple bean holder
     }
 
     private Protocol()

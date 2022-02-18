@@ -169,15 +169,15 @@ public class MonitoredServerConnection extends SEAdminServerConnection
         }
         else if (bytes < (1024 * 1024))
         {
-            return String.format("%.2f kb", (float) bytes / 1024.0);
+            return String.format("%.2f kb", bytes / 1024.0);
         }
         else if (bytes < (1024 * 1024 * 1024))
         {
-            return String.format("%.2f mb", (float) bytes / (1024.0 * 1024.0));
+            return String.format("%.2f mb", bytes / (1024.0 * 1024.0));
         }
         else
         {
-            return String.format("%.2f gb", (float) bytes / (1024.0 * 1024.0 * 1024.0));
+            return String.format("%.2f gb", bytes / (1024.0 * 1024.0 * 1024.0));
         }
     }
 

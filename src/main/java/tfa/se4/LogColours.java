@@ -17,21 +17,26 @@ import tfa.se4.logger.LoggerInterface;
 /**
  * Class to handle colour choices for the log window.
  */
-public class LogColours
+public final class LogColours
 {
-    private static List<LogColour> s_logColours = null;
-    private static Color s_default = Color.BLACK;
-    private static Color s_defaultChat = Color.BLACK;
+    private static List<LogColour> sLogColours = null;
+    private static Color sDefault = Color.BLACK;
+    private static Color sDefaultChat = Color.BLACK;
 
     public static class LogColour {
-        public Pattern pattern;
-        public Color colour;
+        public Pattern pattern; //NOSONAR This is a simple bean holder
+        public Color colour; //NOSONAR This is a simple bean holder
 
         private LogColour(final Pattern p, final Color c)
         {
             pattern = p;
             colour = c;
         }
+    }
+
+    private LogColours()
+    {
+        // Prevent instantiation
     }
 
     /**
@@ -41,11 +46,11 @@ public class LogColours
      */
     public static Color getDefault(final LoggerInterface logger)
     {
-        if (s_logColours == null)
+        if (sLogColours == null)
         {
             readConfiguration(logger);
         }
-        return s_default;
+        return sDefault;
     }
 
     /**
@@ -55,11 +60,11 @@ public class LogColours
      */
     public static Color getDefaultChat(final LoggerInterface logger)
     {
-        if (s_logColours == null)
+        if (sLogColours == null)
         {
             readConfiguration(logger);
         }
-        return s_defaultChat;
+        return sDefaultChat;
     }
 
     /**
@@ -69,12 +74,12 @@ public class LogColours
      */
     public static  List<LogColour> getColours(final LoggerInterface logger)
     {
-        if (s_logColours == null)
+        if (sLogColours == null)
         {
             readConfiguration(logger);
         }
 
-        return s_logColours;
+        return sLogColours;
     }
 
     /**
@@ -96,7 +101,7 @@ public class LogColours
         catch (final IOException e)
         {
             logger.log(LoggerInterface.LogLevel.INFO, LoggerInterface.LogType.SYSTEM, "Unable to read %s ", toRead.getName(), e.getLocalizedMessage());
-            s_logColours = new ArrayList<>();
+            sLogColours = new ArrayList<>();
             return;
         }
 
@@ -105,22 +110,22 @@ public class LogColours
         {
             if (StringUtils.isNotBlank(line) && !line.trim().startsWith("#"))
             {
-                if (line.trim().startsWith("default") && line.indexOf('=') > 0)
+                if (line.trim().startsWith("default") && line.contains("="))
                 {
                     final Color c = extractColour(logger, line);
                     if (c != null)
                     {
-                        s_default = c;
+                        sDefault = c;
                         continue;
                     }
                 }
 
-                if (line.trim().startsWith("chat") && line.indexOf('=') > 0)
+                if (line.trim().startsWith("chat") && line.contains("="))
                 {
                     final Color c = extractColour(logger, line);
                     if (c != null)
                     {
-                        s_defaultChat = c;
+                        sDefaultChat = c;
                         continue;
                     }
                 }
@@ -152,7 +157,7 @@ public class LogColours
             }
         }
 
-        s_logColours = result;
+        sLogColours = result;
     }
 
     /**

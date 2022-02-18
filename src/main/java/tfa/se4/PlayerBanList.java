@@ -29,20 +29,20 @@ public final class PlayerBanList implements Runnable
 {
     public static class Ban
     {
-        public String steamID;
-        public String name;
-        public String reason;
+        public String steamID; //NOSONAR This is a simple bean holder
+        public String name; //NOSONAR This is a simple bean holder
+        public String reason; //NOSONAR This is a simple bean holder
     }
 
-    private Map<String, Ban> m_bans = new HashMap<>();
-    private final File m_file;
-    private long m_lastRead = 0;
-    private final LoggerInterface m_logger;
+    private Map<String, Ban> mBans = new HashMap<>();
+    private final File mFile;
+    private long mLastRead = 0;
+    private final LoggerInterface mLogger;
 
     public PlayerBanList(final String fileName, final LoggerInterface logger)
     {
-        m_file = new File(fileName);
-        m_logger = logger;
+        mFile = new File(fileName);
+        mLogger = logger;
         new Thread(this).start();
     }
 
@@ -54,10 +54,10 @@ public final class PlayerBanList implements Runnable
         {
             while (true)
             {
-                if (FileUtils.isFileNewer(m_file, m_lastRead))
+                if (FileUtils.isFileNewer(mFile, mLastRead))
                 {
                     final Map<String, Ban> bans = new HashMap<>();
-                    final List<String> lines = FileUtils.readLines(m_file, Charset.defaultCharset());
+                    final List<String> lines = FileUtils.readLines(mFile, Charset.defaultCharset());
                     for (final String line : lines)
                     {
                         if (StringUtils.isNotBlank(line) && !line.trim().startsWith("#"))
@@ -73,22 +73,22 @@ public final class PlayerBanList implements Runnable
                             }
                             else
                             {
-                                m_logger.log(LogLevel.INFO, LogType.SYSTEM, "Invalid ban entry '%s' read from %s was ignored", line, m_file.getName());
+                                mLogger.log(LogLevel.INFO, LogType.SYSTEM, "Invalid ban entry '%s' read from %s was ignored", line, mFile.getName());
                             }
                         }
 
                     }
-                    m_bans = bans;
-                    m_logger.log(LogLevel.INFO, LogType.SYSTEM, "%s player bans read from %s", Integer.toString(m_bans.size()), m_file.getName());
-                    m_lastRead = System.currentTimeMillis();
+                    mBans = bans;
+                    mLogger.log(LogLevel.INFO, LogType.SYSTEM, "%s player bans read from %s", Integer.toString(mBans.size()), mFile.getName());
+                    mLastRead = System.currentTimeMillis();
                 }
-                //noinspection BusyWait
-                Thread.sleep(30000);
+
+                Utils.sleep(30000);
             }
         }
-        catch (final IOException | InterruptedException ex)
+        catch (final IOException ex)
         {
-            m_logger.log(LogLevel.ERROR, LogType.SYSTEM, ex, "Cannot read player bans from %s. Error is %s", m_file.getName(), ex.getMessage());
+            mLogger.log(LogLevel.ERROR, LogType.SYSTEM, ex, "Cannot read player bans from %s. Error is %s", mFile.getName(), ex.getMessage());
         }
     }
 
@@ -100,7 +100,7 @@ public final class PlayerBanList implements Runnable
      */
     public Ban getBan(final String steamID)
     {
-        return m_bans.get(steamID);
+        return mBans.get(steamID);
     }
 
     /**
@@ -119,7 +119,7 @@ public final class PlayerBanList implements Runnable
 
             try
             {
-                PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(m_file.getAbsolutePath(), true)));
+                PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(mFile.getAbsolutePath(), true)));
                 out.println(banText);
                 out.close();
             }

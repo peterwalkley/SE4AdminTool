@@ -18,7 +18,7 @@ public class PlayerSummaryQueryResult {
     @JsonProperty("response")
     private PlayerSummaryResponse response;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("response")
     public PlayerSummaryResponse getResponse() {

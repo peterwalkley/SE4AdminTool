@@ -18,10 +18,13 @@ public final class ExtremeIPAPI implements IPLookupInterface
     private static long lastLookup = 0;
 
     /** API key. */
-    private final String m_APIkey;
+    private final String mAPIkey;
 
     /** Lookup cache to reduce hits to IP stack. */
-    private static final Map<String, IPInformation> s_cache = new HashMap<>();
+    private static final Map<String, IPInformation> sCache = new HashMap<>();
+
+    /** Lock object we will use for rate limiting access. */
+    private static String sMonitor = "lock";
 
     /**
      * Initialise and remember steam API key.
@@ -30,31 +33,32 @@ public final class ExtremeIPAPI implements IPLookupInterface
      */
     public ExtremeIPAPI(final String apiKey)
     {
-        m_APIkey = apiKey;
+        mAPIkey = apiKey;
     }
 
     /**
      * Ensure we don't try and do more than 20 requests per minute.
      */
-    private static synchronized void applyRateLimit() {
+    private static void applyRateLimit() {
 
-        long diff = System.currentTimeMillis() - lastLookup;
-        if (diff < 3500) {
-            try {
-                Thread.sleep(3500 - diff);
+        synchronized (sMonitor) {
+            long diff = System.currentTimeMillis() - lastLookup;
+            if (diff < 3500) {
+                try {
+                    sMonitor.wait(3500 - diff);
+                } catch (final InterruptedException e) {
+                    // ignore
+                }
             }
-            catch (final InterruptedException e) {
-                // ignore
-            }
+            lastLookup = System.currentTimeMillis();
         }
-        lastLookup = System.currentTimeMillis();
     }
 
     @Override
     public IPInformation getIPAddressInformation(final String ip, final LoggerInterface logger, final boolean waitForResult)
     {
-        if (s_cache.get(ip) != null)
-            return s_cache.get(ip);
+        if (sCache.get(ip) != null)
+            return sCache.get(ip);
 
         if (!waitForResult) {
             return IPInformation.
@@ -64,14 +68,14 @@ public final class ExtremeIPAPI implements IPLookupInterface
 
         logger.log(LoggerInterface.LogLevel.DEBUG, LoggerInterface.LogType.IPINFO, "Fetching IP address information for %s", ip);
         applyRateLimit();
-        if (s_cache.get(ip) != null) // check cache again in case a different thread got the answer during the rate limit check
-            return s_cache.get(ip);
+        if (sCache.get(ip) != null) // check cache again in case a different thread got the answer during the rate limit check
+            return sCache.get(ip);
 
         final String urlTemplate = "https://extreme-ip-lookup.com/json/##IP##?key=##API_KEY##";
 
         final String url = urlTemplate
                 .replace("##IP##", ip)
-                .replace("##API_KEY##", m_APIkey);
+                .replace("##API_KEY##", mAPIkey);
 
         try
         {
@@ -86,7 +90,7 @@ public final class ExtremeIPAPI implements IPLookupInterface
                     setRegion(result.getRegion()).
                     setLatitude(result.getLat()).
                     setLongitude(result.getLon());
-            s_cache.put(ip, info);
+            sCache.put(ip, info);
             logger.log(LoggerInterface.LogLevel.INFO, LoggerInterface.LogType.IPINFO, "IP location for %s is %s", ip, info.toString());
             return info;
         }

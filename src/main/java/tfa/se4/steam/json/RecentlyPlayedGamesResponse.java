@@ -18,7 +18,7 @@ public class RecentlyPlayedGamesResponse {
     @JsonProperty("response")
     private RecentlyPlayedGameResponse response;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("response")
     public RecentlyPlayedGameResponse getResponse() {

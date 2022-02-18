@@ -19,7 +19,7 @@ public class PlayerSummaryResponse {
     @JsonProperty("players")
     private List<PlayerSummaryInfo> players = null;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("players")
     public List<PlayerSummaryInfo> getPlayers() {

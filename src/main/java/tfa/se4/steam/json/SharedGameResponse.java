@@ -18,7 +18,7 @@ public class SharedGameResponse
     @JsonProperty("lender_steamid")
     private String lenderSteamid;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("lender_steamid")
     public String getLenderSteamid()

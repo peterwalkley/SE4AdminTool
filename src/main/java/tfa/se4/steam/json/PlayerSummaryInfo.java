@@ -72,7 +72,7 @@ public class PlayerSummaryInfo {
     @JsonProperty("loccountrycode")
     private String loccountrycode;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("steamid")
     public String getSteamid() {
