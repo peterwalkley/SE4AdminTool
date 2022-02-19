@@ -7,9 +7,6 @@ import tfa.se4.SEAdminServerConnection;
 import tfa.se4.Utils;
 import tfa.se4.json.ServerStatus;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 @WebSocket
@@ -27,12 +24,12 @@ public class MonitoredServerConnection extends SEAdminServerConnection
     {
         super(options);
         model = new GameModel();
-        if (!isSteamSupported())
+        if (isSteamNotAvailable())
         {
             log(LogLevel.INFO, LogType.STEAM, "Steam access is disabled. No automatic ban checks will be performed.");
         }
 
-        if (!ipLookupSupported())
+        if (ipLookupNotAvailable())
         {
             log(LogLevel.INFO, LogType.IPINFO, "IP address checking is disabled. No location lookups will be performed.");
         }
@@ -122,9 +119,9 @@ public class MonitoredServerConnection extends SEAdminServerConnection
      *
      * @return Whether IP stack is in use.
      */
-    public boolean ipLookupSupported()
+    public boolean ipLookupNotAvailable()
     {
-        return getIPLookup() != null;
+        return getIPLookup() == null;
 
     }
 
@@ -133,9 +130,9 @@ public class MonitoredServerConnection extends SEAdminServerConnection
      *
      * @return Whether steam is in use
      */
-    public boolean isSteamSupported()
+    public boolean isSteamNotAvailable()
     {
-        return getSteamAPI() != null;
+        return getSteamAPI() == null;
     }
 
     /**

@@ -5,15 +5,12 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 import javafx.beans.binding.Bindings;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.util.Callback;
 
 import org.apache.commons.lang3.StringUtils;
 import tfa.se4.KickBanReasons;
@@ -141,14 +138,14 @@ public class ServerPaneController implements Initializable
         kills.setCellValueFactory(new PropertyValueFactory<>("kills"));
         assists.setCellValueFactory(new PropertyValueFactory<>("assists"));
         longestShot.setCellValueFactory(new PropertyValueFactory<>("longestShot"));
-        longestShot.setCellFactory(new ColumnFormatter<Player, Double>(new DecimalFormat("0.00")));
+        longestShot.setCellFactory(new ColumnFormatter<>(new DecimalFormat("0.00")));
         playedHours.setCellValueFactory(new PropertyValueFactory<>("playhours"));
         location.setCellValueFactory(new PropertyValueFactory<>("location"));
-        if (!mConnection.ipLookupSupported())
+        if (mConnection.ipLookupNotAvailable())
         {
             location.setVisible(false);
         }
-        if (!mConnection.isSteamSupported())
+        if (mConnection.isSteamNotAvailable())
         {
             playedHours.setVisible(false);
         }
@@ -156,136 +153,94 @@ public class ServerPaneController implements Initializable
         playersTable.setItems(mConnection.getModel().getPlayers());
 
         playersTable.setRowFactory(
-                new Callback<TableView<Player>, TableRow<Player>>()
-                {
-                    @Override
-                    public TableRow<Player> call(TableView<Player> tableView)
-                    {
-                        final TableRow<Player> row = new TableRow<>();
-                        final ContextMenu rowMenu = new ContextMenu();
-                        MenuItem profileItem = new MenuItem("Profile ...");
-                        profileItem.setOnAction(event -> SE4AdminGUI.showDocument("https://steamcommunity.com/profiles/" + row.getItem().getSteamId()));
-                        MenuItem kickItem = new MenuItem("Kick ...");
-                        kickItem.setOnAction(new EventHandler<ActionEvent>()
-                        {
-                            @Override
-                            public void handle(ActionEvent event)
-                            {
-                                final Player toKick = row.getItem();
-                                final List<String> reasons = mReasons.getReasons();
-                                ChoiceDialog<String> dialog = new ChoiceDialog<>(reasons.get(0), reasons);
-                                dialog.setTitle("Kick " + toKick.getName());
-                                dialog.setHeaderText("Select reason for kicking " + toKick.getName());
-                                dialog.setContentText("Reason:");
-                                if (SE4AdminGUI.isDarkTheme())
-                                    dialog.getDialogPane().getStylesheets().add("dark-theme.css");
+                tableView -> {
+                    final TableRow<Player> row = new TableRow<>();
+                    final ContextMenu rowMenu = new ContextMenu();
+                    MenuItem profileItem = new MenuItem("Profile ...");
+                    profileItem.setOnAction(event -> SE4AdminGUI.showDocument("https://steamcommunity.com/profiles/" + row.getItem().getSteamId()));
+                    MenuItem kickItem = new MenuItem("Kick ...");
+                    kickItem.setOnAction(event -> {
+                        final Player toKick = row.getItem();
+                        final List<String> reasons = mReasons.getReasons();
+                        ChoiceDialog<String> dialog = new ChoiceDialog<>(reasons.get(0), reasons);
+                        dialog.setTitle("Kick " + toKick.getName());
+                        dialog.setHeaderText("Select reason for kicking " + toKick.getName());
+                        dialog.setContentText("Reason:");
+                        if (SE4AdminGUI.isDarkTheme())
+                            dialog.getDialogPane().getStylesheets().add("dark-theme.css");
 
-                                Optional<String> result = dialog.showAndWait();
-                                result.ifPresent(r -> mConnection.kickPlayer(toKick, r));
-                            }
-                        });
-                        MenuItem banItem = new MenuItem("Ban ...");
-                        banItem.setOnAction(new EventHandler<ActionEvent>()
-                        {
-                            @Override
-                            public void handle(ActionEvent event)
-                            {
-                                final Player toBan = row.getItem();
-                                final List<String> reasons = mReasons.getReasons();
-                                ChoiceDialog<String> dialog = new ChoiceDialog<>(reasons.get(0), reasons);
-                                dialog.setTitle("Ban " + toBan.getName());
-                                dialog.setHeaderText("Select reason for banning " + toBan.getName());
-                                dialog.setContentText("Reason:");
-                                if (SE4AdminGUI.isDarkTheme())
-                                    dialog.getDialogPane().getStylesheets().add("dark-theme.css");
+                        Optional<String> result = dialog.showAndWait();
+                        result.ifPresent(r -> mConnection.kickPlayer(toKick, r));
+                    });
+                    MenuItem banItem = new MenuItem("Ban ...");
+                    banItem.setOnAction(event -> {
+                        final Player toBan = row.getItem();
+                        final List<String> reasons = mReasons.getReasons();
+                        ChoiceDialog<String> dialog = new ChoiceDialog<>(reasons.get(0), reasons);
+                        dialog.setTitle("Ban " + toBan.getName());
+                        dialog.setHeaderText("Select reason for banning " + toBan.getName());
+                        dialog.setContentText("Reason:");
+                        if (SE4AdminGUI.isDarkTheme())
+                            dialog.getDialogPane().getStylesheets().add("dark-theme.css");
 
-                                Optional<String> result = dialog.showAndWait();
-                                result.ifPresent(r -> mConnection.banPlayer(toBan, r));
-                            }
-                        });
-                        MenuItem copyNameItem = new MenuItem("Copy name ...");
-                        copyNameItem.setOnAction(new EventHandler<ActionEvent>()
-                        {
-                            @Override
-                            public void handle(ActionEvent event)
-                            {
-                                final Clipboard clipboard = Clipboard.getSystemClipboard();
-                                final ClipboardContent content = new ClipboardContent();
-                                content.putString(row.getItem().getName());
-                                clipboard.setContent(content);
-                            }
-                        });
-                        MenuItem copySteamIDItem = new MenuItem("Copy steam ID ...");
-                        copySteamIDItem.setOnAction(new EventHandler<ActionEvent>()
-                        {
-                            @Override
-                            public void handle(ActionEvent event)
-                            {
-                                final Clipboard clipboard = Clipboard.getSystemClipboard();
-                                final ClipboardContent content = new ClipboardContent();
-                                content.putString(row.getItem().getSteamId());
-                                clipboard.setContent(content);
-                            }
-                        });
-                        rowMenu.getItems().addAll(profileItem, kickItem, banItem, copyNameItem, copySteamIDItem);
+                        Optional<String> result = dialog.showAndWait();
+                        result.ifPresent(r -> mConnection.banPlayer(toBan, r));
+                    });
+                    MenuItem copyNameItem = new MenuItem("Copy name ...");
+                    copyNameItem.setOnAction(event -> {
+                        final Clipboard clipboard = Clipboard.getSystemClipboard();
+                        final ClipboardContent content = new ClipboardContent();
+                        content.putString(row.getItem().getName());
+                        clipboard.setContent(content);
+                    });
+                    MenuItem copySteamIDItem = new MenuItem("Copy steam ID ...");
+                    copySteamIDItem.setOnAction(event -> {
+                        final Clipboard clipboard = Clipboard.getSystemClipboard();
+                        final ClipboardContent content = new ClipboardContent();
+                        content.putString(row.getItem().getSteamId());
+                        clipboard.setContent(content);
+                    });
+                    rowMenu.getItems().addAll(profileItem, kickItem, banItem, copyNameItem, copySteamIDItem);
 
-                        // only display context menu for non-null items:
-                        row.contextMenuProperty().bind(
-                                Bindings.when(Bindings.isNotNull(row.itemProperty()))
-                                        .then(rowMenu)
-                                        .otherwise((ContextMenu) null));
-                        return row;
-                    }
+                    // only display context menu for non-null items:
+                    row.contextMenuProperty().bind(
+                            Bindings.when(Bindings.isNotNull(row.itemProperty()))
+                                    .then(rowMenu)
+                                    .otherwise((ContextMenu) null));
+                    return row;
                 });
 
         // log pane
         final ContextMenu logMenu = new ContextMenu();
         MenuItem copyAllItem = new MenuItem("Copy ALL to clipboard ...");
-        copyAllItem.setOnAction(new EventHandler<ActionEvent>()
-        {
-            @Override
-            public void handle(ActionEvent event)
+        copyAllItem.setOnAction(event -> {
+            final Clipboard clipboard = Clipboard.getSystemClipboard();
+            final ClipboardContent content = new ClipboardContent();
+            final StringBuilder sb = new StringBuilder(4096);
+            mConnection.getModel().getRawLogLines().forEach(line ->
             {
-                final Clipboard clipboard = Clipboard.getSystemClipboard();
-                final ClipboardContent content = new ClipboardContent();
-                final StringBuilder sb = new StringBuilder(4096);
-                mConnection.getModel().getRawLogLines().forEach(line ->
-                {
-                    sb.append(line);
-                    sb.append('\n');
-                });
-                content.putString(sb.toString());
-                clipboard.setContent(content);
-            }
+                sb.append(line);
+                sb.append('\n');
+            });
+            content.putString(sb.toString());
+            clipboard.setContent(content);
         });
         MenuItem copySelectedItem = new MenuItem("Copy selected to clipboard ...");
-        copySelectedItem.setOnAction(new EventHandler<ActionEvent>()
-        {
-            @Override
-            public void handle(ActionEvent event)
+        copySelectedItem.setOnAction(event -> {
+            final Clipboard clipboard = Clipboard.getSystemClipboard();
+            final ClipboardContent content = new ClipboardContent();
+            final StringBuilder sb = new StringBuilder(4096);
+            logList.getSelectionModel().getSelectedItems().forEach(line ->
             {
-                final Clipboard clipboard = Clipboard.getSystemClipboard();
-                final ClipboardContent content = new ClipboardContent();
-                final StringBuilder sb = new StringBuilder(4096);
-                logList.getSelectionModel().getSelectedItems().forEach(line ->
-                {
-                    sb.append(line);
-                    sb.append('\n');
-                });
-                content.putString(sb.toString());
-                clipboard.setContent(content);
-            }
+                sb.append(line);
+                sb.append('\n');
+            });
+            content.putString(sb.toString());
+            clipboard.setContent(content);
         });
         copySelectedItem.disableProperty().bind(logList.getSelectionModel().selectedItemProperty().isNull());
         MenuItem clearItem = new MenuItem("Clear log");
-        clearItem.setOnAction(new EventHandler<ActionEvent>()
-        {
-            @Override
-            public void handle(ActionEvent event)
-            {
-                mConnection.getModel().clearLog();
-            }
-        });
+        clearItem.setOnAction(event -> mConnection.getModel().clearLog());
         logMenu.getItems().addAll(copyAllItem, copySelectedItem, clearItem);
         logList.setItems(mConnection.getModel().getLogLines());
         logList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -311,14 +266,7 @@ public class ServerPaneController implements Initializable
             }
 
             MenuItem item = new MenuItem(itemName);
-            item.setOnAction(new EventHandler<ActionEvent>()
-            {
-                @Override
-                public void handle(ActionEvent event)
-                {
-                    insertCommand(command);
-                }
-            });
+            item.setOnAction(event -> insertCommand(command));
 
             if (parentName == null)
             {

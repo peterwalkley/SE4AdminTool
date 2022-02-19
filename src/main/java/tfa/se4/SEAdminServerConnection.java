@@ -1,13 +1,10 @@
 package tfa.se4;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.text.MessageFormat;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -595,18 +592,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
                 p.setGamePlaySeconds((gameEndTime - start) / 1000L);
             }
 
-            if (mIpLookup != null)
-            {
-                final IPInformation ipInfo = mIpLookup.getIPAddressInformation(p.getIPv4(), this, false);
-                if (ipInfo != null)
-                {
-                    p.setAdditionalProperty("Latitude", ipInfo.getLatitude());
-                    p.setAdditionalProperty("Longitude", ipInfo.getLongitude());
-                    p.setAdditionalProperty("City", ipInfo.getCity());
-                    p.setAdditionalProperty("Region", ipInfo.getRegion());
-                    p.setAdditionalProperty("Country", ipInfo.getCountry());
-                }
-            }
+            setIPInformation(p);
         }
         final String postBody = JSONUtils.marshalServerStatus(status, this);
         log(LogLevel.INFO, LogType.GAME_ENDED, postBody);
@@ -634,6 +620,14 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         p.setScore(null);
         p.setAdditionalProperty("ConnectionTimeSeconds", joinedSecs);
         p.setAdditionalProperty("Host", mServerStatus.getServer().getHost());
+
+        setIPInformation(p);
+        final String postBody = JSONUtils.marshalPlayer(p, this);
+        log(LogLevel.INFO, LogType.LEAVE, postBody);
+    }
+
+    private void setIPInformation(final Player p)
+    {
         if (mIpLookup != null)
         {
             final IPInformation ipInfo = mIpLookup.getIPAddressInformation(p.getIPv4(), this, false);
@@ -646,10 +640,8 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
                 p.setAdditionalProperty("Country", ipInfo.getCountry());
             }
         }
-        final String postBody = JSONUtils.marshalPlayer(p, this);
-        log(LogLevel.INFO, LogType.LEAVE, postBody);
-    }
 
+    }
     /**
      * Status update handler for inherited classes to over-ride.
      *
@@ -683,7 +675,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         }
         catch (final IOException ex)
         {
-            ex.printStackTrace();
+            log(LogLevel.TRACE, LogType.SYSTEM, ex, ex.getLocalizedMessage());
         }
     }
 
@@ -704,7 +696,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         }
         catch (final IOException ex)
         {
-            ex.printStackTrace();
+            log(LogLevel.TRACE, LogType.SYSTEM, ex, ex.getLocalizedMessage());
         }
     }
 
@@ -855,10 +847,10 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     @OnWebSocketError
     public void onError(Throwable cause)
     {
-        if (cause instanceof java.net.ConnectException ||           // Remote connection died or server was killed.
-                cause instanceof java.net.SocketTimeoutException ||     // timeout connecting
-                cause instanceof java.io.IOException                    // Broken pipe
-        )
+        // Remote connection died or server was killed.
+        // timeout connecting
+        // Broken pipe
+        if (cause instanceof IOException)
         {
             log(LogLevel.INFO, LogType.SYSTEM, "WebSocket error handled as connection death");
         }
@@ -927,15 +919,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
             System.out.println("Kicking of VAC or Game banned player, managing closed profiles and limiting play hours requires a steam API key for checks to be performed. These features will be disabled.  Please update your configuration."); //NOSONAR
         }
         final SEAdminServerConnection socket = new SEAdminServerConnection(opts);
-        try
-        {
-            // wait for closed socket connection.
-            socket.awaitClose();
-        }
-        finally
-        {
-            // nothing
-        }
+        socket.awaitClose();
     }
 
 }
