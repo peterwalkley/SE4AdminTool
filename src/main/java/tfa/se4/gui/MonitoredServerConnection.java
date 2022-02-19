@@ -39,9 +39,13 @@ public class MonitoredServerConnection extends SEAdminServerConnection
     public void setServerStatus(ServerStatus status)
     {
         super.setServerStatus(status);
+        if (status == null) {
+            model.setTimeLeft(null);
+            return;
+        }
 
         Platform.runLater(() -> {
-            if (status != null && status.getGameData() != null && status.getGameData().getCurrentMap() != null)
+            if (status.getGameData() != null && status.getGameData().getCurrentMap() != null)
             {
                 model.setMap(status.getGameData().getCurrentMap().getName());
                 model.setMode(status.getGameData().getCurrentMap().getMode());
@@ -49,7 +53,7 @@ public class MonitoredServerConnection extends SEAdminServerConnection
                 model.setTimeLimit(status.getGameData().getCurrentMap().getTimeLimit().toString());
             }
 
-            if (status != null && status.getLobby() != null)
+            if (status.getLobby() != null)
             {
                 model.setState(status.getLobby().getState());
                 model.setMaxPlayers(status.getLobby().getMaxPlayers().toString());
@@ -65,13 +69,13 @@ public class MonitoredServerConnection extends SEAdminServerConnection
                 model.setPlayers(status.getLobby().getPlayers());
             }
 
-            if (status != null && status.getServer() != null)
+            if (status.getServer() != null)
             {
                 model.setServerName(status.getServer().getName());
                 model.setServerHost(status.getServer().getHost());
             }
 
-            if (getGameStartTime() == 0 || status == null)
+            if (getGameStartTime() == 0)
             {
                 model.setTimeLeft(null);
             }

@@ -44,7 +44,7 @@ public final class KickBanReasons implements Runnable
         new Thread(this).start();
     }
 
-    @SuppressWarnings({"InfiniteLoopStatement", "BusyWait"})
+    @SuppressWarnings({"InfiniteLoopStatement"})
     @Override
     public void run()
     {

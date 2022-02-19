@@ -98,7 +98,6 @@ public class ServerPaneController implements Initializable
     private Button sendButton;
 
     private final MonitoredServerConnection mConnection;
-    private KickBanReasons mReasons;
 
     public ServerPaneController(final MonitoredServerConnection connection)
     {
@@ -114,7 +113,7 @@ public class ServerPaneController implements Initializable
     @Override
     public void initialize(URL loc, ResourceBundle resources)
     {
-        mReasons = new KickBanReasons(mConnection);
+        final KickBanReasons kickBanReasons = new KickBanReasons(mConnection);
         statusLabel.textProperty().bind(mConnection.getModel().stateProperty());
         mapLabel.textProperty().bind(mConnection.getModel().mapProperty());
         modeLabel.textProperty().bind(mConnection.getModel().modeProperty());
@@ -161,7 +160,7 @@ public class ServerPaneController implements Initializable
                     MenuItem kickItem = new MenuItem("Kick ...");
                     kickItem.setOnAction(event -> {
                         final Player toKick = row.getItem();
-                        final List<String> reasons = mReasons.getReasons();
+                        final List<String> reasons = kickBanReasons.getReasons();
                         ChoiceDialog<String> dialog = new ChoiceDialog<>(reasons.get(0), reasons);
                         dialog.setTitle("Kick " + toKick.getName());
                         dialog.setHeaderText("Select reason for kicking " + toKick.getName());
@@ -175,7 +174,7 @@ public class ServerPaneController implements Initializable
                     MenuItem banItem = new MenuItem("Ban ...");
                     banItem.setOnAction(event -> {
                         final Player toBan = row.getItem();
-                        final List<String> reasons = mReasons.getReasons();
+                        final List<String> reasons = kickBanReasons.getReasons();
                         ChoiceDialog<String> dialog = new ChoiceDialog<>(reasons.get(0), reasons);
                         dialog.setTitle("Ban " + toBan.getName());
                         dialog.setHeaderText("Select reason for banning " + toBan.getName());
@@ -210,7 +209,15 @@ public class ServerPaneController implements Initializable
                     return row;
                 });
 
-        // log pane
+        initializeLogWindow();
+        initializeCommandsWindow();
+    }
+
+    /**
+     * Initialize the log window section with pop-up menu, clear button, coloured text and auto-scroll
+     */
+    private void initializeLogWindow()
+    {
         final ContextMenu logMenu = new ContextMenu();
         MenuItem copyAllItem = new MenuItem("Copy ALL to clipboard ...");
         copyAllItem.setOnAction(event -> {
@@ -246,8 +253,12 @@ public class ServerPaneController implements Initializable
         logList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         logList.setContextMenu(logMenu);
         logList.setCellFactory(param -> new ColouredCell(mConnection));
-
-        // command window section
+    }
+    /**
+     * Initialise send command text box and button
+     */
+    private void initializeCommandsWindow()
+    {
         final ContextMenu commandsMenu = new ContextMenu();
         final Map<String, Menu> childMenus = new HashMap<>();
         S_COMMANDS.forEach(command -> {
@@ -305,6 +316,9 @@ public class ServerPaneController implements Initializable
         commandText.positionCaret(command.length());
     }
 
+    /**
+     * Send message command used by fxml file.
+     */
     public void sendMessage()
     {
         if (StringUtils.isNotBlank(commandText.getText()))
