@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -107,7 +108,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
                     future.get(5000, TimeUnit.SECONDS);
                     mClient = client;
                 }
-                catch (final Exception ex)
+                catch (final Exception ex) //NOSONAR ignore whinge about InterruptedException
                 {
                     log(LogLevel.INFO, LogType.SYSTEM, "Connect failed. Retrying in " + mRetryTimeoutSecs + " seconds.");
                     log(LogLevel.TRACE, LogType.SYSTEM, ex, "Connection error");
@@ -382,7 +383,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     {
         new Thread(() -> {
             // Make the kick public
-            serverSay("KICKING " + p.getName() + " for " + reason);
+            serverSay(MessageFormat.format("KICKING {0} for {1}", p.getName(), reason));
 
             // Delay 5 seconds
             Utils.sleep(5000);
@@ -412,8 +413,8 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
 
             // Make the ban public
             final String msg = banAdded ?
-                    "BANNING " + p.getName() + " for " + reason :
-                    "KICKING banned player " + p.getName() + " for " + reason ;
+                    MessageFormat.format("BANNING {0} for {1}", p.getName(), reason) :
+                    MessageFormat.format("KICKING banned player {0} for {1}", p.getName(), reason);
             serverSay(msg);
 
             // Delay 5 seconds
@@ -872,38 +873,18 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
     @Override
     public void log(LogLevel level, LogType type, String message, Object... args)
     {
-
         log(level, type, null, message, args);
     }
 
     @Override
     public void log(LogLevel level, LogType type, Throwable t, String message, Object... args)
     {
-
         if (isFilterMessage(level))
         {
             return;
         }
 
-        final StringBuilder sb = new StringBuilder(128);
-        sb.append(Instant.now().toString());
-        sb.append('|');
-        sb.append(level.label);
-        sb.append('|');
-        sb.append(type.label);
-        sb.append('|');
-        sb.append(args == null ? message : String.format(message, args));
-
-        if (t != null)
-        {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            t.printStackTrace(pw);
-            sb.append('\n');
-            sb.append(sw);
-        }
-
-        System.out.println(sb); //NOSONAR
+        System.out.println(Utils.formatLogMessage(level, type, t, message, args)); //NOSONAR
     }
 
     /**

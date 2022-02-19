@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import tfa.se4.Options;
 import tfa.se4.SEAdminServerConnection;
+import tfa.se4.Utils;
 import tfa.se4.json.ServerStatus;
 
 import java.io.PrintWriter;
@@ -100,25 +101,7 @@ public class MonitoredServerConnection extends SEAdminServerConnection
             return;
         }
 
-        final StringBuilder sb = new StringBuilder(128);
-        sb.append(Instant.now().toString());
-        sb.append('|');
-        sb.append(level.label);
-        sb.append('|');
-        sb.append(type.label);
-        sb.append('|');
-        sb.append(args == null ? message : String.format(message, args));
-
-        if (t != null)
-        {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            t.printStackTrace(pw);
-            sb.append('\n');
-            sb.append(sw);
-        }
-
-        Platform.runLater(() -> model.addLogLine(sb.toString()));
+        Platform.runLater(() -> model.addLogLine(Utils.formatLogMessage(level, type, t, message, args)));
     }
 
     @Override
