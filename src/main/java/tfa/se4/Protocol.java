@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public final class Protocol
 {
-    private static MessageDigest SHA1 = null; //NOSONAR ignoring static name convetion here
+    private static MessageDigest SHA1 = null; //NOSONAR ignoring static name convention here
 
     private static final byte[] EMPTY = new byte[]{};
 
@@ -162,7 +162,6 @@ public final class Protocol
      */
     public static byte[] getSaltValue(final ByteBuffer buf)
     {
-        //TODO: check version and protocol
         final byte[] salt = new byte[buf.array().length - 8];
         buf.position(8);
         buf.get(salt, 0, salt.length);

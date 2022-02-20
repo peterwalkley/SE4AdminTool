@@ -711,9 +711,15 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         switch (messageId)
         {
             case Protocol.REPLY_INIT:
-                log(LogLevel.INFO, LogType.SYSTEM, "Authenticating");
-                final byte[] salt = Protocol.getSaltValue(content);
-                sendMessage(Protocol.REQUEST_SEND_PWD, Protocol.buildSaltedPassword(salt, mOptions.getPassword()));
+                if (content.get(0) == 0 && Protocol.getUInt32(content, 4) == -2061645531) {
+                    log(LogLevel.INFO, LogType.SYSTEM, "Authenticating");
+                    final byte[] salt = Protocol.getSaltValue(content);
+                    sendMessage(Protocol.REQUEST_SEND_PWD, Protocol.buildSaltedPassword(salt, mOptions.getPassword()));
+                }
+                else {
+                    log(LogLevel.INFO, LogType.SYSTEM, "Protocol or game version mismatch. Please ensure you are connecting to a Sniper Elite 4 server.");
+                    closeConnection();
+                }
                 break;
 
             case Protocol.REPLY_CONNECTION_SUCCESS_1:
