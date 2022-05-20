@@ -711,7 +711,7 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         switch (messageId)
         {
             case Protocol.REPLY_INIT:
-                if (content.get(0) == 0 && Protocol.getUInt32(content, 4) == -2061645531) {
+                if (content.get(0) == 0 && Protocol.getUInt32(content, 4) == 2233321765L) {
                     log(LogLevel.INFO, LogType.SYSTEM, "Authenticating");
                     final byte[] salt = Protocol.getSaltValue(content);
                     sendMessage(Protocol.REQUEST_SEND_PWD, Protocol.buildSaltedPassword(salt, mOptions.getPassword()));

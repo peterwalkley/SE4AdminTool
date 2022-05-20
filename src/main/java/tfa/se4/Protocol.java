@@ -254,11 +254,11 @@ public final class Protocol
     public static long getUInt32(final ByteBuffer buf, int offset)
     {
         byte[] bytes = buf.array();
-        return
+        return 0xffffffffL & (
                 ((bytes[offset + 0] & 0xFF) << 0) | //NOSONAR ignore useless shift
                 ((bytes[offset + 1] & 0xFF) << 8) |
                 ((bytes[offset + 2] & 0xFF) << 16) |
-                ((bytes[offset + 3] & 0xFF) << 24);
+                ((bytes[offset + 3] & 0xFF) << 24));
     }
 
     /**
