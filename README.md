@@ -78,7 +78,9 @@ Server administrators should join the steam group <https://steamcommunity.com/gr
 covers a range of topics related to running servers, not just this tool.
 
 I will also accept friend requests
-via my steam profile <https://steamcommunity.com/profiles/76561198022231968/> unless you have a VAC ban.
+via my steam profile <https://steamcommunity.com/profiles/76561198022231968/> unless you have a VAC ban. Note that after
+several attempts to hijack my account via the 'vote for me' CSGO scam I will need to see you play the game. Please open your profile
+so I can verify.
 
 ## Known Issues
 - If the server is configured with a map rotation and also to allow map votes between games (`Lobby.AutoTriggerMapVote 1`)
