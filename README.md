@@ -24,8 +24,8 @@ specific players access to a server even if they have a steam VAC or game ban.
 
 ## Additional Features only on GUI Version
 - Player information display during a game including steam ID, score, kills, longest shot.
-- (Optional) See players' location (City, State, Country) based on IP address. This feature requires that you provide an API key
-from <https://extreme-ip-lookup.com/>. A free key will allow 10,000 lookups per month.
+- See players' location (City, State, Country) based on IP address. This feature uses a free IP address lookup courtesy of <https://ip-api.com>  
+  The tool restricts its use of lookup to avoid exceeding the free request limit.
 - Kick or Ban a player (right click on player name).
 - See players steam profile (right click on player name).
 - Send server commands using a free text input box. Commands list is also visible via right-click on the input box.
@@ -33,10 +33,10 @@ from <https://extreme-ip-lookup.com/>. A free key will allow 10,000 lookups per 
 
 ![Example Screenshot](images/screenshot.png)
 ## Installation
-A windows installer can be downloaded from <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.5/TFA.SE4.Administrator_1.5.exe>. 
+A windows installer can be downloaded from <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.6/TFA.SE4.Administrator_1.6.exe>. 
 This will install the GUI and a java runtime environment for the application.
 
-The zip file <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.5/TFA.SE4.Administrator-1.5.zip> is available as an alternative,
+The zip file <https://github.com/peterwalkley/SE4AdminTool/releases/download/1.6/TFA.SE4.Administrator-1.6.zip> is available as an alternative,
 download, unzip to a directory and run the exe within.
 
 Before using the application for the first time
@@ -86,6 +86,9 @@ then the server does not send the correct map name to the admin tool, but instea
   
 
 ## Changelog
+### 1.6 RELEASE
+- Remove support for <https://extreme-ip-lookup.com/> as their free IP address lookup is being withdrawn on 15h November 2025.
+  This feature is now provided by <https://ip-api.com> using their free service. An API key is no longer required. 
 ### 1.5 RELEASE
 - Remove all support for IPStack. It is causing more problems than I am prepared to support.
 - Changed the IP address checking to reduce delay on connecting to a server with several players already online. 

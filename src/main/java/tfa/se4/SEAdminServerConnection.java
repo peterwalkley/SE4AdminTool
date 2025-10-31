@@ -30,7 +30,7 @@ import tfa.se4.PlayerBanList.Ban;
 import tfa.se4.Protocol.ReplyMessage;
 import tfa.se4.iplookup.IPInformation;
 import tfa.se4.iplookup.IPLookupInterface;
-import tfa.se4.iplookup.extremeip.ExtremeIPAPI;
+import tfa.se4.iplookup.ipapi.IPAPI;
 import tfa.se4.json.JSONUtils;
 import tfa.se4.json.Player;
 import tfa.se4.json.ServerStatus;
@@ -73,16 +73,12 @@ public class SEAdminServerConnection implements LoggerInterface, Runnable
         mIpBans = new IPBanList(options.getIPBansFile(), this);
         mWhiteList = new PlayerWhiteList(options.getWhiteListFile(), this);
         mBanList = new PlayerBanList(options.getPlayerBansListFile(), this);
+        mIpLookup = new IPAPI();
         if (StringUtils.isNotBlank(options.getSteamAPIKey()))
         {
             mSteamAPI = new SteamAPI(options.getSteamAPIKey());
         }
 
-        if (StringUtils.isNotBlank(options.getExtremeIPAPIKey()))
-        {
-            this.log(LogLevel.INFO, LogType.IPINFO, "Initialising Extreme IP");
-            mIpLookup = new ExtremeIPAPI(options.getExtremeIPAPIKey());
-        }
         new Thread(this).start();
     }
 

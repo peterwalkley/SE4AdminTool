@@ -10,7 +10,7 @@ public class IPInformation {
     private String country;
     private String ipAddress;
 
-    public static final IPInformation create() {
+    public static IPInformation create() {
         return new IPInformation();
     }
     public String getLatitude() {
@@ -54,7 +54,7 @@ public class IPInformation {
     }
 
     public IPInformation setCountry(String country) {
-        if (StringUtils.isNotBlank(country)) // don't allow overwite of "N/A" with a blank
+        if (StringUtils.isNotBlank(country)) // don't allow overwrite of "N/A" with a blank
             this.country = country;
         return this;
     }

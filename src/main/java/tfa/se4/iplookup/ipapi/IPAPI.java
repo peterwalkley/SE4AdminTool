@@ -1,4 +1,4 @@
-package tfa.se4.iplookup.extremeip;
+package tfa.se4.iplookup.ipapi;
 
 import org.apache.http.client.fluent.Request;
 import tfa.se4.Utils;
@@ -11,15 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Holder class for anything we do to talk to Extreme IP.
+ * Holder class for anything we do to talk to IP API:  https://ip-api.com/
  */
-public final class ExtremeIPAPI implements IPLookupInterface
-{
+public class IPAPI implements IPLookupInterface {
     /** For rate limit. */
     private static long lastLookup = 0;
-
-    /** API key. */
-    private final String mAPIkey;
 
     /** Lookup cache to reduce hits to IP stack. */
     private static final Map<String, IPInformation> sCache = new HashMap<>();
@@ -27,21 +23,20 @@ public final class ExtremeIPAPI implements IPLookupInterface
     /**
      * Initialise and remember steam API key.
      *
-     * @param apiKey Steam API key.
      */
-    public ExtremeIPAPI(final String apiKey)
+    public IPAPI()
     {
-        mAPIkey = apiKey;
+        // Nothing needed
     }
 
     /**
-     * Ensure we don't try and do more than 20 requests per minute.
+     * Ensure we don't try and do more than 45 requests per minute.
      */
     private static void applyRateLimit() {
 
         long diff = System.currentTimeMillis() - lastLookup;
-        if (diff < 3500) {
-            Utils.sleep(3500 - diff);
+        if (diff < 1500) {
+            Utils.sleep(1500 - diff);
         }
         lastLookup = System.currentTimeMillis();
     }
@@ -63,28 +58,28 @@ public final class ExtremeIPAPI implements IPLookupInterface
         if (sCache.get(ip) != null) // check cache again in case a different thread got the answer during the rate limit check
             return sCache.get(ip);
 
-        final String urlTemplate = "https://extreme-ip-lookup.com/json/##IP##?key=##API_KEY##";
+        final String urlTemplate = "http://ip-api.com/json/##IP##";
 
-        final String url = urlTemplate
-                .replace("##IP##", ip)
-                .replace("##API_KEY##", mAPIkey);
+        final String url = urlTemplate.replace("##IP##", ip);
 
         try
         {
-            final ExtremeIPResponse result = JSONUtils.unMarshalServerStatus(
+            final IPAPIResponse result = JSONUtils.unMarshalServerStatus(
                     Request.Get(url).connectTimeout(2000).socketTimeout(2000).execute().returnContent().asString(), logger);
 
-            final IPInformation info = IPInformation.
-                    create().
-                    setIpAddress(ip).
-                    setCity(result.getCity()).
-                    setCountry(result.getCountry()).
-                    setRegion(result.getRegion()).
-                    setLatitude(result.getLat()).
-                    setLongitude(result.getLon());
-            sCache.put(ip, info);
-            logger.log(LoggerInterface.LogLevel.INFO, LoggerInterface.LogType.IPINFO, "IP location for %s is %s", ip, info.toString());
-            return info;
+            if (result != null && "success".equals(result.getStatus())) {
+                final IPInformation info = IPInformation.
+                        create().
+                        setIpAddress(ip).
+                        setCity(result.getCity()).
+                        setCountry(result.getCountry()).
+                        setRegion(result.getRegion()).
+                        setLatitude(result.getLat()).
+                        setLongitude(result.getLon());
+                sCache.put(ip, info);
+                logger.log(LoggerInterface.LogLevel.INFO, LoggerInterface.LogType.IPINFO, "IP location for %s is %s", ip, info.toString());
+                return info;
+            }
         }
         catch (final IOException e)
         {

@@ -1,0 +1,9 @@
+/target/
+/.gradle/
+/.idea/
+*.iml
+*.xcf
+/.settings/
+.classpath
+.project
+

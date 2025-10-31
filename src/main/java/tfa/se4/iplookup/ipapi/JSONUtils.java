@@ -1,11 +1,10 @@
-package tfa.se4.iplookup.extremeip;
+package tfa.se4.iplookup.ipapi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import tfa.se4.logger.LoggerInterface;
 
-public final class JSONUtils
-{
+public class JSONUtils {
     /**
      * Object mapper.
      */
@@ -27,11 +26,11 @@ public final class JSONUtils
      * @param logger Logger for writing error information.
      * @return Object or null when fails to unmarshal.
      */
-    public static ExtremeIPResponse unMarshalServerStatus(final String json, final LoggerInterface logger)
+    public static IPAPIResponse unMarshalServerStatus(final String json, final LoggerInterface logger)
     {
         try
         {
-            return MAPPER.readValue(json, ExtremeIPResponse.class);
+            return MAPPER.readValue(json, IPAPIResponse.class);
         }
         catch (JsonProcessingException e)
         {

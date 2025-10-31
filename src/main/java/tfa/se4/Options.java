@@ -22,7 +22,6 @@ public class Options
     private final String mBansListFile;
     private final String mPlayerGreeting;
     private final String mSteamAPIKey;
-    private final String mExtremeIPAPIKey;
     private boolean mApplyVACBans;
     private boolean mApplyGameBans;
     private int mClosedProfilePolicy;
@@ -59,7 +58,6 @@ public class Options
         mApplyVACBans = Boolean.parseBoolean(props.getProperty("kick.vac.banned", "false").trim());
         mApplyGameBans = Boolean.parseBoolean(props.getProperty("kick.game.banned", "false").trim());
         mSteamAPIKey = props.getProperty("steam.api.key", "").trim();
-        mExtremeIPAPIKey = props.getProperty("extremeip.api.key", "").trim();
         mClosedProfilePolicy = getOptionalInt(props, "closed.profile.policy", 0, 0, 2);
         mClosedProfileMessage = props.getProperty("closed.profile.message", "Hello #PlayerName#, please open your steam profile to public.").trim();
         mPlayHoursLimit = getOptionalInt(props, "maximum.playhours", -1, 0, Integer.MAX_VALUE);
@@ -249,16 +247,6 @@ public class Options
     public String getSteamAPIKey()
     {
         return mSteamAPIKey;
-    }
-
-    /**
-     * Get Extreme IP API key.
-     *
-     * @return Key
-     */
-    public String getExtremeIPAPIKey()
-    {
-        return mExtremeIPAPIKey;
     }
 
     /**

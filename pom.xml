@@ -6,7 +6,7 @@
 
   <groupId>tfa</groupId>
   <artifactId>se4</artifactId>
-  <version>1.5</version>
+  <version>1.6</version>
 
   <name>TFA SE4 Administrator</name>
   <url>https://github.com/peterwalkley/SE4AdminTool</url>
@@ -59,6 +59,12 @@
         <artifactId>fluent-hc</artifactId>
         <version>4.5.14</version>
     </dependency>
+      <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>4.13.2</version>
+          <scope>test</scope>
+      </dependency>
   </dependencies>
 
   <build>
