@@ -3,8 +3,7 @@ pipeline {
 
     tools {
         maven "maven"
-        jdk "JDK_1.8"
-    }
+                    jdk "JDK_17"    }
     environment {
         SONAR_KEY = credentials('SNIPER_ELITE_ADMIN_SONAR_ID')
     }

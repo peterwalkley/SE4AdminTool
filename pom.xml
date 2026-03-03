@@ -14,8 +14,9 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <javafx.version>17.0.10</javafx.version>
   </properties>
 
   <dependencies>
@@ -65,6 +66,30 @@
           <version>4.13.2</version>
           <scope>test</scope>
       </dependency>
+      <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-controls</artifactId>
+          <version>${javafx.version}</version>
+          <classifier>win</classifier>
+      </dependency>
+      <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-fxml</artifactId>
+          <version>${javafx.version}</version>
+          <classifier>win</classifier>
+      </dependency>
+      <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-graphics</artifactId>
+          <version>${javafx.version}</version>
+          <classifier>win</classifier>
+      </dependency>
+      <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-base</artifactId>
+          <version>${javafx.version}</version>
+          <classifier>win</classifier>
+      </dependency>
   </dependencies>
 
   <build>
@@ -111,7 +136,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-shade-plugin</artifactId>
-          <version>3.2.4</version>
+          <version>3.5.2</version>
         </plugin>
         <plugin>
             <groupId>com.github.spotbugs</groupId>
@@ -158,13 +183,10 @@
 					</goals>
 					<configuration>
 						<transformers>
-							<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-							<manifestEntries>
-								<Main-Class>tfa.se4.SEAdminServerConnection</Main-Class>
-								<Build-Number>1.0</Build-Number>
-							</manifestEntries>
-							</transformer>
-						</transformers>
+                            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>tfa.se4.Launcher</mainClass>
+                            </transformer>
+                        </transformers>
 					</configuration>
 				</execution>
 			</executions>
@@ -206,7 +228,7 @@
                                     <mainClass>tfa.se4.gui.SE4AdminGUI</mainClass>
                                     <bundleJre>true</bundleJre>
                                     <customizedJre>false</customizedJre>
-                                    <jrePath>C:\jdk1.8.0_231\jre</jrePath>
+                                    <jrePath>F:\jdk-17\jre</jrePath> <!-- todo -->
                                     <copyDependencies>true</copyDependencies>
                                     <generateInstaller>true</generateInstaller>
                                     <createZipball>false</createZipball>
@@ -245,7 +267,7 @@
                                     <mainClass>tfa.se4.gui.SE4AdminGUI</mainClass>
                                     <bundleJre>true</bundleJre>
                                     <customizedJre>false</customizedJre>
-                                    <jrePath>C:\jdk1.8.0_231\jre</jrePath>
+                                    <jrePath>F:\jdk-17\jre</jrePath> <!-- todo -->
                                     <copyDependencies>true</copyDependencies>
                                     <generateInstaller>false</generateInstaller>
                                     <createZipball>true</createZipball>
